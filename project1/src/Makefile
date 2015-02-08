@@ -1,6 +1,7 @@
 all: parser
 
 OBJS = decafTokens.o decafParser.o main.o
+LIBS = -lpopt
 
 clean:
 	$(RM) -rf parser decafTokens.cpp decafParser.cpp decafParser.hpp decafParser.output $(OBJS)
@@ -21,4 +22,4 @@ parser: $(OBJS)
 	g++ -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
 
 test: parser example.d
-	cat example.d | ./parser
+	cat example.d | ./parser --target parse

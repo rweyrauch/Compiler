@@ -22,8 +22,10 @@ void yyerror(const char *s)
  
 %token IDENTIFIER INTEGER BOOLEAN CHARACTER STRING
 %token CEQ CNE CLT CLE CGT CGE EQUAL PLUSEQUAL MINUSEQUAL
-%token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA SEMI BANG DOT
+%token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA SEMI BANG
 %token PLUS MINUS MUL DIV MOD LOR LAND
+
+%right UNARY
 
 %start program
 
@@ -148,7 +150,7 @@ location
 	: ident
 	| ident LBRACKET expr RBRACKET
 	;
-
+    
 expr_list 
 	: expr
 	| expr_list COMMA expr
@@ -159,8 +161,8 @@ expr
 	| method_call
 	| literal
 	| expr bin_op expr
-	| unary_op expr
 	| LPAREN expr RPAREN
+	| unary_op expr  %prec UNARY
 	;
 
 callout_arg_list 
