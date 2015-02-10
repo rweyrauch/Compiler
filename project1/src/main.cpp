@@ -2,6 +2,8 @@
 #include <iostream>
 #include <string>
 #include <popt.h>
+#include "Parser.h"
+//#include "Scanner.h"
 
 char* g_target = 0;
 
@@ -12,8 +14,6 @@ poptOption appOptions[] =
     POPT_TABLEEND
 };
 
-extern int yyparse();
-extern int yylex();
 bool g_scan_only = false;
 
 int main(int argc, char **argv)
@@ -28,11 +28,16 @@ int main(int argc, char **argv)
 	if (std::string(g_target) == "scan")
     {
         g_scan_only = true;
-		yylex();
+		Scanner scanner;
+		while (scanner.lex())
+		{
+			std::cout << "Token: " << scanner.matched() << std::endl;
+		}
     }
 	else // "parse"
     {
-		yyparse();
+		Parser parser;
+		parser.parse();
 	}
 	return 0;
 }

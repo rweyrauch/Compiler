@@ -1,4 +1,6 @@
 
+%scanner Scanner.h
+
 %token RETURN CALLOUT
 %token BOOLTYPE INTTYPE CLASS VOID
 %token IF ELSE FOR CONTINUE BREAK

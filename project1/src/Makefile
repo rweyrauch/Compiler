@@ -1,20 +1,23 @@
 all: parser
 
-OBJS = decafTokens.o decafParser.o main.o
+CPPFLAGS = -std=c++11
+OBJS = parse.o lex.o main.o
 LIBS = -lpopt
 
 clean:
-	$(RM) -rf parser decafTokens.cpp decafParser.cpp decafParser.hpp decafParser.output $(OBJS)
+	$(RM) -rf parser Scanner.h Scannerbase.h Scanner.ih parse.cc lex.cc Parser.h Parserbase.h Parser.ih $(OBJS)
 
-decafParser.cpp: decaf.y
-	bison --defines --report=all --warnings=all --output=$@ $^
+parse.cc: decaf.g Scanner.h
+	bisonc++ --scanner=Scanner.h $^
 	
-decafParser.hpp: decafParser.cpp
+Parser.h: parse.cc
+Parserbase.h: parse.cc
+Parser.ih: parse.cc
 
-decafTokens.cpp: decaf.lex decafParser.hpp
-	flex -o $@ $^
+Scanner.h: decaf.lpp
+	flexc++ $^
 
-%.o: %.cpp
+%.o: %.cpp %.cc
 	g++ -c $(CPPFLAGS) -o $@ $<
 
 

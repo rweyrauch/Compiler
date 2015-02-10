@@ -1,0 +1,70 @@
+
+digit [0-9]
+xdigit [a-fA-F0-9]
+
+%%
+
+"//"[^\n]*						;	// comment
+
+"callout"                       { return (Parser::CALLOUT); }
+"return"				        { return (Parser::RETURN); }
+
+"boolean"						{ return (Parser::BOOLTYPE); }
+"int"							{ return (Parser::INTTYPE); }
+"class"							{ return (Parser::CLASS); }
+"void"							{ return (Parser::VOID); }
+
+"if"							{ return (Parser::IF); }
+"else"							{ return (Parser::ELSE); }
+
+"for"							{ return (Parser::FOR); }
+"break"							{ return (Parser::BREAK); }
+"continue"						{ return (Parser::CONTINUE); }
+
+false|true				        { return (Parser::BOOLEAN); }
+
+[a-zA-Z_][a-zA-Z0-9_]*  		{ return (Parser::IDENTIFIER); }
+0[xX]{xdigit}+					{ return (Parser::INTEGER); }
+{digit}+						{ return (Parser::INTEGER); }
+[0][xX]							{ }
+'(\\.|[^\'\"\n])'				{ return (Parser::CHARACTER); }
+\"(\\.|[^\\"\'\n])*\"	    	{ return (Parser::STRING); }
+
+"="						        { return (Parser::EQUAL); }
+"+="							{ return (Parser::PLUSEQUAL); }
+"-="							{ return (Parser::MINUSEQUAL); }
+
+"=="				          	{ return (Parser::CEQ); }
+"!="			          		{ return (Parser::CNE); }
+
+"||"							{ return (Parser::LOR); }
+"&&"							{ return (Parser::LAND); }
+
+"<"				          		{ return (Parser::CLT); }
+"<="	          				{ return (Parser::CLE); }
+">"				          		{ return (Parser::CGT); }
+">="					        { return (Parser::CGE); }
+
+"("	          					{ return (Parser::LPAREN); }
+")"					          	{ return (Parser::RPAREN); }
+"{"         					{ return (Parser::LBRACE); }
+"}"					          	{ return (Parser::RBRACE); }
+"["								{ return (Parser::LBRACKET); }
+"]"								{ return (Parser::RBRACKET); }
+
+","				          		{ return (Parser::COMMA); }
+"!"								{ return (Parser::BANG); }
+
+"+"				          		{ return (Parser::PLUS); }
+"-"		          				{ return (Parser::MINUS); }
+"*"		          				{ return (Parser::MUL); }
+"/"				          		{ return (Parser::DIV); }
+"%"							    { return (Parser::MOD); }
+
+";"								{ return (Parser::SEMI); }
+
+[ \t\v\f]					    {  } // white space
+\n								{  } // new line
+
+.                       		{  }
+
