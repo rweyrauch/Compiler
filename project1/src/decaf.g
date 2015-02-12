@@ -1,5 +1,6 @@
 
 %scanner Scanner.h
+%scanner-token-function scanner.lex()
 
 %token RETURN CALLOUT
 %token BOOLTYPE INTTYPE CLASS VOID
