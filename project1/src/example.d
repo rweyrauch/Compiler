@@ -6,13 +6,17 @@ class Program {
 	int array[5], bar[2], x;
 	boolean ok; int junk, more_junk[4];
 	
+	"This is a string.";
+	
 	int add(int a, int b) 
 	{
+		ok = true;
 		return a + b;
 	}
 	
 	int foo()
 	{
+		junk = -1;
 		return 0;
 	}
 	

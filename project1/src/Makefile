@@ -5,7 +5,7 @@ OBJS = parse.o lex.o main.o
 LIBS = -lpopt
 
 clean:
-	$(RM) -rf parser Scanner.h Scannerbase.h Scanner.ih parse.cc lex.cc Parser.h Parserbase.h Parser.ih $(OBJS)
+	$(RM) -rf parser Scannerbase.h parse.cc lex.cc Parserbase.h $(OBJS)
 
 parse.cc: decaf.g Scanner.h
 	bisonc++ --scanner=Scanner.h $^
@@ -14,14 +14,16 @@ Parser.h: parse.cc
 Parserbase.h: parse.cc
 Parser.ih: parse.cc
 
-Scanner.h: decaf.lpp
-	flexc++ $^
+lex.cc: decaf.lpp Scanner.ih Scanner.h
+	flexc++ --construction $^
+	
+Scannerbase.h: lex.cc
 
 %.o: %.cpp %.cc
 	g++ -c $(CPPFLAGS) -o $@ $<
 
 
-parser: $(OBJS)
+parser: $(OBJS) Scanner.h
 	g++ -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
 
 test: parser example.d

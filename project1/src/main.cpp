@@ -29,9 +29,29 @@ int main(int argc, char **argv)
     {
         g_scan_only = true;
 		Scanner scanner;
-		while (scanner.lex())
+        int token = 0;
+		while (token = scanner.lex())
 		{
-			std::cout << "Token: " << scanner.matched() << std::endl;
+			std::cout << scanner.lineNr() << " ";
+            switch (token)
+            {
+                case Parser::IDENTIFIER:
+                    std::cout << "IDENTIFIER ";
+                    break;
+                case Parser::INTEGER:
+                    std::cout << "INTLITERAL ";
+                    break;
+                case Parser::CHARACTER:
+                    std::cout << "CHARLITERAL ";  
+                    break;
+                case Parser::STRING:
+                    std::cout << "STRINGLITERAL ";
+                    break;
+                case Parser::BOOLEAN:
+                    std::cout << "BOOLEANLITERAL ";
+                    break;
+            }
+            std::cout << scanner.matched() << std::endl;
 		}
     }
 	else // "parse"

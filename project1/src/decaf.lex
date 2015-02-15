@@ -1,3 +1,27 @@
+%{
+#include <iostream>
+#include "decafParser.hpp"
+
+extern bool g_scan_only;
+
+#define PRINT_TOKEN std::cout << g_scanner_line_num << " " << yytext << std::endl;
+#define PRINT_IDENTIFIER std::cout << g_scanner_line_num << " IDENTIFIER " << yytext << std::endl;
+#define PRINT_INTLITERAL std::cout << g_scanner_line_num << " INTLITERAL " << yytext << std::endl;
+#define PRINT_STRINGLITERAL std::cout << g_scanner_line_num << " STRINGLITERAL " << yytext << std::endl;
+#define PRINT_CHARLITERAL std::cout << g_scanner_line_num << " CHARLITERAL " << yytext << std::endl;
+#define PRINT_BOOLITERAL std::cout << g_scanner_line_num << " BOOLEANLITERAL " << yytext << std::endl;
+#define PRINT_COMMENT std::cout << g_scanner_line_num << " COMMENT " << yytext << std::endl;
+#define ERROR std::cout << "Unknown token, \"" << yytext << "\", at column " << g_scanner_column_num << " on line " << g_scanner_line_num << std::endl;
+
+int g_scanner_line_num = 1;
+int g_scanner_column_num = 0;
+
+void track_column();
+ 
+%}
+
+%option noyywrap
+
 
 digit [0-9]
 xdigit [a-fA-F0-9]
@@ -28,7 +52,7 @@ false|true				        { track_column(); if (g_scan_only) PRINT_BOOLITERAL else r
 {digit}+						{ track_column(); if (g_scan_only) PRINT_INTLITERAL else return (INTEGER); }
 [0][xX]							{ track_column(); ERROR; }
 '(\\.|[^\'\"\n])'				{ track_column(); if (g_scan_only) PRINT_CHARLITERAL else return (CHARACTER); }
-\"(\\.|[^\\"\'\n])*\"	    	{ track_column(); if (g_scan_only) PRINT_STRINGLITERAL else return (STRING); }
+\"(\\.|[^\"\'\n])*\"	    	{ track_column(); if (g_scan_only) PRINT_STRINGLITERAL else return (STRING); }
 
 "="						        { track_column(); if (g_scan_only) PRINT_TOKEN else return (EQUAL); }
 "+="							{ track_column(); if (g_scan_only) PRINT_TOKEN else return (PLUSEQUAL); }
@@ -68,3 +92,20 @@ false|true				        { track_column(); if (g_scan_only) PRINT_BOOLITERAL else r
 
 .                       		{ ERROR; }
 
+%%
+
+void track_column()
+{
+	const int tab_width = 4;
+	int i;
+ 
+	for (i = 0; yytext[i] != '\0'; i++)
+	{
+		if (yytext[i] == '\n')
+			g_scanner_column_num = 0;
+		else if (yytext[i] == '\t')
+			g_scanner_column_num += tab_width - (g_scanner_column_num % tab_width);
+		else
+			g_scanner_column_num++;
+	}
+}
