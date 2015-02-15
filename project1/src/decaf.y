@@ -150,19 +150,59 @@ location
 	: ident
 	| ident LBRACKET expr RBRACKET
 	;
+	
+primary_expr
+    : ident
+    | literal
+	| LPAREN expr RPAREN
+    ;
+    
+unary_expr
+    : primary_expr
+    | unary_op unary_expr
+    ;
+  
+mult_expr
+    : unary_expr
+    | mult_expr MUL unary_expr
+    | mult_expr DIV unary_expr
+    | mult_expr MOD unary_expr
+    ;
+    
+add_expr
+    : mult_expr
+    | add_expr PLUS mult_expr
+    | add_expr MINUS mult_expr
+    ;
+
+rel_expr
+    : add_expr
+    | rel_expr rel_op add_expr
+    ;
+    
+equal_expr
+    : rel_expr
+    | equal_expr eq_op
+    ;
+
+logic_expr
+    : equal_expr
+    | logic_expr logic_op equal_expr
+    ;
+    
+assign_expr
+    : logic_expr
+    | assign_expr assign_op logic_expr
+    ;
+    
+expr 
+	: assign_expr
+	;
+
     
 expr_list 
 	: expr
 	| expr_list COMMA expr
-	;
-	
-expr 
-	: location
-	| method_call
-	| literal
-	| expr bin_op expr
-	| LPAREN expr RPAREN
-	| unary_op expr  %prec UNARY
 	;
 
 callout_arg_list 
@@ -174,26 +214,11 @@ callout_arg
 	: expr
 	| STRING
 	;
-		
-bin_op 
-	: arith_op
-	| rel_op
-	| eq_op
-	| cond_op
-	;
 	
 unary_op
 	: MINUS
 	| PLUS
 	| BANG
-	;
-	
-arith_op 
-	: PLUS
-	| MINUS
-	| MUL 
-	| DIV
-	| MOD
 	;
 
 rel_op 
@@ -208,7 +233,7 @@ eq_op
 	| CNE
 	;
 	
-cond_op 
+logic_op 
 	: LAND 
 	| LOR
 	;

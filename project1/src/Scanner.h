@@ -12,13 +12,15 @@ class Scanner: public ScannerBase
 {
     public:
         explicit Scanner(std::istream &in = std::cin,
-                                std::ostream &out = std::cout);
+                         std::ostream &out = std::cout);
 
         Scanner(std::string const &infile, std::string const &outfile);
         
         // $insert lexFunctionDecl
         int lex();
 
+        int columnNr() { return m_current_column; }
+        
     protected:
     
         int m_current_column;

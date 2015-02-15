@@ -8,7 +8,7 @@ clean:
 	$(RM) -rf parser Scannerbase.h parse.cc lex.cc Parserbase.h $(OBJS)
 
 parse.cc: decaf.g Scanner.h
-	bisonc++ --scanner=Scanner.h $^
+	bisonc++ --construction --scanner=Scanner.h $^
 	
 Parser.h: parse.cc
 Parserbase.h: parse.cc

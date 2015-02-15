@@ -6,7 +6,7 @@ class Program {
 	int array[5], bar[2], x;
 	boolean ok; int junk, more_junk[4];
 	
-	"This is a string.";
+	//"This is a string.";
 	
 	int add(int a, int b) 
 	{

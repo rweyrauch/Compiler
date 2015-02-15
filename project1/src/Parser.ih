@@ -8,7 +8,7 @@
 
 inline void Parser::error(char const *msg)
 {
-    std::cerr << msg << '\n';
+    std::cerr << msg << " at line " << d_scanner.lineNr() << ":" << d_scanner.columnNr() << ".  Unexpected token: " << d_scanner.matched() << std::endl;
 }
 
 // $insert lex
