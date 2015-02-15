@@ -203,7 +203,6 @@ callout_arg
 	
 unary_op
 	: MINUS
-	| PLUS
 	| BANG
 	;
 
