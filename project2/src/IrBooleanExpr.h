@@ -21,6 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+#pragma once
 #include "IrExpression.h"
 
 namespace Decaf
@@ -45,8 +46,7 @@ class IrBooleanExpression : public IrExpression
 {
 public:
     IrBooleanExpression(int lineNumber, int columnNumber, IrBooleanOperator boolOp) :
-        IrBase(lineNumber, columnNumber),
-        m_type(IrTypeBoolean),
+        IrExpression(lineNumber, columnNumber, IrTypeBoolean),
         m_operator(boolOp)
     {}
     

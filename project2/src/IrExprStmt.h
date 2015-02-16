@@ -29,14 +29,14 @@
 namespace Decaf
 {
 
-class IrAssignStatement : public IrStatement
+class IrExpressionStatement : public IrStatement
 {
 public:
-    IrAssignStatement(int lineNumber, int columnNumber) :
+    IrExpressionStatement(int lineNumber, int columnNumber) :
         IrStatement(lineNumber, columnNumber)
     {}
     
-    virtual ~IrAssignStatement()
+    virtual ~IrExpressionStatement()
     {}
     
     virtual void print() {}
@@ -44,8 +44,8 @@ public:
 protected:    
     
 private:
-    IrAssignStatement() = delete;
-    IrAssignStatement(const IrAssignStatement& rhs) = delete;
+    IrExpressionStatement() = delete;
+    IrExpressionStatement(const IrExpressionStatement& rhs) = delete;
 };
 
 } // namespace Decaf

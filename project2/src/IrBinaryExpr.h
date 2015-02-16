@@ -21,6 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+#pragma once
 #include "IrExpression.h"
 
 namespace Decaf
@@ -41,8 +42,7 @@ class IrBinaryExpression : public IrExpression
 {
 public:
     IrBinaryExpression(int lineNumber, int columnNumber, IrType type, IrBinaryOperator binaryOp) :
-        IrBase(lineNumber, columnNumber),
-        m_type(type),
+        IrExpression(lineNumber, columnNumber, type),
         m_operator(binaryOp)
     {}
     

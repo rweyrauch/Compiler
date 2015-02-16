@@ -3,6 +3,28 @@
 #ifndef Parser_h_included
 #define Parser_h_included
 
+#include "IrBase.h"
+#include "IrBlock.h"
+#include "IrClass.h"
+
+#include "IrMethodDecl.h"
+#include "IrFieldDecl.h"
+
+#include "IrBinaryExpr.h"
+#include "IrBooleanExpr.h"
+
+#include "IrAssignStmt.h"
+#include "IrBreakStmt.h"
+#include "IrContinueStmt.h"
+#include "IrExprStmt.h"
+#include "IrForStmt.h"
+#include "IrIfStmt.h"
+#include "IrMethodCallStmt.h"
+#include "IrPlusAssignStmt.h"
+#include "IrReturnStmt.h"
+
+using namespace Decaf;
+
 // $insert baseclass
 #include "Parserbase.h"
 // $insert scanner.h

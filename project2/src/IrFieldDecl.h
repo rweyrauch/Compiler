@@ -24,28 +24,32 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "IrStatement.h"
+#include "IrBase.h"
 
 namespace Decaf
 {
+class IrArgument;
 
-class IrAssignStatement : public IrStatement
+class IrFieldDecl : public IrBase
 {
 public:
-    IrAssignStatement(int lineNumber, int columnNumber) :
-        IrStatement(lineNumber, columnNumber)
+    IrFieldDecl(int lineNumber, int columnNumber, const std::string& ident) :
+        IrBase(lineNumber, columnNumber),
+        m_identifier(ident)
     {}
     
-    virtual ~IrAssignStatement()
+    virtual ~IrFieldDecl()
     {}
     
     virtual void print() {}
         
-protected:    
+protected:
     
+    std::string m_identifier;
+     
 private:
-    IrAssignStatement() = delete;
-    IrAssignStatement(const IrAssignStatement& rhs) = delete;
+    IrFieldDecl() = delete;
+    IrFieldDecl(const IrFieldDecl& rhs) = delete;
 };
 
 } // namespace Decaf

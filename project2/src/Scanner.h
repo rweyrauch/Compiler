@@ -3,6 +3,12 @@
 #ifndef Scanner_H_INCLUDED_
 #define Scanner_H_INCLUDED_
 
+#include "IrBase.h"
+#include "IrBlock.h"
+#include "IrClass.h"
+
+using namespace Decaf;
+
 // $insert baseclass_h
 #include "Scannerbase.h"
 
