@@ -22,7 +22,7 @@
 %token BOOLTYPE INTTYPE CLASS VOID
 %token IF ELSE FOR CONTINUE BREAK
  
-%token<string> IDENTIFIER INTEGER BOOLEAN CHARACTER STRING
+%token IDENTIFIER INTEGER BOOLEAN CHARACTER STRING
 %token EQUAL PLUSEQUAL MINUSEQUAL
 %token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA SEMI BANG
 %token MOD LOR LAND
@@ -82,17 +82,17 @@ method_decl_list
 	| method_decl_list method_decl { $1->push_back($<methodDecl>2); }
 	;
 	
-argument_list 
-	: argument
-	| argument_list COMMA argument
+argument_decl_list 
+	: argument_decl
+	| argument_decl_list COMMA argument_decl
 	;
 
-argument 
+argument_decl 
 	: type ident
 	;
 	
 method_decl 
-	: type ident LPAREN argument_list RPAREN block { $$ = new Decaf::IrMethodDecl(d_scanner.lineNr(), d_scanner.columnNr(), $2 ); }
+	: type ident LPAREN argument_decl_list RPAREN block { $$ = new Decaf::IrMethodDecl(d_scanner.lineNr(), d_scanner.columnNr(), $2 ); }
 	| type ident LPAREN RPAREN block { $$ = new Decaf::IrMethodDecl(d_scanner.lineNr(), d_scanner.columnNr(), $2); }
 	;
 
@@ -129,7 +129,7 @@ ident_list
 	;
 	
 ident 
-	: IDENTIFIER { $$ = new Decaf::IrIdentifier(d_scanner.lineNr(), d_scanner.columnNr(), d_scanner.matched()); delete $1; }
+	: IDENTIFIER { $$ = new Decaf::IrIdentifier(d_scanner.lineNr(), d_scanner.columnNr(), d_scanner.matched()); }
 	;
 
 statement 

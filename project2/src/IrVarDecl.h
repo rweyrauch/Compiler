@@ -26,6 +26,7 @@
 #include <vector>
 #include "IrCommon.h"
 #include "IrBase.h"
+#include "IrIdentifier.h"
 
 namespace Decaf
 {
@@ -33,7 +34,7 @@ namespace Decaf
 class IrVariableDecl : public IrBase
 {
 public:
-    IrVariableDecl(int lineNumber, int columnNumber, const std::string& ident, IrType type) :
+    IrVariableDecl(int lineNumber, int columnNumber, IrIdentifier* ident, IrType type) :
         IrBase(lineNumber, columnNumber),
         m_identifier(ident),
         m_type(type)
@@ -47,7 +48,7 @@ public:
 protected:
     
     IrType m_type;
-    std::string m_identifier;
+    IrIdentifier* m_identifier;
      
 private:
     IrVariableDecl() = delete;

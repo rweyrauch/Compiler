@@ -43,7 +43,11 @@ public:
     virtual ~IrMethodDecl()
     {}
     
-    virtual void print() {}
+    virtual void print()
+    {
+        std::cout << "Method: " << m_identifier->getIdentifier() << " at " << getLineNumber() << ", " << getColumnNumber() << std::endl;
+        
+    }
     
     void addArgument(IrArgument* arg)
     {

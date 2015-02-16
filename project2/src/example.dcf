@@ -1,4 +1,8 @@
 // simplest Decaf program
 class Program
 {    
+    int foo()
+    {
+        return 0;
+    }
 }

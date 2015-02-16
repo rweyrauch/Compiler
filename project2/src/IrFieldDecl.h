@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 #include "IrBase.h"
+#include "IrIdentifier.h"
 
 namespace Decaf
 {
@@ -32,7 +33,7 @@ namespace Decaf
 class IrFieldDecl : public IrBase
 {
 public:
-    IrFieldDecl(int lineNumber, int columnNumber, const std::string& ident) :
+    IrFieldDecl(int lineNumber, int columnNumber, IrIdentifier* ident) :
         IrBase(lineNumber, columnNumber),
         m_identifier(ident)
     {}
@@ -44,7 +45,7 @@ public:
         
 protected:
     
-    std::string m_identifier;
+    IrIdentifier* m_identifier;
      
 private:
     IrFieldDecl() = delete;
