@@ -28,7 +28,7 @@
 
 namespace Decaf
 {
-class IrVariable;
+class IrVariableDecl;
 
 class IrBlock : public IrStatement
 {
@@ -44,18 +44,26 @@ public:
     
     virtual void print() {}
     
-    void addVariableDecl(IrVariable* var)
+    void addVariableDecl(IrVariableDecl* var)
     {
         m_variables.push_back(var);
+    }
+    void addVariableDecl(const std::vector<IrVariableDecl*>& variables)
+    {
+        m_variables.insert(m_variables.end(), variables.begin(), variables.end());
     }
     
     void addStatement(IrStatement* stmt)
     {
         m_statements.push_back(stmt);
     }
+    void addStatements(const std::vector<IrStatement*>& statements)
+    {
+        m_statements.insert(m_statements.end(), statements.begin(), statements.end());
+    }
     
 protected:    
-    std::vector<IrVariable*> m_variables;
+    std::vector<IrVariableDecl*> m_variables;
     std::vector<IrStatement*> m_statements;
     
 private:

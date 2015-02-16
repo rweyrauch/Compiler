@@ -22,35 +22,44 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include "IrCommon.h"
-#include "IrExpression.h"
 
 namespace Decaf
 {
     
-class IrBooleanExpression : public IrExpression
+enum class IrType
 {
-public:
-    IrBooleanExpression(int lineNumber, int columnNumber, IrBooleanOperator boolOp) :
-        IrExpression(lineNumber, columnNumber, IrType::Boolean),
-        m_operator(boolOp)
-    {}
+    Void = 0,
+    Integer,
+    Boolean,
     
-    virtual ~IrBooleanExpression()
-    {}
+    NUM_IR_TYPES
+};
     
-    virtual void print() {}
+enum class IrBinaryOperator
+{
+    Add = 0,
+    Subtract,
+    Multiply,
+    Divide,
+    Modulo,
     
-    IrBooleanOperator getOperator() const { return m_operator; }
+    NUM_IR_BINARY_OPERATORS
+};
     
-protected:
+ 
+enum class IrBooleanOperator
+{
+    Equal = 0,
+    NotEqual,
+    Less,
+    LessEqual,
+    Greater,
+    GreaterEqual,
+    LogicalAnd,
+    LogicalOr,
+    Not,
     
-    IrBooleanOperator m_operator;
-    
-private:
-    IrBooleanExpression() = delete;
-    IrBooleanExpression(const IrBooleanExpression& rhs) = delete;
+    NUM_IR_BOOLEAN_OPERATORS
 };
 
 } // namespace Decaf
-

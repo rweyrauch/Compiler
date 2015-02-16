@@ -1,6 +1,6 @@
 all: parser
 
-CPPFLAGS = -std=c++11
+CPPFLAGS = -std=c++11 -g -DDEBUG
 OBJS = parse.o lex.o main.o
 LIBS = -lpopt
 
@@ -21,7 +21,6 @@ Parser.ih: parse.cc
 	
 %.o: %.cpp %.cc
 	g++ -c $(CPPFLAGS) -o $@ $<
-
 
 parser: $(OBJS) Scanner.h
 	g++ -o $@ $(OBJS) $(LIBS) $(LDFLAGS)

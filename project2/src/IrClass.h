@@ -22,19 +22,21 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include <iostream>
 #include <string>
 #include <vector>
 #include "IrBase.h"
+#include "IrIdentifier.h"
+#include "IrFieldDecl.h"
+#include "IrMethodDecl.h"
 
 namespace Decaf
 {
-class IrFieldDecl;
-class IrMethodDecl;
 
 class IrClass : public IrBase
 {
 public:
-    IrClass(int lineNumber, int columnNumber, const std::string& ident) :
+    IrClass(int lineNumber, int columnNumber, IrIdentifier* ident) :
         IrBase(lineNumber, columnNumber),
         m_identifier(ident),
         m_field_decl_list(),
@@ -44,21 +46,40 @@ public:
     virtual ~IrClass()
     {}
     
-    virtual void print() {}
+    virtual void print() 
+    {
+        std::cout << "Class: " << m_identifier->getIdentifier() << " at " << getLineNumber() << ", " << getColumnNumber() << std::endl;
+        for (auto i : m_field_decl_list)
+        {
+            i->print();
+        }
+        for (auto i : m_method_decl_list)
+        {
+            i->print();
+        }
+    }
     
     void addFieldDecl(IrFieldDecl* field)
     {
         m_field_decl_list.push_back(field);
+    }
+    void addFieldDecl(const std::vector<IrFieldDecl*>& fields)
+    {
+        m_field_decl_list.insert(m_field_decl_list.end(), fields.begin(), fields.end());
     }
     
     void addMethodDecl(IrMethodDecl* method)
     {
         m_method_decl_list.push_back(method);
     }
+    void addMethodDecl(const std::vector<IrMethodDecl*>& methods)
+    {
+        m_method_decl_list.insert(m_method_decl_list.end(), methods.begin(), methods.end());
+    }
     
 protected:
     
-    std::string m_identifier;
+    IrIdentifier* m_identifier;
     
     std::vector<IrFieldDecl*> m_field_decl_list;
     std::vector<IrMethodDecl*> m_method_decl_list;

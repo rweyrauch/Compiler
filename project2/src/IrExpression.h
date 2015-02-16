@@ -22,20 +22,12 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include "IrCommon.h"
 #include "IrBase.h"
 
 namespace Decaf
 {
-     
-enum IrType
-{
-    IrTypeVoid = 0,
-    IrTypeInteger,
-    IrTypeBoolean,
     
-    NUM_IR_TYPES
-};
-   
 class IrExpression : public IrBase
 {
 public:

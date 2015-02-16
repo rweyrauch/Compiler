@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 #include "IrBase.h"
+#include "IrIdentifier.h"
 
 namespace Decaf
 {
@@ -33,7 +34,7 @@ class IrArgument;
 class IrMethodDecl : public IrBase
 {
 public:
-    IrMethodDecl(int lineNumber, int columnNumber, const std::string& ident) :
+    IrMethodDecl(int lineNumber, int columnNumber, IrIdentifier* ident) :
         IrBase(lineNumber, columnNumber),
         m_identifier(ident),
         m_argument_list()
@@ -51,7 +52,7 @@ public:
     
 protected:
     
-    std::string m_identifier;
+    IrIdentifier* m_identifier;
     std::vector<IrArgument*> m_argument_list;
     
 private:

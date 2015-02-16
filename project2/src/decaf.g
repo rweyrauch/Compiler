@@ -4,11 +4,18 @@
 
 %union {
     Decaf::IrClass *programClass;
+    Decaf::IrIdentifier *ident;
     Decaf::IrBlock *block;
     Decaf::IrMethodDecl *methodDecl;
     Decaf::IrFieldDecl *fieldDecl;
+    std::vector<Decaf::IrMethodDecl*> *methodDeclList;
+    std::vector<Decaf::IrFieldDecl*> *fieldDeclList;
     Decaf::IrStatement *stmt;
+    std::vector<Decaf::IrStatement*> *stmtList;
+    Decaf::IrVariableDecl *varDecl;
+    std::vector<Decaf::IrVariableDecl*> *varDeclList;
     std::string *string;
+    int token;
 }
 
 %token RETURN CALLOUT
@@ -24,20 +31,27 @@
 %token MUL DIV
 
 %type <programClass> program
-%type <block> block statement_list
-%type <string> ident
+%type <block> block
 %type <methodDecl> method_decl
 %type <fieldDecl> field_decl
+%type <methodDeclList> method_decl_list
+%type <fieldDeclList> field_decl_list
 %type <stmt> statement
+%type <stmtList> statement_list
+%type <varDecl> var_decl
+%type <varDeclList> var_decl_list
+%type <ident> ident
+%type <token> type
+
 %start program
 
 %%
 
 program 
-	: CLASS ident LBRACE field_decl_list method_decl_list RBRACE { $$ = new Decaf::IrClass(0, 0, *$2); $$->addFieldDecl($4); $$->addMethodDecl($5); }
-	| CLASS ident LBRACE field_decl_list RBRACE  { $$ = new Decaf::IrClass(0, 0, *$2); $$->addFieldDecl($4);}
-	| CLASS ident LBRACE method_decl_list RBRACE  { $$ = new Decaf::IrClass(0, 0, *$2); $$->addMethodDecl($4); }
-	| CLASS ident LBRACE RBRACE  { $$ = new Decaf::IrClass(0, 0, *$2); }
+	: CLASS ident LBRACE field_decl_list method_decl_list RBRACE { $$ = new Decaf::IrClass(d_scanner.lineNr(), d_scanner.columnNr(), $2); setRoot($$); $$->addFieldDecl(*$4); $$->addMethodDecl(*$5); }
+	| CLASS ident LBRACE field_decl_list RBRACE  { $$ = new Decaf::IrClass(d_scanner.lineNr(), d_scanner.columnNr(), $2); setRoot($$); $$->addFieldDecl(*$4);}
+	| CLASS ident LBRACE method_decl_list RBRACE  { $$ = new Decaf::IrClass(d_scanner.lineNr(), d_scanner.columnNr(), $2); setRoot($$); $$->addMethodDecl(*$4); }
+	| CLASS ident LBRACE RBRACE  { $$ = new Decaf::IrClass(d_scanner.lineNr(), d_scanner.columnNr(), $2); setRoot($$); }
 	;
 	
 array_decl 
@@ -55,8 +69,8 @@ field_var_decl
 	;
 	
 field_decl_list 
-	: field_decl
-	| field_decl_list field_decl
+	: field_decl { $$ = new std::vector<Decaf::IrFieldDecl*>(); $$->push_back($<fieldDecl>1); }
+	| field_decl_list field_decl { $1->push_back($<fieldDecl>2); }
 	;
 	
 field_decl 
@@ -64,8 +78,8 @@ field_decl
 	;
 
 method_decl_list 
-	: method_decl
-	| method_decl_list method_decl
+	: method_decl { $$ = new std::vector<Decaf::IrMethodDecl*>(); $$->push_back($<methodDecl>1); }
+	| method_decl_list method_decl { $1->push_back($<methodDecl>2); }
 	;
 	
 argument_list 
@@ -78,15 +92,15 @@ argument
 	;
 	
 method_decl 
-	: type ident LPAREN argument_list RPAREN block { $$ = new Decaf::IrMethodDecl(0, 0, *$2); }
-	| type ident LPAREN RPAREN block { $$ = new Decaf::IrMethodDecl(0, 0, *$2); }
+	: type ident LPAREN argument_list RPAREN block { $$ = new Decaf::IrMethodDecl(d_scanner.lineNr(), d_scanner.columnNr(), $2 ); }
+	| type ident LPAREN RPAREN block { $$ = new Decaf::IrMethodDecl(d_scanner.lineNr(), d_scanner.columnNr(), $2); }
 	;
 
 block 
-	: LBRACE var_decl_list statement_list RBRACE { $$ = $3; }
-	| LBRACE statement_list RBRACE { $$ = $2; }
-	| LBRACE var_decl_list RBRACE
-	| LBRACE RBRACE { $$ = new Decaf::IrBlock(0,0); }
+	: LBRACE var_decl_list statement_list RBRACE { $$ = new Decaf::IrBlock(d_scanner.lineNr(), d_scanner.columnNr()); $$->addVariableDecl(*$2); $$->addStatements(*$3); }
+	| LBRACE statement_list RBRACE { $$ = new Decaf::IrBlock(d_scanner.lineNr(), d_scanner.columnNr()); $$->addStatements(*$2); }
+	| LBRACE var_decl_list RBRACE { $$ = new Decaf::IrBlock(d_scanner.lineNr(), d_scanner.columnNr()); $$->addVariableDecl(*$2); }
+	| LBRACE RBRACE { $$ = new Decaf::IrBlock(d_scanner.lineNr(), d_scanner.columnNr()); }
 	;
 
 var_decl_list 
@@ -95,39 +109,39 @@ var_decl_list
 	;
 	
 var_decl 
-	: type ident_list SEMI
+	: type ident_list SEMI 
 	;
 
 statement_list 
-	: statement { $$ = new Decaf::IrBlock(0, 0); $$->addStatement($<stmt>1); }
-	| statement_list statement { $1->addStatement($<stmt>2); }
+	: statement { $$ = new std::vector<Decaf::IrStatement*>(); $$->push_back($1); }
+	| statement_list statement { $1->push_back($2); }
 	;
 	
 type 
-	: INTTYPE
-	| BOOLTYPE
-	| VOID
+	: INTTYPE { $$ = (int)Decaf::IrType::Integer; }
+	| BOOLTYPE { $$ = (int)Decaf::IrType::Boolean; }
+	| VOID { $$ = (int)Decaf::IrType::Void; }
 	;
 	
 ident_list 
-	: ident
+    : ident
 	| ident_list COMMA ident
 	;
 	
 ident 
-	: IDENTIFIER
+	: IDENTIFIER { $$ = new Decaf::IrIdentifier(d_scanner.lineNr(), d_scanner.columnNr(), d_scanner.matched()); delete $1; }
 	;
-	  	
+
 statement 
-	: IF LPAREN expr RPAREN block { $$ = new Decaf::IrIfStatement(0, 0); }
-	| IF LPAREN expr RPAREN block ELSE block  { $$ = new Decaf::IrIfStatement(0, 0); }
-	| FOR ident EQUAL expr COMMA expr block { $$ = new Decaf::IrForStatement(0, 0); }
-	| RETURN SEMI { $$ = new Decaf::IrReturnStatement(0, 0); }
-	| RETURN expr SEMI { $$ = new Decaf::IrReturnStatement(0, 0); }
-	| BREAK SEMI { $$ = new Decaf::IrBreakStatement(0, 0); }
-	| CONTINUE SEMI { $$ = new Decaf::IrContinueStatement(0, 0); }
-    | expr SEMI { $$ = new Decaf::IrExpressionStatement(0, 0); }
-	| block { $$ = new Decaf::IrBlock(0, 0); }
+	: IF LPAREN expr RPAREN block { $$ = new Decaf::IrIfStatement(d_scanner.lineNr(), d_scanner.columnNr()); }
+	| IF LPAREN expr RPAREN block ELSE block  { $$ = new Decaf::IrIfStatement(d_scanner.lineNr(), d_scanner.columnNr()); }
+	| FOR ident EQUAL expr COMMA expr block { $$ = new Decaf::IrForStatement(d_scanner.lineNr(), d_scanner.columnNr()); }
+	| RETURN SEMI { $$ = new Decaf::IrReturnStatement(d_scanner.lineNr(), d_scanner.columnNr()); }
+	| RETURN expr SEMI { $$ = new Decaf::IrReturnStatement(d_scanner.lineNr(), d_scanner.columnNr()); }
+	| BREAK SEMI { $$ = new Decaf::IrBreakStatement(d_scanner.lineNr(), d_scanner.columnNr()); }
+	| CONTINUE SEMI { $$ = new Decaf::IrContinueStatement(d_scanner.lineNr(), d_scanner.columnNr()); }
+    | expr SEMI { $$ = new Decaf::IrExpressionStatement(d_scanner.lineNr(), d_scanner.columnNr()); }
+	| block { $$ = new Decaf::IrBlock(d_scanner.lineNr(), d_scanner.columnNr()); }
 	;
 	
 assign_op 

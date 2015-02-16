@@ -3,12 +3,15 @@
 #ifndef Parser_h_included
 #define Parser_h_included
 
+#include "IrCommon.h"
 #include "IrBase.h"
 #include "IrBlock.h"
 #include "IrClass.h"
+#include "IrIdentifier.h"
 
 #include "IrMethodDecl.h"
 #include "IrFieldDecl.h"
+#include "IrVarDecl.h"
 
 #include "IrBinaryExpr.h"
 #include "IrBooleanExpr.h"
@@ -36,16 +39,26 @@ class Parser: public ParserBase
 {
     // $insert scannerobject
     Scanner d_scanner;
-        
+
+    IrClass* d_root;
+    
     public:
+        Parser(std::string const &infile, std::string const &outfile) :
+            d_scanner(infile, outfile),
+            d_root(0) {}
+        virtual ~Parser() {}
         int parse();
 
+        void dumpAST() { if (d_root) d_root->print(); }
+        
     private:
         void error(char const *msg);    // called on (syntax) errors
         int lex();                      // returns the next token from the
                                         // lexical scanner. 
         void print();                   // use, e.g., d_token, d_loc
 
+        void setRoot(IrClass* root) { d_root = root; }
+        
     // support functions for parse():
         void executeAction(int ruleNr);
         void errorRecovery();

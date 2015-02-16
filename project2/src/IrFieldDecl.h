@@ -28,7 +28,6 @@
 
 namespace Decaf
 {
-class IrArgument;
 
 class IrFieldDecl : public IrBase
 {

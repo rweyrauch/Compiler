@@ -22,21 +22,11 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include "IrCommon.h"
 #include "IrExpression.h"
 
 namespace Decaf
 {
- 
-enum IrBinaryOperator
-{
-    IrBinOpAdd = 0,
-    IrBinOpSubtract,
-    IrBinOpMultiply,
-    IrBinOpDivide,
-    IrBinOpModulo,
-    
-    NUM_IR_BINARY_OPERATORS
-};
     
 class IrBinaryExpression : public IrExpression
 {

@@ -25,7 +25,7 @@ int main(int argc, char **argv)
         std::cerr << poptStrerror(res) << std::endl;
     }
     
-	if (std::string(g_target) == "scan")
+	if (g_target && std::string(g_target) == "scan")
     {
         g_scan_only = true;
 		Scanner scanner;
@@ -56,8 +56,9 @@ int main(int argc, char **argv)
     }
 	else // "parse"
     {
-		Parser parser;
+		Parser parser("example.dcf", "example.out");
 		parser.parse();
+        parser.dumpAST();
 	}
 	return 0;
 }

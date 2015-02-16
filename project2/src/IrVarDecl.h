@@ -22,35 +22,36 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include <string>
+#include <vector>
 #include "IrCommon.h"
-#include "IrExpression.h"
+#include "IrBase.h"
 
 namespace Decaf
 {
-    
-class IrBooleanExpression : public IrExpression
+
+class IrVariableDecl : public IrBase
 {
 public:
-    IrBooleanExpression(int lineNumber, int columnNumber, IrBooleanOperator boolOp) :
-        IrExpression(lineNumber, columnNumber, IrType::Boolean),
-        m_operator(boolOp)
+    IrVariableDecl(int lineNumber, int columnNumber, const std::string& ident, IrType type) :
+        IrBase(lineNumber, columnNumber),
+        m_identifier(ident),
+        m_type(type)
     {}
     
-    virtual ~IrBooleanExpression()
+    virtual ~IrVariableDecl()
     {}
     
     virtual void print() {}
-    
-    IrBooleanOperator getOperator() const { return m_operator; }
-    
+        
 protected:
     
-    IrBooleanOperator m_operator;
-    
+    IrType m_type;
+    std::string m_identifier;
+     
 private:
-    IrBooleanExpression() = delete;
-    IrBooleanExpression(const IrBooleanExpression& rhs) = delete;
+    IrVariableDecl() = delete;
+    IrVariableDecl(const IrVariableDecl& rhs) = delete;
 };
 
 } // namespace Decaf
-
