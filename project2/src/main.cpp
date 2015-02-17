@@ -6,10 +6,12 @@
 //#include "Scanner.h"
 
 char* g_target = 0;
+char* g_outputFilename = 0;
 
 poptOption appOptions[] =
 {
-    { "target", 't', POPT_ARG_STRING|POPT_ARGFLAG_ONEDASH, &g_target, 0, "scan or parse", NULL },
+    { "target", 't', POPT_ARG_STRING, &g_target, 0, "scan or parse", NULL },
+    { "output", 'o', POPT_ARG_STRING, &g_outputFilename, 0, "output filename", NULL },
     POPT_AUTOHELP
     POPT_TABLEEND
 };
@@ -25,14 +27,22 @@ int main(int argc, char **argv)
         std::cerr << poptStrerror(res) << std::endl;
     }
     
-	if (g_target && std::string(g_target) == "scan")
+    if (g_target && std::string(g_target) == "scan")
     {
         g_scan_only = true;
-		Scanner scanner;
+        Scanner* scanner = 0;
+        if (poptPeekArg(cmd))
+        {
+            scanner = new Scanner(poptGetArg(cmd), g_outputFilename ? g_outputFilename : "decaf.out");
+        }
+        else
+        {
+            scanner = new Scanner();
+        }
         int token = 0;
-		while (token = scanner.lex())
-		{
-			std::cout << scanner.lineNr() << " ";
+        while (token = scanner->lex())
+        {
+            std::cout << scanner->lineNr() << " ";
             switch (token)
             {
                 case Parser::IDENTIFIER:
@@ -51,14 +61,25 @@ int main(int argc, char **argv)
                     std::cout << "BOOLEANLITERAL ";
                     break;
             }
-            std::cout << scanner.matched() << std::endl;
-		}
+            std::cout << scanner->matched() << std::endl;
+        }
+        delete scanner;
     }
-	else // "parse"
+    else // "parse"
     {
-		Parser parser("example.dcf", "example.out");
-		parser.parse();
-        parser.dumpAST();
-	}
-	return 0;
+        Parser* parser = 0;
+        if (poptPeekArg(cmd))
+        {
+            parser = new Parser(poptGetArg(cmd), g_outputFilename ? g_outputFilename : "decaf.out");
+        }
+        else
+        {
+            parser = new Parser();
+        }
+        parser->parse();
+        parser->dumpAST();
+        
+        delete parser;
+    }
+    return 0;
 }

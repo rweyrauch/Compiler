@@ -48,6 +48,9 @@ class Parser: public ParserBase
     IrClass* d_root;
     
     public:
+        Parser() :
+            d_scanner(),
+            d_root(0) {}
         Parser(std::string const &infile, std::string const &outfile) :
             d_scanner(infile, outfile),
             d_root(0) {}
