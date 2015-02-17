@@ -26,6 +26,11 @@
 #include "IrPlusAssignStmt.h"
 #include "IrReturnStmt.h"
 
+#include "IrLiteral.h"
+#include "IrIntLiteral.h"
+#include "IrBoolLiteral.h"
+#include "IrCharLiteral.h"
+
 using namespace Decaf;
 
 // $insert baseclass

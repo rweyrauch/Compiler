@@ -1,8 +1,10 @@
 // simplest Decaf program
 class Program
 {    
-    int foo()
+    int foo(int x)
     {
-        return 0;
+        int xx;
+        xx = x + 2;
+        return xx;
     }
 }

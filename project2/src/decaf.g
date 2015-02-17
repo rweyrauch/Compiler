@@ -14,6 +14,7 @@
     std::vector<Decaf::IrStatement*> *stmtList;
     Decaf::IrVariableDecl *varDecl;
     std::vector<Decaf::IrVariableDecl*> *varDeclList;
+    Decaf::IrLiteral *literal;
     std::string *string;
     int token;
 }
@@ -42,6 +43,7 @@
 %type <varDeclList> var_decl_list
 %type <ident> ident
 %type <token> type
+%type <literal> literal
 
 %start program
 
@@ -253,7 +255,7 @@ logic_op
 	;
 	
 literal 
-	: INTEGER 
-	| BOOLEAN 
-	| CHARACTER
+	: INTEGER { $$ = new Decaf::IrIntegerLiteral(d_scanner.lineNr(), d_scanner.columnNr(), d_scanner.matched()); }
+	| BOOLEAN { $$ = new Decaf::IrBooleanLiteral(d_scanner.lineNr(), d_scanner.columnNr(), d_scanner.matched()); }
+	| CHARACTER { $$ = new Decaf::IrCharacterLiteral(d_scanner.lineNr(), d_scanner.columnNr(), d_scanner.matched()); }
 	;

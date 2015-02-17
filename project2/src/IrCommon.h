@@ -31,6 +31,7 @@ enum class IrType
     Void = 0,
     Integer,
     Boolean,
+    Character,
     
     NUM_IR_TYPES
 };

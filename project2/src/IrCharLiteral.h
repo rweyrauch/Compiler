@@ -22,31 +22,42 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include "IrExpression.h"
+#include "IrLiteral.h"
 
 namespace Decaf
 {
  
-class IrLiteral : public IrExpression
+class IrCharacterLiteral : public IrLiteral
 {
 public:
-    IrLiteral(int lineNumber, int columnNumber, IrType type, const std::string& value) :
-        IrExpression(lineNumber, columnNumber, type),
-        m_valueAsString(value)
+    IrCharacterLiteral(int lineNumber, int columnNumber, const std::string& value) :
+        IrLiteral(lineNumber, columnNumber, IrType::Character, value)
+    {
+        if (value.length() == 1)
+        {
+            m_value = value.front();
+        }
+        else
+        {
+            // deal with control characters
+        }
+    }
+    
+    virtual ~IrCharacterLiteral()
     {}
     
-    virtual ~IrLiteral()
+    virtual void print() 
     {}
     
-    virtual void print() = 0;
+    char getValue() const { return m_value; }
     
 protected:
     
-    std::string m_valueAsString;
+    char m_value;
     
 private:
-    IrLiteral() = delete;
-    IrLiteral(const IrLiteral& rhs) = delete;
+    IrCharacterLiteral() = delete;
+    IrCharacterLiteral(const IrCharacterLiteral& rhs) = delete;
 };
 
 }
