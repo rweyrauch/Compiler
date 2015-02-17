@@ -38,7 +38,7 @@ public:
     virtual ~IrLiteral()
     {}
     
-    virtual void print() = 0;
+    virtual void print() {}
     
 protected:
     

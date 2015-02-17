@@ -4,8 +4,9 @@
 #define Scanner_H_INCLUDED_
 
 #include "IrBase.h"
-#include "IrBlock.h"
 #include "IrClass.h"
+#include "IrLiteral.h"
+#include "IrBlock.h"
 
 using namespace Decaf;
 
