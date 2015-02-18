@@ -36,7 +36,14 @@ class IrVariableDecl : public IrBase
 public:
     IrVariableDecl(int lineNumber, int columnNumber, IrIdentifier* ident, IrType type) :
         IrBase(lineNumber, columnNumber),
-        m_identifier(ident),
+        m_identifiers(),
+        m_type(type)
+    {
+        m_identifiers.push_back(ident);
+    }
+    IrVariableDecl(int lineNumber, int columnNumber, const std::vector<IrIdentifier*> ident_list, IrType type) :
+        IrBase(lineNumber, columnNumber),
+        m_identifiers(ident_list),
         m_type(type)
     {}
     
@@ -48,7 +55,7 @@ public:
 protected:
     
     IrType m_type;
-    IrIdentifier* m_identifier;
+    std::vector<IrIdentifier*> m_identifiers;
      
 private:
     IrVariableDecl() = delete;

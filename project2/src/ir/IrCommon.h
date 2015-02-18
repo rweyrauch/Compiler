@@ -28,6 +28,7 @@ namespace Decaf
     
 enum class IrType
 {
+    Unknown = -1,
     Void = 0,
     Integer,
     Boolean,

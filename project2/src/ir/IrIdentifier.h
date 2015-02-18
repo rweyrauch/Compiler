@@ -35,7 +35,14 @@ class IrIdentifier : public IrBase
 public:
     IrIdentifier(int lineNumber, int columnNumber, const std::string& ident) :
         IrBase(lineNumber, columnNumber),
-        m_identifier(ident)
+        m_identifier(ident),
+        m_index(-1)
+    {}
+
+    IrIdentifier(int lineNumber, int columnNumber, const std::string& ident, int index) :
+        IrBase(lineNumber, columnNumber),
+        m_identifier(ident),
+        m_index(index)
     {}
     
     virtual ~IrIdentifier()
@@ -47,9 +54,12 @@ public:
     }
     
     const std::string& getIdentifier() const { return m_identifier; }
+    int getIndex() const { return m_index; }
+    
 protected:
     
     std::string m_identifier;
+    int m_index;
     
 private:
     IrIdentifier() = delete;

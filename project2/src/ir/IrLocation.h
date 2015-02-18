@@ -31,16 +31,25 @@ class IrLocation : public IrExpression
 {
 public:
     IrLocation(int lineNumber, int columnNumber, IrType type) :
-        IrBase(lineNumber, columnNumber),
-        m_type(type)
+        IrExpression(lineNumber, columnNumber, type),
+        m_index(-1)
+    {}
+
+    IrLocation(int lineNumber, int columnNumber, IrType type, int index) :
+        IrExpression(lineNumber, columnNumber, type),
+        m_index(index)
     {}
     
     virtual ~IrLocation()
     {}
     
     virtual void print() {}
-        
+    
+    int getIndex() const { return m_index; }
+    
 protected:
+    
+    int m_index;
     
 private:
     IrLocation() = delete;
