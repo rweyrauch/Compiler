@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include <iostream>
 #include "IrCommon.h"
 #include "IrBase.h"
 #include "IrIdentifier.h"
@@ -41,7 +42,10 @@ public:
     virtual ~IrFieldDecl()
     {}
     
-    virtual void print() {}
+    virtual void print() 
+    {
+       std::cout << "Field Declaration: " << m_identifier->getIdentifier() << " Type: " << (int)m_type << " at " << getLineNumber() << ", " << getColumnNumber() << std::endl;        
+    }
         
 protected:
     

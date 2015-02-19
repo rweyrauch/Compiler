@@ -51,8 +51,7 @@ public:
         std::cout << "Class: " << m_identifier->getIdentifier() << " at " << getLineNumber() << ", " << getColumnNumber() << std::endl;
         for (auto i : m_field_decl_list)
         {
-            // (i != nullptr)
-            //  i->print();
+            i->print();
         }
         for (auto i : m_method_decl_list)
         {
