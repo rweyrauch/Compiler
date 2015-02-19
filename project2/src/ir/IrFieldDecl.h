@@ -22,8 +22,7 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <string>
-#include <vector>
+#include "IrCommon.h"
 #include "IrBase.h"
 #include "IrIdentifier.h"
 
@@ -33,9 +32,10 @@ namespace Decaf
 class IrFieldDecl : public IrBase
 {
 public:
-    IrFieldDecl(int lineNumber, int columnNumber, IrIdentifier* ident) :
+    IrFieldDecl(int lineNumber, int columnNumber, IrIdentifier* ident, IrType type) :
         IrBase(lineNumber, columnNumber),
-        m_identifier(ident)
+        m_identifier(ident),
+        m_type(type)
     {}
     
     virtual ~IrFieldDecl()
@@ -46,7 +46,8 @@ public:
 protected:
     
     IrIdentifier* m_identifier;
-     
+    IrType m_type; 
+    
 private:
     IrFieldDecl() = delete;
     IrFieldDecl(const IrFieldDecl& rhs) = delete;

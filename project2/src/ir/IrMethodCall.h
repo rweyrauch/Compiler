@@ -24,28 +24,32 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "IrStatement.h"
+#include "IrExpression.h"
 
 namespace Decaf
 {
+class IrIdentifier;
 
-class IrMethodCallStatement : public IrStatement
+class IrMethodCall : public IrExpression
 {
 public:
-    IrMethodCallStatement(int lineNumber, int columnNumber) :
-        IrStatement(lineNumber, columnNumber)
+    IrMethodCall(int lineNumber, int columnNumber, IrIdentifier* ident, IrType type) :
+        IrExpression(lineNumber, columnNumber, type),
+        m_identifier(ident)
     {}
     
-    virtual ~IrMethodCallStatement()
+    virtual ~IrMethodCall()
     {}
     
     virtual void print() {}
         
 protected:    
     
+    IrIdentifier* m_identifier;
+    
 private:
-    IrMethodCallStatement() = delete;
-    IrMethodCallStatement(const IrMethodCallStatement& rhs) = delete;
+    IrMethodCall() = delete;
+    IrMethodCall(const IrMethodCall& rhs) = delete;
 };
 
 } // namespace Decaf

@@ -26,17 +26,20 @@
 
 namespace Decaf
 {
-   
+class IrIdentifier;
+
 class IrLocation : public IrExpression
 {
 public:
-    IrLocation(int lineNumber, int columnNumber, IrType type) :
+    IrLocation(int lineNumber, int columnNumber, IrIdentifier* ident, IrType type) :
         IrExpression(lineNumber, columnNumber, type),
-        m_index(-1)
+        m_identifier(ident),
+        m_index(nullptr)
     {}
 
-    IrLocation(int lineNumber, int columnNumber, IrType type, int index) :
+    IrLocation(int lineNumber, int columnNumber, IrIdentifier* ident, IrType type, IrExpression* index) :
         IrExpression(lineNumber, columnNumber, type),
+        m_identifier(ident),
         m_index(index)
     {}
     
@@ -45,11 +48,13 @@ public:
     
     virtual void print() {}
     
-    int getIndex() const { return m_index; }
+    IrIdentifier* getIdentifier() const { return m_identifier; }
+    IrExpression* getIndex() const { return m_index; }
     
 protected:
     
-    int m_index;
+    IrIdentifier* m_identifier;
+    IrExpression* m_index;
     
 private:
     IrLocation() = delete;

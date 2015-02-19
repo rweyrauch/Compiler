@@ -7,6 +7,8 @@
 #include "IrClass.h"
 #include "IrLiteral.h"
 #include "IrBlock.h"
+#include "IrLocation.h"
+#include "IrMethodCall.h"
 
 using namespace Decaf;
 

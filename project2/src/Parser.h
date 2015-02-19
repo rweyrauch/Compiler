@@ -8,6 +8,7 @@
 #include "IrBlock.h"
 #include "IrClass.h"
 #include "IrIdentifier.h"
+#include "IrLocation.h"
 
 #include "IrMethodDecl.h"
 #include "IrFieldDecl.h"
@@ -22,7 +23,6 @@
 #include "IrExprStmt.h"
 #include "IrForStmt.h"
 #include "IrIfStmt.h"
-#include "IrMethodCallStmt.h"
 #include "IrPlusAssignStmt.h"
 #include "IrReturnStmt.h"
 
@@ -30,6 +30,10 @@
 #include "IrIntLiteral.h"
 #include "IrBoolLiteral.h"
 #include "IrCharLiteral.h"
+
+#include "IrExpression.h"
+#include "IrMethodCall.h"
+
 
 using namespace Decaf;
 
