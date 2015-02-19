@@ -3,12 +3,7 @@
 #ifndef Scanner_H_INCLUDED_
 #define Scanner_H_INCLUDED_
 
-#include "IrBase.h"
-#include "IrClass.h"
-#include "IrLiteral.h"
-#include "IrBlock.h"
-#include "IrLocation.h"
-#include "IrMethodCall.h"
+#include "Ir.h"
 
 using namespace Decaf;
 
