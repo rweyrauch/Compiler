@@ -25,6 +25,7 @@
 #include <iostream>
 #include "IrCommon.h"
 #include "IrStatement.h"
+#include "IrExpression.h"
 
 namespace Decaf
 {
@@ -32,8 +33,9 @@ namespace Decaf
 class IrReturnStatement : public IrStatement
 {
 public:
-    IrReturnStatement(int lineNumber, int columnNumber) :
-        IrStatement(lineNumber, columnNumber)
+    IrReturnStatement(int lineNumber, int columnNumber, IrExpression* returnValue = nullptr) :
+        IrStatement(lineNumber, columnNumber),
+        m_returnValue(returnValue)
     {}
     
     virtual ~IrReturnStatement()
@@ -43,9 +45,12 @@ public:
     {
         IRPRINT_INDENT(depth);
         std::cout << "Return(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
+        if (m_returnValue) m_returnValue->print(depth+1);
     }
         
 protected:    
+    
+    IrExpression* m_returnValue;
     
 private:
     IrReturnStatement() = delete;

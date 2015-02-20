@@ -65,9 +65,19 @@ enum class IrBooleanOperator : int
     NUM_IR_BOOLEAN_OPERATORS
 };
 
+enum class IrAssignmentOperator : int
+{
+    Assign = 0,
+    IncrementAssign,
+    DecrementAssign,
+    
+    NUM_IR_ASSIGNMENT_OPERATORS
+};
+
 const std::string& IrTypeToString(IrType type);
 const std::string& IrBinaryOperatorToString(IrBinaryOperator op);
 const std::string& IrBooleanOperatorToString(IrBooleanOperator op);
+const std::string& IrAssignmentOperatorToString(IrAssignmentOperator op);
 
 #define IRPRINT_INDENT(depth) { for (auto d = 0; d < (depth); d++) std::cout << "  "; }
 

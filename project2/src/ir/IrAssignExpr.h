@@ -22,39 +22,37 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <iostream>
-#include "IrCommon.h"
-#include "IrStatement.h"
+#include <string>
+#include <vector>
 #include "IrExpression.h"
 
 namespace Decaf
 {
 
-class IrExpressionStatement : public IrStatement
+class IrAssignExpression : public IrExpression
 {
 public:
-    IrExpressionStatement(int lineNumber, int columnNumber, IrExpression* expr) :
-        IrStatement(lineNumber, columnNumber),
-        m_expression(expr)
+    IrAssignExpression(int lineNumber, int columnNumber, IrExpression* lhs, IrAssignmentOperator assignOp, IrExpression* rhs) :
+        IrExpression(lineNumber, columnNumber, lhs->getType()),
+        m_lhs(lhs),
+        m_operator(assignOp),
+        m_rhs(rhs)
     {}
     
-    virtual ~IrExpressionStatement()
+    virtual ~IrAssignExpression()
     {}
     
-    virtual void print(unsigned int depth)
-    {
-        IRPRINT_INDENT(depth);
-        std::cout << "Statement(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
-        if (m_expression) m_expression->print(depth+1);
-    }
-    
+    virtual void print(unsigned int depth);
+        
 protected:    
-    
-    IrExpression* m_expression;
+  
+    IrAssignmentOperator m_operator;
+    IrExpression* m_lhs;
+    IrExpression* m_rhs;
     
 private:
-    IrExpressionStatement() = delete;
-    IrExpressionStatement(const IrExpressionStatement& rhs) = delete;
+    IrAssignExpression() = delete;
+    IrAssignExpression(const IrAssignExpression& rhs) = delete;
 };
 
 } // namespace Decaf

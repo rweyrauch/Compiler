@@ -28,24 +28,32 @@
 
 namespace Decaf
 {
+class IrIdentifier;
+class IrExpression;
+class IrBlock;
 
 class IrForStatement : public IrStatement
 {
 public:
-    IrForStatement(int lineNumber, int columnNumber) :
-        IrStatement(lineNumber, columnNumber)
+    IrForStatement(int lineNumber, int columnNumber, IrIdentifier* loopVar, IrExpression* initialExpr, IrExpression* endExpr, IrBlock* block = nullptr) :
+        IrStatement(lineNumber, columnNumber),
+        m_loopVariable(loopVar),
+        m_initialValue(initialExpr),
+        m_terminatingValue(endExpr),
+        m_body(block)
     {}
     
     virtual ~IrForStatement()
     {}
     
-    virtual void print(unsigned int depth)
-    {
-        IRPRINT_INDENT(depth);
-        std::cout << "For(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
-    }
+    virtual void print(unsigned int depth);
         
 protected:    
+    
+    IrIdentifier* m_loopVariable;
+    IrExpression* m_initialValue;
+    IrExpression* m_terminatingValue;
+    IrBlock* m_body;
     
 private:
     IrForStatement() = delete;

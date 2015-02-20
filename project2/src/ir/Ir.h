@@ -26,7 +26,7 @@
 #include "IrCommon.h"
 #include "IrBase.h"
 
-#include "IrAssignStmt.h"
+#include "IrAssignExpr.h"
 #include "IrBinaryExpr.h"
 #include "IrBlock.h"
 #include "IrBooleanExpr.h"

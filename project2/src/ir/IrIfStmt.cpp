@@ -21,40 +21,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#pragma once
 #include <iostream>
 #include "IrCommon.h"
-#include "IrStatement.h"
+#include "IrIfStmt.h"
 #include "IrExpression.h"
+#include "IrBlock.h"
 
 namespace Decaf
 {
 
-class IrExpressionStatement : public IrStatement
+void IrIfStatement::print(unsigned int depth) 
 {
-public:
-    IrExpressionStatement(int lineNumber, int columnNumber, IrExpression* expr) :
-        IrStatement(lineNumber, columnNumber),
-        m_expression(expr)
-    {}
+    IRPRINT_INDENT(depth);
+    std::cout << "If(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
+    m_condition->print(depth+1);
+    if (m_trueBlock) m_trueBlock->print(depth+1);
+    if (m_falseBlock) m_falseBlock->print(depth+1);
+}
     
-    virtual ~IrExpressionStatement()
-    {}
-    
-    virtual void print(unsigned int depth)
-    {
-        IRPRINT_INDENT(depth);
-        std::cout << "Statement(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
-        if (m_expression) m_expression->print(depth+1);
-    }
-    
-protected:    
-    
-    IrExpression* m_expression;
-    
-private:
-    IrExpressionStatement() = delete;
-    IrExpressionStatement(const IrExpressionStatement& rhs) = delete;
-};
-
 } // namespace Decaf

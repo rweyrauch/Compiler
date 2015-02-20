@@ -50,7 +50,7 @@
 %type <varDeclList> var_decl_list argument_decl_list
 %type <ident> ident
 %type <identList> ident_list
-%type <token> type rel_op logic_op
+%type <token> type rel_op logic_op assign_op
 %type <literal> literal
 %type <location> location
 %type <locationList> location_list
@@ -265,15 +265,15 @@ ident
 statement 
     : IF LPAREN expr RPAREN block 
     { 
-        $$ = new Decaf::IrIfStatement(d_scanner.lineNr(), d_scanner.columnNr()); 
+        $$ = new Decaf::IrIfStatement(d_scanner.lineNr(), d_scanner.columnNr(), $3, $5); 
     }
     | IF LPAREN expr RPAREN block ELSE block  
     { 
-        $$ = new Decaf::IrIfStatement(d_scanner.lineNr(), d_scanner.columnNr()); 
+        $$ = new Decaf::IrIfStatement(d_scanner.lineNr(), d_scanner.columnNr(), $3, $5, $7); 
     }
     | FOR ident EQUAL expr COMMA expr block 
     { 
-        $$ = new Decaf::IrForStatement(d_scanner.lineNr(), d_scanner.columnNr()); 
+        $$ = new Decaf::IrForStatement(d_scanner.lineNr(), d_scanner.columnNr(), $2, $4, $6, $7); 
     }
     | RETURN SEMI 
     { 
@@ -281,7 +281,7 @@ statement
     }
     | RETURN expr SEMI 
     { 
-        $$ = new Decaf::IrReturnStatement(d_scanner.lineNr(), d_scanner.columnNr()); 
+        $$ = new Decaf::IrReturnStatement(d_scanner.lineNr(), d_scanner.columnNr(), $2); 
     }
     | BREAK SEMI 
     { 
@@ -293,7 +293,7 @@ statement
     }
     | expr SEMI 
     { 
-        $$ = new Decaf::IrExpressionStatement(d_scanner.lineNr(), d_scanner.columnNr()); 
+        $$ = new Decaf::IrExpressionStatement(d_scanner.lineNr(), d_scanner.columnNr(), $1); 
     }
     | block 
     { 
@@ -302,9 +302,9 @@ statement
     ;
     
 assign_op 
-    : EQUAL
-    | PLUSEQUAL
-    | MINUSEQUAL
+    : EQUAL { $$ = (int)Decaf::IrAssignmentOperator::Assign; }
+    | PLUSEQUAL { $$ = (int)Decaf::IrAssignmentOperator::IncrementAssign; }
+    | MINUSEQUAL { $$ = (int)Decaf::IrAssignmentOperator::DecrementAssign; }
     ;
     
 method_call 
@@ -394,8 +394,11 @@ logic_expr
 assign_expr
     : logic_expr  { $$ = $1; }
     | assign_expr assign_op logic_expr
+    {
+        $$ = new Decaf::IrAssignExpression(d_scanner.lineNr(), d_scanner.columnNr(), $1, (Decaf::IrAssignmentOperator)$2, $3); 
+    }
     ;
-    
+
 expr 
     : assign_expr { $$ = $1; }
     ;

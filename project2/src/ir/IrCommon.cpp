@@ -62,6 +62,13 @@ const std::string gIrBooleanOperatorStrings[(int)IrBooleanOperator::NUM_IR_BOOLE
 };
 static_assert(sizeof(gIrBooleanOperatorStrings)/sizeof(std::string) == (size_t)IrBooleanOperator::NUM_IR_BOOLEAN_OPERATORS, "Unexpected number of IrBooleanOperator strings.");
 
+const std::string gIrAssignmentOperatorStrings[(int)IrAssignmentOperator::NUM_IR_ASSIGNMENT_OPERATORS] =
+{
+    std::string("Assign"),
+    std::string("IncrementAssign"),
+    std::string("DecrementAssign")
+};
+static_assert(sizeof(gIrAssignmentOperatorStrings)/sizeof(std::string) == (size_t)IrAssignmentOperator::NUM_IR_ASSIGNMENT_OPERATORS, "Unexpected number of IrAssignmentOperator strings.");
 
 const std::string& IrTypeToString(IrType type)
 {
@@ -76,6 +83,11 @@ const std::string& IrBinaryOperatorToString(IrBinaryOperator op)
 const std::string& IrBooleanOperatorToString(IrBooleanOperator op)
 {
     return gIrBooleanOperatorStrings[(int)op];
+}
+
+const std::string& IrAssignmentOperatorToString(IrAssignmentOperator op)
+{
+    return gIrAssignmentOperatorStrings[(int)op];
 }
 
 } // namespace Decaf

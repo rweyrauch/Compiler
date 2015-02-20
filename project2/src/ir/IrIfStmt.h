@@ -28,25 +28,30 @@
 
 namespace Decaf
 {
+class IrExpression;
+class IrBlock;
 
 class IrIfStatement : public IrStatement
 {
 public:
-    IrIfStatement(int lineNumber, int columnNumber) :
-        IrStatement(lineNumber, columnNumber)
+    IrIfStatement(int lineNumber, int columnNumber, IrExpression* condition, IrBlock* trueBlock, IrBlock* falseBlock = nullptr) :
+        IrStatement(lineNumber, columnNumber),
+        m_condition(condition),
+        m_trueBlock(trueBlock),
+        m_falseBlock(falseBlock)
     {}
     
     virtual ~IrIfStatement()
     {}
     
-    virtual void print(unsigned int depth)
-    {
-        IRPRINT_INDENT(depth);
-        std::cout << "Ir(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
-    }
+    virtual void print(unsigned int depth);
     
         
 protected:    
+    
+    IrExpression* m_condition;
+    IrBlock* m_trueBlock;
+    IrBlock* m_falseBlock;
     
 private:
     IrIfStatement() = delete;
