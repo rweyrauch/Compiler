@@ -31,21 +31,27 @@ namespace Decaf
 class IrBooleanExpression : public IrExpression
 {
 public:
-    IrBooleanExpression(int lineNumber, int columnNumber, IrBooleanOperator boolOp) :
+    IrBooleanExpression(int lineNumber, int columnNumber, IrExpression* lhs, IrBooleanOperator boolOp, IrExpression* rhs) :
         IrExpression(lineNumber, columnNumber, IrType::Boolean),
-        m_operator(boolOp)
+        m_lhs(lhs),
+        m_operator(boolOp),
+        m_rhs(rhs)
     {}
     
     virtual ~IrBooleanExpression()
     {}
     
-    virtual void print(unsigned int depth) {}
+    virtual void print(unsigned int depth);
     
     IrBooleanOperator getOperator() const { return m_operator; }
+    IrExpression* getLeftHandSide() const { return m_lhs; }
+    IrExpression* getRightHandSide() const { return m_rhs; }
     
 protected:
     
     IrBooleanOperator m_operator;
+    IrExpression* m_lhs;
+    IrExpression* m_rhs;
     
 private:
     IrBooleanExpression() = delete;

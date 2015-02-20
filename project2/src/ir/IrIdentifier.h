@@ -22,9 +22,8 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <iostream>
 #include <string>
-#include <vector>
+#include "IrCommon.h"
 #include "IrBase.h"
 
 namespace Decaf
@@ -35,35 +34,19 @@ class IrIdentifier : public IrBase
 public:
     IrIdentifier(int lineNumber, int columnNumber, const std::string& ident) :
         IrBase(lineNumber, columnNumber),
-        m_identifier(ident),
-        m_index(-1)
-    {}
-
-    IrIdentifier(int lineNumber, int columnNumber, const std::string& ident, int index) :
-        IrBase(lineNumber, columnNumber),
-        m_identifier(ident),
-        m_index(index)
+        m_identifier(ident)
     {}
     
     virtual ~IrIdentifier()
     {}
     
-    virtual void print(unsigned int depth) 
-    {
-		for (auto d = 0; d < depth; d++) std::cout << "  ";	
-		if (m_index < 0)	
-			std::cout << "Identifier(" << getLineNumber() << "," << getColumnNumber() << ") = \"" << m_identifier << "\"" << std::endl;
-		else
-			std::cout << "Identifier(" << getLineNumber() << "," << getColumnNumber() << ") = \"" << m_identifier << "[" << m_index << "]\"" << std::endl;			
-    }
+    virtual void print(unsigned int depth);
     
     const std::string& getIdentifier() const { return m_identifier; }
-    int getIndex() const { return m_index; }
     
 protected:
     
     std::string m_identifier;
-    int m_index;
     
 private:
     IrIdentifier() = delete;

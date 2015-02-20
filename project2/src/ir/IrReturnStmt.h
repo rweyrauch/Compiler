@@ -22,8 +22,8 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <string>
-#include <vector>
+#include <iostream>
+#include "IrCommon.h"
 #include "IrStatement.h"
 
 namespace Decaf
@@ -39,7 +39,11 @@ public:
     virtual ~IrReturnStatement()
     {}
     
-    virtual void print(unsigned int depth) {}
+    virtual void print(unsigned int depth)
+    {
+        IRPRINT_INDENT(depth);
+        std::cout << "Return(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
+    }
         
 protected:    
     

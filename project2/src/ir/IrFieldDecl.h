@@ -22,38 +22,30 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <iostream>
 #include "IrCommon.h"
 #include "IrBase.h"
-#include "IrIdentifier.h"
 
 namespace Decaf
 {
+class IrLocation;
 
 class IrFieldDecl : public IrBase
 {
 public:
-    IrFieldDecl(int lineNumber, int columnNumber, IrIdentifier* ident, IrType type) :
+    IrFieldDecl(int lineNumber, int columnNumber, IrLocation* location, IrType type) :
         IrBase(lineNumber, columnNumber),
-        m_identifier(ident),
+        m_location(location),
         m_type(type)
     {}
     
     virtual ~IrFieldDecl()
     {}
     
-    virtual void print(unsigned int depth) 
-    {
-		for (auto d = 0; d < depth; d++) std::cout << "  ";
-		std::cout << "Field Decl(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
-		for (auto d = 0; d < depth; d++) std::cout << "  ";
-		std::cout << "  Type = " << (int)m_type << std::endl;
-		m_identifier->print(depth+1);
-    }
+    virtual void print(unsigned int depth);
         
 protected:
     
-    IrIdentifier* m_identifier;
+    IrLocation* m_location;
     IrType m_type; 
     
 private:

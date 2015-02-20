@@ -50,7 +50,7 @@
 %type <varDeclList> var_decl_list argument_decl_list
 %type <ident> ident
 %type <identList> ident_list
-%type <token> type
+%type <token> type rel_op logic_op
 %type <literal> literal
 %type <location> location
 %type <locationList> location_list
@@ -124,7 +124,7 @@ field_decl
         for (auto it = $2->begin(); it != $2->end(); ++it) 
         { 
             Decaf::IrLocation* location = *it; 
-            Decaf::IrFieldDecl* decl = new Decaf::IrFieldDecl(d_scanner.lineNr(), d_scanner.columnNr(), location->getIdentifier(), (Decaf::IrType)$1); 
+            Decaf::IrFieldDecl* decl = new Decaf::IrFieldDecl(d_scanner.lineNr(), d_scanner.columnNr(), location, (Decaf::IrType)$1); 
             $$->push_back(decl); 
         } 
     }
@@ -165,10 +165,12 @@ method_decl
     : type ident LPAREN argument_decl_list RPAREN block 
     { 
         $$ = new Decaf::IrMethodDecl(d_scanner.lineNr(), d_scanner.columnNr(), $2 ); 
+        $$->addBlock($6);
     }
     | type ident LPAREN RPAREN block 
     { 
         $$ = new Decaf::IrMethodDecl(d_scanner.lineNr(), d_scanner.columnNr(), $2);
+        $$->addBlock($5);
     }
     ;
 
@@ -330,47 +332,72 @@ location
     ;
     
 primary_expr
-    : location
-    | literal
-    | method_call
-    | LPAREN expr RPAREN
+    : location { $$ = $1; }
+    | literal { $$ = $1; }
+    | method_call { $$ = $1; }
+    | LPAREN expr RPAREN { $$ = $2; }
     ;
     
 unary_expr
-    : primary_expr
-    | unary_op unary_expr
+    : primary_expr { $$ = $1; }
+    | MINUS unary_expr 
+    { 
+        $$ = new Decaf::IrBinaryExpression(d_scanner.lineNr(), d_scanner.columnNr(), Decaf::IrType::Unknown, nullptr, Decaf::IrBinaryOperator::Subtract, $2); 
+    }
+    | BANG unary_expr  
+    { 
+        $$ = new Decaf::IrBooleanExpression(d_scanner.lineNr(), d_scanner.columnNr(), nullptr, Decaf::IrBooleanOperator::Not, $2); 
+    }
     ;
 
 mult_expr
-    : unary_expr
-    | mult_expr MUL unary_expr
-    | mult_expr DIV unary_expr
-    | mult_expr MOD unary_expr
+    : unary_expr { $$ = $1; }
+    | mult_expr MUL unary_expr 
+    { 
+        $$ = new Decaf::IrBinaryExpression(d_scanner.lineNr(), d_scanner.columnNr(), Decaf::IrType::Unknown, $1, Decaf::IrBinaryOperator::Multiply, $3); 
+    }
+    | mult_expr DIV unary_expr 
+    { 
+        $$ = new Decaf::IrBinaryExpression(d_scanner.lineNr(), d_scanner.columnNr(), Decaf::IrType::Unknown, $1, Decaf::IrBinaryOperator::Divide, $3); 
+    }
+    | mult_expr MOD unary_expr 
+    { 
+        $$ = new Decaf::IrBinaryExpression(d_scanner.lineNr(), d_scanner.columnNr(), Decaf::IrType::Unknown, $1, Decaf::IrBinaryOperator::Modulo, $3); 
+    }
     ;
     
 add_expr
-    : mult_expr
-    | add_expr PLUS mult_expr
-    | add_expr MINUS mult_expr
+    : mult_expr { $$ = $1; }
+    | add_expr PLUS mult_expr  
+    { 
+        $$ = new Decaf::IrBinaryExpression(d_scanner.lineNr(), d_scanner.columnNr(), Decaf::IrType::Unknown, $1, Decaf::IrBinaryOperator::Add, $3); 
+    }
+    | add_expr MINUS mult_expr  
+    { 
+        $$ = new Decaf::IrBinaryExpression(d_scanner.lineNr(), d_scanner.columnNr(), Decaf::IrType::Unknown, $1, Decaf::IrBinaryOperator::Subtract, $3); 
+    }
     ;
 
 rel_expr
-    : add_expr
-    | rel_expr rel_op add_expr
+    : add_expr { $$ = $1; }
+    | rel_expr rel_op add_expr { $$ = new Decaf::IrBooleanExpression(d_scanner.lineNr(), d_scanner.columnNr(), $1, (Decaf::IrBooleanOperator)$2, $3); }
     ;
  
 logic_expr
-    : rel_expr
-    | logic_expr logic_op rel_expr
+    : rel_expr  { $$ = $1; }
+    | logic_expr logic_op rel_expr  
+    { 
+        $$ = new Decaf::IrBooleanExpression(d_scanner.lineNr(), d_scanner.columnNr(), $1, (Decaf::IrBooleanOperator)$2, $3); 
+    }
     ;
     
 assign_expr
-    : logic_expr
+    : logic_expr  { $$ = $1; }
     | assign_expr assign_op logic_expr
     ;
     
 expr 
-    : assign_expr
+    : assign_expr { $$ = $1; }
     ;
 
 expr_list 
@@ -388,23 +415,18 @@ callout_arg
     | STRING
     ;
     
-unary_op
-    : MINUS
-    | BANG
-    ;
-
 rel_op 
-    : CLT
-    | CGT
-    | CLE
-    | CGE
-    | CEQ 
-    | CNE
+    : CLT { $$ = (int)Decaf::IrBooleanOperator::Less; }
+    | CGT { $$ = (int)Decaf::IrBooleanOperator::Greater; }
+    | CLE { $$ = (int)Decaf::IrBooleanOperator::LessEqual; }
+    | CGE { $$ = (int)Decaf::IrBooleanOperator::GreaterEqual; }
+    | CEQ { $$ = (int)Decaf::IrBooleanOperator::Equal; }
+    | CNE { $$ = (int)Decaf::IrBooleanOperator::NotEqual; }
     ;
     
 logic_op 
-    : LAND 
-    | LOR
+    : LAND { $$ = (int)Decaf::IrBooleanOperator::LogicalAnd; }
+    | LOR { $$ = (int)Decaf::IrBooleanOperator::LogicalOr; }
     ;
     
 literal 

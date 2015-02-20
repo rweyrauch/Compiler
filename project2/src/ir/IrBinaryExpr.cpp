@@ -21,54 +21,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#pragma once
-#include <string>
-#include <vector>
-#include "IrStatement.h"
+#include <iostream>
+#include "IrCommon.h"
+#include "IrBinaryExpr.h"
 
 namespace Decaf
 {
-class IrVariableDecl;
 
-class IrBlock : public IrStatement
+void IrBinaryExpression::print(unsigned int depth) 
 {
-public:
-    IrBlock(int lineNumber, int columnNumber) :
-        IrStatement(lineNumber, columnNumber),
-        m_variables(),
-        m_statements()
-    {}
-    
-    virtual ~IrBlock()
-    {}
-    
-    virtual void print(unsigned int depth);
-    
-    void addVariableDecl(IrVariableDecl* var)
-    {
-        m_variables.push_back(var);
-    }
-    void addVariableDecl(const std::vector<IrVariableDecl*>& variables)
-    {
-        m_variables.insert(m_variables.end(), variables.begin(), variables.end());
-    }
-    
-    void addStatement(IrStatement* stmt)
-    {
-        m_statements.push_back(stmt);
-    }
-    void addStatements(const std::vector<IrStatement*>& statements)
-    {
-        m_statements.insert(m_statements.end(), statements.begin(), statements.end());
-    }
-    
-protected:    
-    std::vector<IrVariableDecl*> m_variables;
-    std::vector<IrStatement*> m_statements;
-    
-private:
-    IrBlock() = delete;
-    IrBlock(const IrBlock& rhs) = delete;
-};
+    IRPRINT_INDENT(depth);
+    std::cout << "Boolean Expr(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
+    if (m_lhs) m_lhs->print(depth+1);
+    IRPRINT_INDENT(depth+1);
+    std::cout << "Operator: " << IrBinaryOperatorToString(m_operator) << std::endl;
+    if (m_rhs) m_rhs->print(depth+1);
+}
 
 } // namespace Decaf

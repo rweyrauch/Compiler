@@ -22,14 +22,15 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include <string>
 
 namespace Decaf
 {
     
-enum class IrType
+enum class IrType : int
 {
-    Unknown = -1,
-    Void = 0,
+    Unknown = 0,
+    Void,
     Integer,
     Boolean,
     Character,
@@ -37,7 +38,7 @@ enum class IrType
     NUM_IR_TYPES
 };
     
-enum class IrBinaryOperator
+enum class IrBinaryOperator : int
 {
     Add = 0,
     Subtract,
@@ -49,7 +50,7 @@ enum class IrBinaryOperator
 };
     
  
-enum class IrBooleanOperator
+enum class IrBooleanOperator : int
 {
     Equal = 0,
     NotEqual,
@@ -63,5 +64,11 @@ enum class IrBooleanOperator
     
     NUM_IR_BOOLEAN_OPERATORS
 };
+
+const std::string& IrTypeToString(IrType type);
+const std::string& IrBinaryOperatorToString(IrBinaryOperator op);
+const std::string& IrBooleanOperatorToString(IrBooleanOperator op);
+
+#define IRPRINT_INDENT(depth) { for (auto d = 0; d < (depth); d++) std::cout << "  "; }
 
 } // namespace Decaf

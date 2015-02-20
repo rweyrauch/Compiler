@@ -22,7 +22,6 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <string>
 #include <vector>
 #include "IrBase.h"
 #include "IrIdentifier.h"

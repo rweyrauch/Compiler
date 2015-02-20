@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #include <iostream>
+#include "IrCommon.h"
 #include "IrClass.h"
 
 namespace Decaf
@@ -29,36 +30,36 @@ namespace Decaf
     
 void IrClass::print(unsigned int depth) 
 {
-	for (auto d = 0; d < depth; d++) std::cout << "  ";
-	
-	std::cout << "Class(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
-	m_identifier->print(depth+1);
-	for (auto i : m_field_decl_list)
-	{
-		i->print(depth+1);
-	}
-	for (auto i : m_method_decl_list)
-	{
-		i->print(depth+1);
-	}
+    IRPRINT_INDENT(depth);
+    
+    std::cout << "Class(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
+    m_identifier->print(depth+1);
+    for (auto i : m_field_decl_list)
+    {
+        i->print(depth+1);
+    }
+    for (auto i : m_method_decl_list)
+    {
+        i->print(depth+1);
+    }
 }
 
 void IrClass::addFieldDecl(IrFieldDecl* field)
 {
-	m_field_decl_list.push_back(field);
+    m_field_decl_list.push_back(field);
 }
 void IrClass::addFieldDecl(const std::vector<IrFieldDecl*>& fields)
 {
-	m_field_decl_list.insert(m_field_decl_list.end(), fields.begin(), fields.end());
+    m_field_decl_list.insert(m_field_decl_list.end(), fields.begin(), fields.end());
 }
 
 void IrClass::addMethodDecl(IrMethodDecl* method)
 {
-	m_method_decl_list.push_back(method);
+    m_method_decl_list.push_back(method);
 }
 void IrClass::addMethodDecl(const std::vector<IrMethodDecl*>& methods)
 {
-	m_method_decl_list.insert(m_method_decl_list.end(), methods.begin(), methods.end());
+    m_method_decl_list.insert(m_method_decl_list.end(), methods.begin(), methods.end());
 }
 
 } // namespace Decaf

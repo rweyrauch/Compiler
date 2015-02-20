@@ -22,14 +22,15 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <string>
 #include <vector>
+#include "IrCommon.h"
 #include "IrBase.h"
 #include "IrIdentifier.h"
 
 namespace Decaf
 {
 class IrArgument;
+class IrBlock;
 
 class IrMethodDecl : public IrBase
 {
@@ -37,33 +38,28 @@ public:
     IrMethodDecl(int lineNumber, int columnNumber, IrIdentifier* ident) :
         IrBase(lineNumber, columnNumber),
         m_identifier(ident),
-        m_argument_list()
+        m_argument_list(),
+        m_block(nullptr)
     {}
     
     virtual ~IrMethodDecl()
     {}
     
-    virtual void print(unsigned int depth)
-    {
-		for (auto d = 0; d < depth; d++) std::cout << "  ";
-		std::cout << "Method(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
-		m_identifier->print(depth+1);
-
-        //for (auto it : m_argument_list)
-        //{
-		//	*it->print(depth+1);
-		//}     
-    }
-    
+    virtual void print(unsigned int depth);
+     
     void addArgument(IrArgument* arg)
     {
         m_argument_list.push_back(arg);
     }
-    
+    void addBlock(IrBlock* block)
+    {
+        m_block = block;
+    }
 protected:
     
     IrIdentifier* m_identifier;
     std::vector<IrArgument*> m_argument_list;
+    IrBlock* m_block;
     
 private:
     IrMethodDecl() = delete;

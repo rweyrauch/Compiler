@@ -21,54 +21,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#pragma once
-#include <string>
-#include <vector>
+#include <iostream>
+#include "IrCommon.h"
+#include "IrBlock.h"
+#include "IrVarDecl.h"
 #include "IrStatement.h"
 
 namespace Decaf
 {
-class IrVariableDecl;
 
-class IrBlock : public IrStatement
+void IrBlock::print(unsigned int depth) 
 {
-public:
-    IrBlock(int lineNumber, int columnNumber) :
-        IrStatement(lineNumber, columnNumber),
-        m_variables(),
-        m_statements()
-    {}
-    
-    virtual ~IrBlock()
-    {}
-    
-    virtual void print(unsigned int depth);
-    
-    void addVariableDecl(IrVariableDecl* var)
+    IRPRINT_INDENT(depth);
+    std::cout << "Block(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
+    for (auto it : m_variables)
     {
-        m_variables.push_back(var);
+        it->print(depth+1);
     }
-    void addVariableDecl(const std::vector<IrVariableDecl*>& variables)
+    for (auto it : m_statements)
     {
-        m_variables.insert(m_variables.end(), variables.begin(), variables.end());
+        it->print(depth+1);
     }
+}
     
-    void addStatement(IrStatement* stmt)
-    {
-        m_statements.push_back(stmt);
-    }
-    void addStatements(const std::vector<IrStatement*>& statements)
-    {
-        m_statements.insert(m_statements.end(), statements.begin(), statements.end());
-    }
-    
-protected:    
-    std::vector<IrVariableDecl*> m_variables;
-    std::vector<IrStatement*> m_statements;
-    
-private:
-    IrBlock() = delete;
-    IrBlock(const IrBlock& rhs) = delete;
-};
-
 } // namespace Decaf

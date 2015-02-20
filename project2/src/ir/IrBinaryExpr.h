@@ -31,21 +31,27 @@ namespace Decaf
 class IrBinaryExpression : public IrExpression
 {
 public:
-    IrBinaryExpression(int lineNumber, int columnNumber, IrType type, IrBinaryOperator binaryOp) :
+    IrBinaryExpression(int lineNumber, int columnNumber, IrType type, IrExpression* lhs, IrBinaryOperator binaryOp, IrExpression* rhs) :
         IrExpression(lineNumber, columnNumber, type),
-        m_operator(binaryOp)
+        m_lhs(lhs),
+        m_operator(binaryOp),
+        m_rhs(rhs)
     {}
     
     virtual ~IrBinaryExpression()
     {}
     
-    virtual void print(unsigned int depth) {}
+    virtual void print(unsigned int depth);
     
     IrBinaryOperator getOperator() const { return m_operator; }
-    
+    IrExpression* getLeftHandSide() const { return m_lhs; }
+    IrExpression* getRightHandSide() const { return m_rhs; }
+   
 protected:
     
     IrBinaryOperator m_operator;
+    IrExpression* m_lhs;
+    IrExpression* m_rhs;
     
 private:
     IrBinaryExpression() = delete;
