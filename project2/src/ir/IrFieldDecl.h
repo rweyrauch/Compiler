@@ -45,7 +45,10 @@ public:
     virtual void print(unsigned int depth) 
     {
 		for (auto d = 0; d < depth; d++) std::cout << "  ";
-        std::cout << "Field Declaration: " << m_identifier->getIdentifier() << " Type: " << (int)m_type << " at " << getLineNumber() << ", " << getColumnNumber() << std::endl;        
+		std::cout << "Field Decl(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
+		for (auto d = 0; d < depth; d++) std::cout << "  ";
+		std::cout << "  Type = " << (int)m_type << std::endl;
+		m_identifier->print(depth+1);
     }
         
 protected:

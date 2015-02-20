@@ -46,7 +46,9 @@ public:
     virtual void print(unsigned int depth)
     {
 		for (auto d = 0; d < depth; d++) std::cout << "  ";
-        std::cout << "Method: " << m_identifier->getIdentifier() << " at " << getLineNumber() << ", " << getColumnNumber() << std::endl; 
+		std::cout << "Method(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
+		m_identifier->print(depth+1);
+
         //for (auto it : m_argument_list)
         //{
 		//	*it->print(depth+1);

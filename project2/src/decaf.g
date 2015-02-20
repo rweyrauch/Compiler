@@ -1,5 +1,6 @@
 
 %scanner Scanner.h
+//%scanner-token-function scanner.lex()
 
 %union {
     Decaf::IrClass *programClass;

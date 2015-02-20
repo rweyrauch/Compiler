@@ -31,7 +31,8 @@ void IrClass::print(unsigned int depth)
 {
 	for (auto d = 0; d < depth; d++) std::cout << "  ";
 	
-	std::cout << "Class: " << m_identifier->getIdentifier() << " at " << getLineNumber() << ", " << getColumnNumber() << std::endl;
+	std::cout << "Class(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
+	m_identifier->print(depth+1);
 	for (auto i : m_field_decl_list)
 	{
 		i->print(depth+1);

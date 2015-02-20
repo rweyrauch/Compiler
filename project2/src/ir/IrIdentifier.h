@@ -50,8 +50,11 @@ public:
     
     virtual void print(unsigned int depth) 
     {
-		for (auto d = 0; d < depth; d++) std::cout << "  ";		
-        std::cout << "Identifier: " << m_identifier << " at " << getLineNumber() << ", " << getColumnNumber() << std::endl;
+		for (auto d = 0; d < depth; d++) std::cout << "  ";	
+		if (m_index < 0)	
+			std::cout << "Identifier(" << getLineNumber() << "," << getColumnNumber() << ") = \"" << m_identifier << "\"" << std::endl;
+		else
+			std::cout << "Identifier(" << getLineNumber() << "," << getColumnNumber() << ") = \"" << m_identifier << "[" << m_index << "]\"" << std::endl;			
     }
     
     const std::string& getIdentifier() const { return m_identifier; }
