@@ -42,7 +42,7 @@ public:
     virtual ~IrBooleanLiteral()
     {}
     
-    virtual void print() 
+    virtual void print(unsigned int depth) 
     {}
     
     bool getValue() const { return m_value; }

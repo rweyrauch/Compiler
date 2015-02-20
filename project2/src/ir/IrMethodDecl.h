@@ -43,10 +43,14 @@ public:
     virtual ~IrMethodDecl()
     {}
     
-    virtual void print()
+    virtual void print(unsigned int depth)
     {
-        std::cout << "Method: " << m_identifier->getIdentifier() << " at " << getLineNumber() << ", " << getColumnNumber() << std::endl;
-        
+		for (auto d = 0; d < depth; d++) std::cout << "  ";
+        std::cout << "Method: " << m_identifier->getIdentifier() << " at " << getLineNumber() << ", " << getColumnNumber() << std::endl; 
+        //for (auto it : m_argument_list)
+        //{
+		//	*it->print(depth+1);
+		//}     
     }
     
     void addArgument(IrArgument* arg)

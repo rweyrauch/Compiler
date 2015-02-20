@@ -39,7 +39,7 @@ public:
     virtual ~IrAssignStatement()
     {}
     
-    virtual void print() {}
+    virtual void print(unsigned int depth) {}
         
 protected:    
     

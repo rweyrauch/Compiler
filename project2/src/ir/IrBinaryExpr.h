@@ -39,7 +39,7 @@ public:
     virtual ~IrBinaryExpression()
     {}
     
-    virtual void print() {}
+    virtual void print(unsigned int depth) {}
     
     IrBinaryOperator getOperator() const { return m_operator; }
     

@@ -39,7 +39,7 @@ public:
     virtual ~IrBooleanExpression()
     {}
     
-    virtual void print() {}
+    virtual void print(unsigned int depth) {}
     
     IrBooleanOperator getOperator() const { return m_operator; }
     

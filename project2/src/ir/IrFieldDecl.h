@@ -42,9 +42,10 @@ public:
     virtual ~IrFieldDecl()
     {}
     
-    virtual void print() 
+    virtual void print(unsigned int depth) 
     {
-       std::cout << "Field Declaration: " << m_identifier->getIdentifier() << " Type: " << (int)m_type << " at " << getLineNumber() << ", " << getColumnNumber() << std::endl;        
+		for (auto d = 0; d < depth; d++) std::cout << "  ";
+        std::cout << "Field Declaration: " << m_identifier->getIdentifier() << " Type: " << (int)m_type << " at " << getLineNumber() << ", " << getColumnNumber() << std::endl;        
     }
         
 protected:

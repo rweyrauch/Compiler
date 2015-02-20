@@ -50,7 +50,7 @@ public:
     virtual ~IrVariableDecl()
     {}
     
-    virtual void print() {}
+    virtual void print(unsigned int depth) {}
         
 protected:
     

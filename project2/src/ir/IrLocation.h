@@ -46,7 +46,7 @@ public:
     virtual ~IrLocation()
     {}
     
-    virtual void print() {}
+    virtual void print(unsigned int depth) {}
     
     IrIdentifier* getIdentifier() const { return m_identifier; }
     IrExpression* getIndex() const { return m_index; }

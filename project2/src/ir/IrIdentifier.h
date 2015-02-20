@@ -48,8 +48,9 @@ public:
     virtual ~IrIdentifier()
     {}
     
-    virtual void print() 
+    virtual void print(unsigned int depth) 
     {
+		for (auto d = 0; d < depth; d++) std::cout << "  ";		
         std::cout << "Identifier: " << m_identifier << " at " << getLineNumber() << ", " << getColumnNumber() << std::endl;
     }
     

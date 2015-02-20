@@ -37,7 +37,7 @@ public:
     virtual ~IrBase() 
     {}
     
-    virtual void print() = 0;
+    virtual void print(unsigned int depth) = 0;
     
     int getLineNumber() const { return m_lineNumber; }
     int getColumnNumber() const { return m_columnNumber; }

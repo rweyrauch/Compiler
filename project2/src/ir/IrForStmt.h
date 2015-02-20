@@ -39,7 +39,7 @@ public:
     virtual ~IrForStatement()
     {}
     
-    virtual void print() {}
+    virtual void print(unsigned int depth) {}
         
 protected:    
     

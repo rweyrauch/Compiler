@@ -22,7 +22,6 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <iostream>
 #include <string>
 #include <vector>
 #include "IrBase.h"
@@ -46,36 +45,13 @@ public:
     virtual ~IrClass()
     {}
     
-    virtual void print() 
-    {
-        std::cout << "Class: " << m_identifier->getIdentifier() << " at " << getLineNumber() << ", " << getColumnNumber() << std::endl;
-        for (auto i : m_field_decl_list)
-        {
-            i->print();
-        }
-        for (auto i : m_method_decl_list)
-        {
-            i->print();
-        }
-    }
+    virtual void print(unsigned int depth); 
+     
+    void addFieldDecl(IrFieldDecl* field);
+    void addFieldDecl(const std::vector<IrFieldDecl*>& fields);
     
-    void addFieldDecl(IrFieldDecl* field)
-    {
-        m_field_decl_list.push_back(field);
-    }
-    void addFieldDecl(const std::vector<IrFieldDecl*>& fields)
-    {
-        m_field_decl_list.insert(m_field_decl_list.end(), fields.begin(), fields.end());
-    }
-    
-    void addMethodDecl(IrMethodDecl* method)
-    {
-        m_method_decl_list.push_back(method);
-    }
-    void addMethodDecl(const std::vector<IrMethodDecl*>& methods)
-    {
-        m_method_decl_list.insert(m_method_decl_list.end(), methods.begin(), methods.end());
-    }
+    void addMethodDecl(IrMethodDecl* method);
+    void addMethodDecl(const std::vector<IrMethodDecl*>& methods);
     
 protected:
     

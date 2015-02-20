@@ -41,7 +41,7 @@ public:
     virtual ~IrMethodCall()
     {}
     
-    virtual void print() {}
+    virtual void print(unsigned int depth) {}
         
 protected:    
     

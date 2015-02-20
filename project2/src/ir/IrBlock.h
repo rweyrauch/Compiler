@@ -42,7 +42,7 @@ public:
     virtual ~IrBlock()
     {}
     
-    virtual void print() {}
+    virtual void print(unsigned int depth) {}
     
     void addVariableDecl(IrVariableDecl* var)
     {

@@ -21,31 +21,43 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#pragma once
-#include <string>
-#include <vector>
-#include "IrStatement.h"
+#include <iostream>
+#include "IrClass.h"
 
 namespace Decaf
 {
-
-class IrBreakStatement : public IrStatement
+    
+void IrClass::print(unsigned int depth) 
 {
-public:
-    IrBreakStatement(int lineNumber, int columnNumber) :
-        IrStatement(lineNumber, columnNumber)
-    {}
-    
-    virtual ~IrBreakStatement()
-    {}
-    
-    virtual void print(unsigned int depth) {}
-        
-protected:    
-    
-private:
-    IrBreakStatement() = delete;
-    IrBreakStatement(const IrBreakStatement& rhs) = delete;
-};
+	for (auto d = 0; d < depth; d++) std::cout << "  ";
+	
+	std::cout << "Class: " << m_identifier->getIdentifier() << " at " << getLineNumber() << ", " << getColumnNumber() << std::endl;
+	for (auto i : m_field_decl_list)
+	{
+		i->print(depth+1);
+	}
+	for (auto i : m_method_decl_list)
+	{
+		i->print(depth+1);
+	}
+}
+
+void IrClass::addFieldDecl(IrFieldDecl* field)
+{
+	m_field_decl_list.push_back(field);
+}
+void IrClass::addFieldDecl(const std::vector<IrFieldDecl*>& fields)
+{
+	m_field_decl_list.insert(m_field_decl_list.end(), fields.begin(), fields.end());
+}
+
+void IrClass::addMethodDecl(IrMethodDecl* method)
+{
+	m_method_decl_list.push_back(method);
+}
+void IrClass::addMethodDecl(const std::vector<IrMethodDecl*>& methods)
+{
+	m_method_decl_list.insert(m_method_decl_list.end(), methods.begin(), methods.end());
+}
 
 } // namespace Decaf

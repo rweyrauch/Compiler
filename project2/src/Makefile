@@ -1,7 +1,7 @@
 all: parser
 
 CPPFLAGS = -std=c++11 -g -DDEBUG -Iir -I.
-OBJS = parse.o lex.o main.o
+OBJS = parse.o lex.o main.o ir/IrClass.o
 LIBS = -lpopt
 
 clean:

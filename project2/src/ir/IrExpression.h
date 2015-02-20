@@ -39,7 +39,7 @@ public:
     virtual ~IrExpression()
     {}
     
-    virtual void print() = 0;
+    virtual void print(unsigned int depth) = 0;
     
     IrType getType() const { return m_type; }
     

@@ -38,7 +38,7 @@ public:
     virtual ~IrLiteral()
     {}
     
-    virtual void print() {}
+    virtual void print(unsigned int depth) = 0;
     
 protected:
     

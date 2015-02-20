@@ -41,7 +41,7 @@ public:
     virtual ~IrIntegerLiteral()
     {}
     
-    virtual void print() 
+    virtual void print(unsigned int depth) 
     {}
     
     int getValue() const { return m_value; }

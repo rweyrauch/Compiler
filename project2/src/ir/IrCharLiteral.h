@@ -46,7 +46,7 @@ public:
     virtual ~IrCharacterLiteral()
     {}
     
-    virtual void print() 
+    virtual void print(unsigned int depth) 
     {}
     
     char getValue() const { return m_value; }

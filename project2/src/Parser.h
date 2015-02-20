@@ -31,7 +31,7 @@ class Parser: public ParserBase
         virtual ~Parser() {}
         int parse();
 
-        void dumpAST() { if (d_root) d_root->print(); }
+        void dumpAST() { if (d_root) d_root->print(0); }
         
     private:
         void error(char const *msg);    // called on (syntax) errors

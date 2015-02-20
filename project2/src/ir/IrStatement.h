@@ -37,7 +37,7 @@ public:
     virtual ~IrStatement()
     {}
     
-    virtual void print() = 0;
+    virtual void print(unsigned int depth) = 0;
     
 protected:
     
