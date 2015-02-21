@@ -50,6 +50,46 @@ void IrClass::print(unsigned int depth)
     }
 }
 
+bool IrClass::applySemanticChecks(const std::string& filename) 
+{ 
+    // Rule: identifier == "Program"
+    if (m_identifier->getIdentifier() != "Program")
+    {
+        std::cerr << "File: " << filename << " Syntax error: Class must be named \'Program\'." << std::endl;
+        return false;
+    }
+    
+    // Rule: Valid program must contain a main function with no parameters.
+    bool mainFound = false;
+    for (auto it : m_method_decl_list)
+    {
+        if (it->getName() == "main" && it->getNumArguments() == 0 && it->getReturnType() == IrType::Void)
+        {
+            mainFound = true;
+            break;
+        }
+    }
+    if (!mainFound)
+    {
+        std::cerr << "File: " << filename << " Syntax error: Class must contain a method \'main\'." << std::endl;
+        return false;        
+    }
+    
+    for (auto it : m_field_decl_list)
+    {
+        if (!it->applySemanticChecks(filename))
+            break;
+    }
+    
+    for (auto it : m_method_decl_list)
+    {
+        if (!it->applySemanticChecks(filename))
+            break;
+    }
+    
+    return true;
+}
+
 void IrClass::addFieldDecl(IrFieldDecl* field)
 {
     m_field_decl_list.push_back(field);

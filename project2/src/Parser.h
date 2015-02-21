@@ -37,7 +37,17 @@ class Parser: public ParserBase
         virtual ~Parser() {}
         int parse();
 
-        void dumpAST() { if (d_root) d_root->print(0); }
+        void dumpAST() 
+        { 
+            if (d_root) 
+                d_root->print(0); 
+        }
+        bool semanticChecks() 
+        { 
+            if (d_root) 
+                return d_root->applySemanticChecks(d_scanner.filename()); 
+            return false; 
+        }
         
     private:
         void error(char const *msg);    // called on (syntax) errors

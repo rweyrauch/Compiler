@@ -57,6 +57,10 @@ public:
         m_block = block;
     }
     
+    const std::string& getName() const { return m_identifier->getIdentifier(); }
+    size_t getNumArguments() const { return m_argument_list.size(); }
+    IrType getReturnType() const { return m_returnType; }
+    
 protected:
     
     IrIdentifier* m_identifier;

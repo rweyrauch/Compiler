@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include <string>
 
 namespace Decaf
 {
@@ -38,6 +39,7 @@ public:
     {}
     
     virtual void print(unsigned int depth) = 0;
+    virtual bool applySemanticChecks(const std::string& filename) { return true; }
     
     int getLineNumber() const { return m_lineNumber; }
     int getColumnNumber() const { return m_columnNumber; }

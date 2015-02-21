@@ -45,6 +45,7 @@ public:
     {}
     
     virtual void print(unsigned int depth); 
+    virtual bool applySemanticChecks(const std::string& filename);
      
     void addFieldDecl(IrFieldDecl* field);
     void addFieldDecl(const std::vector<IrFieldDecl*>& fields);
