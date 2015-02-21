@@ -29,6 +29,7 @@
 namespace Decaf
 {
 class IrVariableDecl;
+class IrSymbolTable;
 
 class IrBlock : public IrStatement
 {
@@ -36,13 +37,22 @@ public:
     IrBlock(int lineNumber, int columnNumber) :
         IrStatement(lineNumber, columnNumber),
         m_variables(),
-        m_statements()
+        m_statements(),
+        m_symbols(nullptr)
     {}
     
     virtual ~IrBlock()
-    {}
+    {
+        for (auto it : m_variables)
+            delete it;
+        for (auto it : m_statements)
+            delete it;
+        delete m_symbols;
+    }
     
+    virtual void clean(); 
     virtual void print(unsigned int depth);
+    virtual bool applySemanticChecks(const std::string& filename);
     
     void addVariableDecl(IrVariableDecl* var)
     {
@@ -61,10 +71,18 @@ public:
     {
         m_statements.insert(m_statements.end(), statements.begin(), statements.end());
     }
-    
+  
+    IrSymbolTable* getSymbols()
+    {
+        return m_symbols;
+    }
+  
 protected:    
+    
     std::vector<IrVariableDecl*> m_variables;
     std::vector<IrStatement*> m_statements;
+    
+    IrSymbolTable* m_symbols;
     
 private:
     IrBlock() = delete;

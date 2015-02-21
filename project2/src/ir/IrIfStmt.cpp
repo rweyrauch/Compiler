@@ -30,6 +30,10 @@
 namespace Decaf
 {
 
+void IrIfStatement::clean()
+{
+}
+    
 void IrIfStatement::print(unsigned int depth) 
 {
     IRPRINT_INDENT(depth);
@@ -37,6 +41,11 @@ void IrIfStatement::print(unsigned int depth)
     m_condition->print(depth+1);
     if (m_trueBlock) m_trueBlock->print(depth+1);
     if (m_falseBlock) m_falseBlock->print(depth+1);
+}
+    
+bool IrIfStatement::applySemanticChecks(const std::string& filename)
+{
+    return true;
 }
     
 } // namespace Decaf

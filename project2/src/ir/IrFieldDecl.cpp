@@ -29,16 +29,25 @@
 namespace Decaf
 {
 
+void IrFieldDecl::clean()
+{
+}
+    
 void IrFieldDecl::print(unsigned int depth) 
 {
     IRPRINT_INDENT(depth);
     std::cout << "Field Decl(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
     IRPRINT_INDENT(depth+1);
-    std::cout << "  Type = " << IrTypeToString(m_type) << std::endl;
+    std::cout << "Type = " << IrTypeToString(m_type) << std::endl;
     
     IRPRINT_INDENT(depth+1); 
     std::cout << "Location: " << std::endl;
     m_location->print(depth+2);
+}
+    
+bool IrFieldDecl::applySemanticChecks(const std::string& filename)
+{
+    return true;
 }
     
 } // namespace Decaf

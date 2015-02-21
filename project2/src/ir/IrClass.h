@@ -30,6 +30,7 @@
 
 namespace Decaf
 {
+class IrSymbolTable;
 
 class IrClass : public IrBase
 {
@@ -38,12 +39,21 @@ public:
         IrBase(lineNumber, columnNumber),
         m_identifier(ident),
         m_field_decl_list(),
-        m_method_decl_list()
+        m_method_decl_list(),
+        m_symbols(nullptr)
     {}
     
     virtual ~IrClass()
-    {}
+    {
+        delete m_identifier;
+        for (auto it : m_field_decl_list)
+            delete it;
+        for (auto it : m_method_decl_list)
+            delete it;
+        delete m_symbols;
+    }
     
+    virtual void clean(); 
     virtual void print(unsigned int depth); 
     virtual bool applySemanticChecks(const std::string& filename);
      
@@ -53,12 +63,19 @@ public:
     void addMethodDecl(IrMethodDecl* method);
     void addMethodDecl(const std::vector<IrMethodDecl*>& methods);
     
+    IrSymbolTable* getSymbols()
+    {
+        return m_symbols;
+    }
+    
 protected:
     
     IrIdentifier* m_identifier;
     
     std::vector<IrFieldDecl*> m_field_decl_list;
     std::vector<IrMethodDecl*> m_method_decl_list;
+    
+    IrSymbolTable* m_symbols;
     
 private:
     IrClass() = delete;

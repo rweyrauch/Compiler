@@ -30,6 +30,18 @@
 namespace Decaf
 {
 
+void IrBlock::clean()
+{
+    for (auto it : m_variables)
+    {
+        it->clean();
+    }
+    for (auto it : m_statements)
+    {
+        it->clean();
+    }
+}
+
 void IrBlock::print(unsigned int depth) 
 {
     IRPRINT_INDENT(depth);
@@ -42,6 +54,22 @@ void IrBlock::print(unsigned int depth)
     {
         it->print(depth+1);
     }
+}
+    
+bool IrBlock::applySemanticChecks(const std::string& filename)
+{
+    bool valid = true;
+    for (auto it : m_variables)
+    {
+        valid = it->applySemanticChecks(filename);
+        if (!valid) return valid;
+    }
+    for (auto it : m_statements)
+    {
+        valid = it->applySemanticChecks(filename);
+        if (!valid) return valid;
+    }   
+    return valid;
 }
     
 } // namespace Decaf

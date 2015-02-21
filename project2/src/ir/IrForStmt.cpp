@@ -31,6 +31,10 @@
 namespace Decaf
 {
 
+void IrForStatement::clean()
+{
+}
+    
 void IrForStatement::print(unsigned int depth) 
 {
     IRPRINT_INDENT(depth);
@@ -42,5 +46,10 @@ void IrForStatement::print(unsigned int depth)
     
     if (m_body) m_body->print(depth+1);
 }
-    
+  
+bool IrForStatement::applySemanticChecks(const std::string& filename)
+{
+    return true;
+}
+  
 } // namespace Decaf

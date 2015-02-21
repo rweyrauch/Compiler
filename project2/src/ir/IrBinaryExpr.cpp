@@ -28,10 +28,16 @@
 namespace Decaf
 {
 
+void IrBinaryExpression::clean()
+{
+}
+    
 void IrBinaryExpression::print(unsigned int depth) 
 {
     IRPRINT_INDENT(depth);
     std::cout << "Binary Expr(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
+    IRPRINT_INDENT(depth+1);
+    std::cout << "Type = " << IrTypeToString(m_type) << std::endl;
     
     if (m_lhs)
     {
@@ -49,6 +55,11 @@ void IrBinaryExpression::print(unsigned int depth)
         std::cout << "RHS: " << std::endl;
         m_rhs->print(depth+2);
     }
+}
+
+bool IrBinaryExpression::applySemanticChecks(const std::string& filename)
+{
+    return true;
 }
 
 } // namespace Decaf

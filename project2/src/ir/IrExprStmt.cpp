@@ -23,37 +23,23 @@
 //
 #include <iostream>
 #include "IrCommon.h"
-#include "IrMethodCall.h"
-#include "IrIdentifier.h"
-#include "IrStringLiteral.h"
+#include "IrExprStmt.h"
 
 namespace Decaf
 {
 
-void IrMethodCall::clean()
+void IrExpressionStatement::clean()
 {
 }
     
-void IrMethodCall::print(unsigned int depth)
+void IrExpressionStatement::print(unsigned int depth) 
 {
     IRPRINT_INDENT(depth);
-    std::cout << "Method Call(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
-    
-    IRPRINT_INDENT(depth+1);
-    std::cout << "Type = " << IrTypeToString(m_type) << std::endl;
-    
-    if (m_identifier) m_identifier->print(depth+1);
-    else if (m_externalFunction) m_externalFunction->print(depth+1);
-    
-    IRPRINT_INDENT(depth+1);
-    std::cout << "Arguments: " << std::endl;
-    for (auto it : m_arguments)
-    {
-        it->print(depth+2);
-    }  
+    std::cout << "Statement(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
+    if (m_expression) m_expression->print(depth+1);
 }
 
-bool IrMethodCall::applySemanticChecks(const std::string& filename)
+bool IrExpressionStatement::applySemanticChecks(const std::string& filename)
 {
     return true;
 }

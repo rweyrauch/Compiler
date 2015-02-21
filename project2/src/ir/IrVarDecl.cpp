@@ -28,6 +28,10 @@
 namespace Decaf
 {
 
+void IrVariableDecl::clean()
+{
+}
+    
 void IrVariableDecl::print(unsigned int depth) 
 {
     IRPRINT_INDENT(depth);
@@ -43,5 +47,10 @@ void IrVariableDecl::print(unsigned int depth)
         it->print(depth+2);
     }
 }
-    
+ 
+bool IrVariableDecl::applySemanticChecks(const std::string& filename)
+{
+    return true;
+}
+ 
 } // namespace Decaf

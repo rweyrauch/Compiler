@@ -30,6 +30,10 @@
 namespace Decaf
 {
 
+void IrMethodDecl::clean()
+{
+}
+
 void IrMethodDecl::print(unsigned int depth)
 {
     IRPRINT_INDENT(depth);
@@ -54,6 +58,11 @@ void IrMethodDecl::print(unsigned int depth)
         std::cout << "Body: " << std::endl;        
         m_block->print(depth+2);
     }
+}
+    
+bool IrMethodDecl::applySemanticChecks(const std::string& filename)
+{
+    return true;
 }
     
 } // namespace Decaf

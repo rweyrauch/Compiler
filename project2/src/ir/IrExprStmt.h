@@ -41,14 +41,11 @@ public:
     virtual ~IrExpressionStatement()
     {}
     
-    virtual void print(unsigned int depth)
-    {
-        IRPRINT_INDENT(depth);
-        std::cout << "Statement(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
-        if (m_expression) m_expression->print(depth+1);
-    }
-    
-protected:    
+    virtual void clean(); 
+    virtual void print(unsigned int depth); 
+    virtual bool applySemanticChecks(const std::string& filename);
+   
+ protected:    
     
     IrExpression* m_expression;
     

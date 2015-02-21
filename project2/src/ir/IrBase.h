@@ -38,6 +38,7 @@ public:
     virtual ~IrBase() 
     {}
     
+    virtual void clean() {}
     virtual void print(unsigned int depth) = 0;
     virtual bool applySemanticChecks(const std::string& filename) { return true; }
     

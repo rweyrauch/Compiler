@@ -28,6 +28,19 @@
 namespace Decaf
 {
     
+void IrClass::clean()
+{
+    m_identifier->clean();
+    for (auto it : m_field_decl_list)
+    {
+        it->clean();
+    }
+    for (auto it : m_method_decl_list)
+    {
+        it->clean();
+    }
+}
+    
 void IrClass::print(unsigned int depth) 
 {
     IRPRINT_INDENT(depth);
@@ -37,16 +50,16 @@ void IrClass::print(unsigned int depth)
     
     IRPRINT_INDENT(depth+1);
     std::cout << "Field Declarations: " << std::endl;
-    for (auto i : m_field_decl_list)
+    for (auto it : m_field_decl_list)
     {
-        i->print(depth+2);
+        it->print(depth+2);
     }
     
     IRPRINT_INDENT(depth+1);
     std::cout << "Method Declarations: " << std::endl;
-    for (auto i : m_method_decl_list)
+    for (auto it : m_method_decl_list)
     {
-        i->print(depth+2);
+        it->print(depth+2);
     }
 }
 

@@ -46,7 +46,9 @@ public:
     virtual ~IrLocation()
     {}
     
+    virtual void clean(); 
     virtual void print(unsigned int depth);
+    virtual bool applySemanticChecks(const std::string& filename);
     
     IrIdentifier* getIdentifier() const { return m_identifier; }
     IrExpression* getIndex() const { return m_index; }

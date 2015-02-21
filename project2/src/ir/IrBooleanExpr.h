@@ -41,7 +41,9 @@ public:
     virtual ~IrBooleanExpression()
     {}
     
-    virtual void print(unsigned int depth);
+    virtual void clean(); 
+    virtual void print(unsigned int depth); 
+    virtual bool applySemanticChecks(const std::string& filename);
     
     IrBooleanOperator getOperator() const { return m_operator; }
     IrExpression* getLeftHandSide() const { return m_lhs; }

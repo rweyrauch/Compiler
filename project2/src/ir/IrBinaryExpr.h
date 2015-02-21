@@ -41,8 +41,10 @@ public:
     virtual ~IrBinaryExpression()
     {}
     
-    virtual void print(unsigned int depth);
-    
+    virtual void clean(); 
+    virtual void print(unsigned int depth); 
+    virtual bool applySemanticChecks(const std::string& filename);
+   
     IrBinaryOperator getOperator() const { return m_operator; }
     IrExpression* getLeftHandSide() const { return m_lhs; }
     IrExpression* getRightHandSide() const { return m_rhs; }

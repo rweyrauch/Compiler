@@ -28,10 +28,17 @@
 namespace Decaf
 {
 
+ void IrBooleanExpression::clean()
+{
+}
+
 void IrBooleanExpression::print(unsigned int depth) 
 {
     IRPRINT_INDENT(depth);
     std::cout << "Boolean Expr(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
+    IRPRINT_INDENT(depth+1);
+    std::cout << "Type = " << IrTypeToString(m_type) << std::endl;
+
     if (m_lhs)
     {
         IRPRINT_INDENT(depth+1);
@@ -48,6 +55,11 @@ void IrBooleanExpression::print(unsigned int depth)
         std::cout << "RHS: " << std::endl;
         m_rhs->print(depth+2);
     }
+}
+
+bool IrBooleanExpression::applySemanticChecks(const std::string& filename)
+{
+    return true;
 }
 
 } // namespace Decaf

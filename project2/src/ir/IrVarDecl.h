@@ -50,7 +50,9 @@ public:
     virtual ~IrVariableDecl()
     {}
     
+    virtual void clean(); 
     virtual void print(unsigned int depth);
+    virtual bool applySemanticChecks(const std::string& filename);
         
 protected:
     
