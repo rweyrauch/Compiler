@@ -24,10 +24,16 @@ class Parser: public ParserBase
     public:
         Parser() :
             d_scanner(),
-            d_root(0) {}
+            d_root(0) 
+        {
+            d_scanner.setSLoc(&d_loc__);
+        }
         Parser(std::string const &infile, std::string const &outfile) :
             d_scanner(infile, outfile),
-            d_root(0) {}
+            d_root(0) 
+        {
+            d_scanner.setSLoc(&d_loc__);            
+        }
         virtual ~Parser() {}
         int parse();
 

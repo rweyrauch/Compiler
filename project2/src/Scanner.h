@@ -9,7 +9,7 @@ using namespace Decaf;
 
 // $insert baseclass_h
 #include "Scannerbase.h"
-
+#include "Parserbase.h"
 
 // $insert classHead
 class Scanner: public ScannerBase
@@ -24,6 +24,8 @@ class Scanner: public ScannerBase
         int lex();
 
         int columnNr() { return m_current_column; }
+        
+        void setSLoc(ParserBase::LTYPE__ *location) { m_loc = location; }
         
     protected:
     
@@ -43,20 +45,23 @@ class Scanner: public ScannerBase
         void postCode(PostEnum__ type);    
                             // re-implement this function for code that must 
                             // be exec'ed after the rules's actions.
+        
+        ParserBase::LTYPE__* m_loc;
 };
 
 // $insert scannerConstructors
 inline Scanner::Scanner(std::istream &in, std::ostream &out)
 :
     ScannerBase(in, out),
-    m_current_column(0)
-
+    m_current_column(0),
+    m_loc(nullptr)
 {}
 
 inline Scanner::Scanner(std::string const &infile, std::string const &outfile)
 :
     ScannerBase(infile, outfile),
-    m_current_column(0)
+    m_current_column(0),
+    m_loc(nullptr)
 {}
 
 // $insert inlineLexFunction
@@ -77,22 +82,28 @@ inline void Scanner::postCode(PostEnum__ type)
 
 inline void Scanner::error()
 {
-    std::cout << filename() << " line " << lineNr() << ":" << m_current_column << ": unexpected char: \'" << matched().front() << "\'" << std::endl;    
+    std::cout << filename() << " line " << lineNr() << ":" << columnNr() << ": unexpected char: \'" << matched().front() << "\'" << std::endl;    
 }
 
 inline void Scanner::track_column()
 {
-	const int tab_width = 4;
+    const int tab_width = 4;
 
-	for (auto it = matched().cbegin(); it != matched().cend(); ++it)
-	{
-		if (*it == '\n')
-			m_current_column = 0;
-		else if (*it == '\t')
-			m_current_column += tab_width - (m_current_column % tab_width);
-		else
-			m_current_column++;
-	}
+    m_loc->first_line = lineNr();
+    m_loc->first_column = columnNr();
+    
+    for (auto it = matched().cbegin(); it != matched().cend(); ++it)
+    {
+        if (*it == '\n')
+            m_current_column = 0;
+        else if (*it == '\t')
+            m_current_column += tab_width - (m_current_column % tab_width);
+        else
+            m_current_column++;
+    }
+
+    m_loc->last_line = lineNr();
+    m_loc->last_column = columnNr();    
 }
  
 inline void Scanner::print() 
