@@ -7,13 +7,13 @@ LIBS = -lpopt
 clean:
 	$(RM) -rf parser Scannerbase.h parse.cc lex.cc Parserbase.h *.output $(OBJS)
 
-lex.cc: decaf.lpp Scanner.ih Scanner.h
+lex.cc: decaf.l
 	flexc++ --construction $^
 	
 Scannerbase.h: lex.cc
 
-parse.cc: decaf.g Scanner.h
-	bisonc++ --construction --scanner=Scanner.h $^
+parse.cc: decaf.y
+	bisonc++ --construction $^
 	
 Parser.h: parse.cc
 Parserbase.h: parse.cc
