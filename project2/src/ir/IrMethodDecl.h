@@ -29,15 +29,16 @@
 
 namespace Decaf
 {
-class IrArgument;
+class IrVariableDecl;
 class IrBlock;
 
 class IrMethodDecl : public IrBase
 {
 public:
-    IrMethodDecl(int lineNumber, int columnNumber, IrIdentifier* ident) :
+    IrMethodDecl(int lineNumber, int columnNumber, IrIdentifier* ident, IrType returnType) :
         IrBase(lineNumber, columnNumber),
         m_identifier(ident),
+        m_returnType(returnType),
         m_argument_list(),
         m_block(nullptr)
     {}
@@ -47,7 +48,7 @@ public:
     
     virtual void print(unsigned int depth);
      
-    void addArgument(IrArgument* arg)
+    void addArgument(IrVariableDecl* arg)
     {
         m_argument_list.push_back(arg);
     }
@@ -55,10 +56,12 @@ public:
     {
         m_block = block;
     }
+    
 protected:
     
     IrIdentifier* m_identifier;
-    std::vector<IrArgument*> m_argument_list;
+    IrType m_returnType;
+    std::vector<IrVariableDecl*> m_argument_list;
     IrBlock* m_block;
     
 private:

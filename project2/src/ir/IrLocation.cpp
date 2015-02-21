@@ -34,8 +34,18 @@ void IrLocation::print(unsigned int depth)
 {
     IRPRINT_INDENT(depth);
     std::cout << "Location(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
-    if (m_identifier) m_identifier->print(depth+1);
-    if (m_index) m_index->print(depth+1);
+    if (m_identifier) 
+    {
+        IRPRINT_INDENT(depth+1);
+        std::cout << "Identifier: " << std::endl;
+        m_identifier->print(depth+2);
+    }
+    if (m_index) 
+    {
+        IRPRINT_INDENT(depth+1);
+        std::cout << "Index: " << std::endl;
+        m_index->print(depth+2);
+    }
 }
 
 } // namespace Decaf

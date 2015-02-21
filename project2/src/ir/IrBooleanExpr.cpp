@@ -32,10 +32,22 @@ void IrBooleanExpression::print(unsigned int depth)
 {
     IRPRINT_INDENT(depth);
     std::cout << "Boolean Expr(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
-    if (m_lhs) m_lhs->print(depth+1);
+    if (m_lhs)
+    {
+        IRPRINT_INDENT(depth+1);
+        std::cout << "LHS: " << std::endl;
+        m_lhs->print(depth+2);
+    }
+    
     IRPRINT_INDENT(depth+1);
     std::cout << "Operator: " << IrBooleanOperatorToString(m_operator) << std::endl;
-    if (m_rhs) m_rhs->print(depth+1);
+    
+    if (m_rhs) 
+    {
+        IRPRINT_INDENT(depth+1);
+        std::cout << "RHS: " << std::endl;
+        m_rhs->print(depth+2);
+    }
 }
 
 } // namespace Decaf

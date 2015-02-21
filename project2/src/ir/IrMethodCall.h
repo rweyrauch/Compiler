@@ -29,23 +29,40 @@
 namespace Decaf
 {
 class IrIdentifier;
+class IrStringLiteral;
 
 class IrMethodCall : public IrExpression
 {
 public:
     IrMethodCall(int lineNumber, int columnNumber, IrIdentifier* ident, IrType type) :
         IrExpression(lineNumber, columnNumber, type),
-        m_identifier(ident)
+        m_identifier(ident),
+        m_externalFunction(0),
+        m_arguments()
+    {}
+
+    IrMethodCall(int lineNumber, int columnNumber, IrStringLiteral* ident, IrType type) :
+        IrExpression(lineNumber, columnNumber, type),
+        m_identifier(0),
+        m_externalFunction(ident),
+        m_arguments()
     {}
     
     virtual ~IrMethodCall()
     {}
     
-    virtual void print(unsigned int depth) {}
-        
+    virtual void print(unsigned int depth);
+    
+    void addArgument(IrExpression* arg)
+    {
+        m_arguments.push_back(arg);
+    }
+    
 protected:    
     
     IrIdentifier* m_identifier;
+    IrStringLiteral* m_externalFunction;
+    std::vector<IrExpression*> m_arguments;
     
 private:
     IrMethodCall() = delete;

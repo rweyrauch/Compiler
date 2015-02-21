@@ -22,6 +22,8 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include <iostream>
+#include "IrCommon.h"
 #include "IrLiteral.h"
 
 namespace Decaf
@@ -43,7 +45,10 @@ public:
     {}
     
     virtual void print(unsigned int depth) 
-    {}
+    {
+        IRPRINT_INDENT(depth);
+        std::cout << "Boolean(" << getLineNumber() << "," << getColumnNumber() << ") = " << m_valueAsString << std::endl;        
+    }
     
     bool getValue() const { return m_value; }
     

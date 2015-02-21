@@ -33,9 +33,12 @@ void IrFieldDecl::print(unsigned int depth)
 {
     IRPRINT_INDENT(depth);
     std::cout << "Field Decl(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
-    IRPRINT_INDENT(depth);
+    IRPRINT_INDENT(depth+1);
     std::cout << "  Type = " << IrTypeToString(m_type) << std::endl;
-    m_location->print(depth+1);
+    
+    IRPRINT_INDENT(depth+1); 
+    std::cout << "Location: " << std::endl;
+    m_location->print(depth+2);
 }
     
 } // namespace Decaf

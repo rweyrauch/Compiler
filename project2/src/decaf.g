@@ -13,6 +13,7 @@
     Decaf::IrMethodDecl *methodDecl;
     Decaf::IrFieldDecl *fieldDecl;
     Decaf::IrExpression *expression;
+    std::vector<Decaf::IrExpression*> *exprList;
     std::vector<Decaf::IrMethodDecl*> *methodDeclList;
     std::vector<Decaf::IrFieldDecl*> *fieldDeclList;
     std::vector<std::vector<Decaf::IrFieldDecl*>> *fieldDeclListList;
@@ -21,6 +22,7 @@
     Decaf::IrVariableDecl *varDecl;
     std::vector<Decaf::IrVariableDecl*> *varDeclList;
     Decaf::IrLiteral *literal;
+    Decaf::IrStringLiteral *stringLiteral;
     std::string *string;
     int token;
 }
@@ -52,8 +54,10 @@
 %type <identList> ident_list
 %type <token> type rel_op logic_op assign_op
 %type <literal> literal
+%type <stringLiteral> string_literal
 %type <location> location
 %type <locationList> location_list
+%type <exprList> expr_list
 %type <expression> expr primary_expr unary_expr mult_expr add_expr rel_expr logic_expr assign_expr
 
 %start program
@@ -164,12 +168,16 @@ argument_decl
 method_decl 
     : type ident LPAREN argument_decl_list RPAREN block 
     { 
-        $$ = new Decaf::IrMethodDecl(d_scanner.lineNr(), d_scanner.columnNr(), $2 ); 
+        $$ = new Decaf::IrMethodDecl(d_scanner.lineNr(), d_scanner.columnNr(), $2, (Decaf::IrType)$1); 
+        for (auto it : *$4)
+        {
+            $$->addArgument(it);
+        }
         $$->addBlock($6);
     }
     | type ident LPAREN RPAREN block 
     { 
-        $$ = new Decaf::IrMethodDecl(d_scanner.lineNr(), d_scanner.columnNr(), $2);
+        $$ = new Decaf::IrMethodDecl(d_scanner.lineNr(), d_scanner.columnNr(), $2, (Decaf::IrType)$1);
         $$->addBlock($5);
     }
     ;
@@ -310,14 +318,28 @@ assign_op
 method_call 
     : ident LPAREN expr_list RPAREN 
     { 
-        $$ = new Decaf::IrMethodCall(d_scanner.lineNr(), d_scanner.columnNr(), $1, Decaf::IrType::Unknown); 
+        $$ = new Decaf::IrMethodCall(d_scanner.lineNr(), d_scanner.columnNr(), $1, Decaf::IrType::Unknown);
+        for (auto it : *$3) 
+        {
+            $$->addArgument(it);
+        }
     }
     | ident LPAREN RPAREN 
     { 
         $$ = new Decaf::IrMethodCall(d_scanner.lineNr(), d_scanner.columnNr(), $1, Decaf::IrType::Unknown); 
     }
-    | CALLOUT LPAREN STRING COMMA callout_arg_list RPAREN
-    | CALLOUT LPAREN STRING RPAREN
+    | CALLOUT LPAREN string_literal COMMA expr_list RPAREN
+    {
+        $$ = new Decaf::IrMethodCall(d_scanner.lineNr(), d_scanner.columnNr(), $3, Decaf::IrType::Unknown);
+        for (auto it : *$5) 
+        {
+            $$->addArgument(it);
+        }
+    }
+    | CALLOUT LPAREN string_literal RPAREN
+    {
+        $$ = new Decaf::IrMethodCall(d_scanner.lineNr(), d_scanner.columnNr(), $3, Decaf::IrType::Unknown);
+    }
     ;
     
 location 
@@ -330,10 +352,11 @@ location
         $$ = new Decaf::IrLocation(d_scanner.lineNr(), d_scanner.columnNr(), $1, Decaf::IrType::Unknown, $3); 
     }
     ;
-    
+
 primary_expr
     : location { $$ = $1; }
     | literal { $$ = $1; }
+    | string_literal { $$ = $1; }
     | method_call { $$ = $1; }
     | LPAREN expr RPAREN { $$ = $2; }
     ;
@@ -404,18 +427,8 @@ expr
     ;
 
 expr_list 
-    : expr
-    | expr_list COMMA expr
-    ;
-
-callout_arg_list 
-    : callout_arg
-    | callout_arg_list COMMA callout_arg
-    ;
-    
-callout_arg 
-    : expr
-    | STRING
+    : expr { $$ = new std::vector<Decaf::IrExpression*>(); $$->push_back($1); }
+    | expr_list COMMA expr { $$->push_back($3); }
     ;
     
 rel_op 
@@ -444,5 +457,12 @@ literal
     | CHARACTER 
     { 
         $$ = new Decaf::IrCharacterLiteral(d_scanner.lineNr(), d_scanner.columnNr(), d_scanner.matched()); 
+    }
+    ;
+
+string_literal
+    : STRING
+    {
+        $$ = new Decaf::IrStringLiteral(d_scanner.lineNr(), d_scanner.columnNr(), d_scanner.matched());
     }
     ;

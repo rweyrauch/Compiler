@@ -49,4 +49,5 @@
 #include "IrPlusAssignStmt.h"
 #include "IrReturnStmt.h"
 #include "IrStatement.h"
+#include "IrStringLiteral.h"
 #include "IrVarDecl.h"

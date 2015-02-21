@@ -23,36 +23,24 @@
 //
 #include <iostream>
 #include "IrCommon.h"
-#include "IrMethodDecl.h"
 #include "IrVarDecl.h"
-#include "IrBlock.h"
 
 namespace Decaf
 {
 
-void IrMethodDecl::print(unsigned int depth)
+void IrVariableDecl::print(unsigned int depth) 
 {
     IRPRINT_INDENT(depth);
-    std::cout << "Method(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
-    IRPRINT_INDENT(depth+1);
-    std::cout << "Name: " << std::endl;
-    m_identifier->print(depth+2);
+    std::cout << "Variable Decl(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
     
     IRPRINT_INDENT(depth+1);
-    std::cout << "Return Type: " << IrTypeToString(m_returnType) << std::endl;
+    std::cout << "Type: " << IrTypeToString(m_type) << std::endl;
     
-    IRPRINT_INDENT(depth+1);
-    std::cout << "Arguments: " << std::endl;
-    for (auto it : m_argument_list)
+    IRPRINT_INDENT(depth+1); 
+    std::cout << "Identifiers: " << std::endl;
+    for (auto it : m_identifiers)
     {
         it->print(depth+2);
-    }  
-    
-    if (m_block) 
-    {
-        IRPRINT_INDENT(depth+1);
-        std::cout << "Body: " << std::endl;        
-        m_block->print(depth+2);
     }
 }
     

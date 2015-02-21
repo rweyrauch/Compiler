@@ -21,39 +21,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+#pragma once
 #include <iostream>
 #include "IrCommon.h"
-#include "IrMethodDecl.h"
-#include "IrVarDecl.h"
-#include "IrBlock.h"
+#include "IrLiteral.h"
 
 namespace Decaf
 {
-
-void IrMethodDecl::print(unsigned int depth)
+ 
+class IrStringLiteral : public IrLiteral
 {
-    IRPRINT_INDENT(depth);
-    std::cout << "Method(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
-    IRPRINT_INDENT(depth+1);
-    std::cout << "Name: " << std::endl;
-    m_identifier->print(depth+2);
-    
-    IRPRINT_INDENT(depth+1);
-    std::cout << "Return Type: " << IrTypeToString(m_returnType) << std::endl;
-    
-    IRPRINT_INDENT(depth+1);
-    std::cout << "Arguments: " << std::endl;
-    for (auto it : m_argument_list)
+public:
+    IrStringLiteral(int lineNumber, int columnNumber, const std::string& value) :
+        IrLiteral(lineNumber, columnNumber, IrType::String, value)
     {
-        it->print(depth+2);
-    }  
-    
-    if (m_block) 
-    {
-        IRPRINT_INDENT(depth+1);
-        std::cout << "Body: " << std::endl;        
-        m_block->print(depth+2);
     }
-}
     
-} // namespace Decaf
+    virtual ~IrStringLiteral()
+    {}
+    
+    virtual void print(unsigned int depth) 
+    {
+        IRPRINT_INDENT(depth);
+        std::cout << "String(" << getLineNumber() << "," << getColumnNumber() << ") = \"" << getValue() << "\"" << std::endl;
+    }
+    
+    const std::string& getValue() { return m_valueAsString; }
+    
+private:
+    IrStringLiteral() = delete;
+    IrStringLiteral(const IrStringLiteral& rhs) = delete;
+};
+
+}

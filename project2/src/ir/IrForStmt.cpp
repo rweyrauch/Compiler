@@ -35,9 +35,11 @@ void IrForStatement::print(unsigned int depth)
 {
     IRPRINT_INDENT(depth);
     std::cout << "For(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
+    
     m_loopVariable->print(depth+1);
     m_initialValue->print(depth+1);
     m_terminatingValue->print(depth+1);
+    
     if (m_body) m_body->print(depth+1);
 }
     

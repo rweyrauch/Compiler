@@ -34,13 +34,19 @@ void IrClass::print(unsigned int depth)
     
     std::cout << "Class(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
     m_identifier->print(depth+1);
+    
+    IRPRINT_INDENT(depth+1);
+    std::cout << "Field Declarations: " << std::endl;
     for (auto i : m_field_decl_list)
     {
-        i->print(depth+1);
+        i->print(depth+2);
     }
+    
+    IRPRINT_INDENT(depth+1);
+    std::cout << "Method Declarations: " << std::endl;
     for (auto i : m_method_decl_list)
     {
-        i->print(depth+1);
+        i->print(depth+2);
     }
 }
 

@@ -34,6 +34,7 @@ enum class IrType : int
     Integer,
     Boolean,
     Character,
+    String,
     
     NUM_IR_TYPES
 };
