@@ -60,6 +60,9 @@ public:
         m_arguments.push_back(arg);
     }
     
+    bool isExternal() const { return (m_externalFunction != nullptr); }
+    const IrIdentifier* getIdentifier() const { return m_identifier; }
+    
 protected:    
     
     IrIdentifier* m_identifier;

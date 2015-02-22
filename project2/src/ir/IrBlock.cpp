@@ -74,13 +74,13 @@ bool IrBlock::analyze(IrTraversalContext* ctx)
     bool valid = true;
     for (auto it : m_variables)
     {
-        valid = it->analyze(ctx);
-        if (!valid) return valid;
+        if (!it->analyze(ctx))
+            valid = false;
     }
     for (auto it : m_statements)
     {
-        valid = it->analyze(ctx);
-        if (!valid) return valid;
+        if (!it->analyze(ctx))
+            valid = false;
     }   
     
     return valid;

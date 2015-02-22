@@ -22,11 +22,14 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <string>
+#include <list>
 #include "IrCommon.h"
 
 namespace Decaf
 {
+class IrSymbolTable;
+class IrLocation;
+class IrMethodCall;
 
 class IrTraversalContext
 {
@@ -34,18 +37,15 @@ public:
     IrTraversalContext() {}
     ~IrTraversalContext() {}
     
-    void setFilename(const std::string& filename)
-    {
-        m_filename = filename;
-    }
-    const std::string& getFilename() const 
-    {
-        return m_filename;
-    }
+    void pushSymbols(IrSymbolTable* symbols) { m_symbols.push_front(symbols); }
+    void popSymbols() { m_symbols.pop_front(); }
+    
+    bool lookup(IrLocation* variable) const;
+    bool lookup(IrMethodCall* method) const;
     
 protected:
     
-    std::string m_filename;
+    std::list<IrSymbolTable*> m_symbols;
 };
 
 } // namespace Decaf

@@ -36,7 +36,6 @@ class Parser: public ParserBase
         {
             d_scanner.setSLoc(&d_loc__);            
             d_ctx = new IrTraversalContext();
-            d_ctx->setFilename(infile);
         }
         virtual ~Parser() {}
         int parse();

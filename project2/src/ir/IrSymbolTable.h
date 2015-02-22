@@ -30,7 +30,8 @@
 
 namespace Decaf
 {
-class IrTraversalContext;
+class IrMethodCall;
+class IrLocation;
 
 class IrSymbolTable
 {
@@ -46,7 +47,8 @@ public:
     bool addVariable(IrVariableDecl* variables);
     bool addMethod(IrMethodDecl* method);
     
-    bool find() { return false; }
+    bool exists(IrLocation* variable) const;
+    bool exists(IrMethodCall* method) const;
     
     void print(int depth);
     

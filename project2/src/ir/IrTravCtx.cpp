@@ -23,8 +23,41 @@
 //
 
 #include "IrTravCtx.h"
+#include "IrSymbolTable.h"
+#include "IrIdentifier.h"
+#include "IrMethodCall.h"
 
 namespace Decaf
 {
 
+bool IrTraversalContext::lookup(IrLocation* location) const
+{
+    bool found = false;
+    // TODO: make this a vector with reverse iterator
+    for (auto it : m_symbols)
+    {
+        if (it->exists(location))
+        {
+            found = true;
+            break;
+        }
+    }
+    return found;
+}
+
+bool IrTraversalContext::lookup(IrMethodCall* method) const
+{
+    bool found = false;
+    // TODO: make this a vector with reverse iterator
+    for (auto it : m_symbols)
+    {
+        if (it->exists(method))
+        {
+            found = true;
+            break;
+        }
+    }
+    return found;
+}
+   
 } // namespace Decaf

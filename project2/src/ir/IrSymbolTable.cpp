@@ -25,6 +25,7 @@
 #include "IrCommon.h"
 #include "IrSymbolTable.h"
 #include "IrIntLiteral.h"
+#include "IrMethodCall.h"
 
 namespace Decaf
 {
@@ -130,6 +131,29 @@ bool IrSymbolTable::addMethod(IrMethodDecl* method)
     }
     
     return ok;
+}
+
+bool IrSymbolTable::exists(IrLocation* variable) const
+{ 
+    auto it = m_variables.find(variable->getIdentifier()->getIdentifier());
+    if (it != m_variables.end())
+    {
+        return true;
+    }
+    return false;     
+}
+
+bool IrSymbolTable::exists(IrMethodCall* method) const
+{ 
+    if (method->isExternal()) return false;
+    
+    auto it = m_methods.find(method->getIdentifier()->getIdentifier());
+    if (it != m_methods.end())
+    {
+        // TODO: match signature
+        return true;
+    }
+    return false; 
 }
 
 void IrSymbolTable::print(int depth)
