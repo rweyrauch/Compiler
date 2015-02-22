@@ -32,6 +32,12 @@ namespace Decaf
 
 void IrMethodCall::clean()
 {
+    if (m_identifier) m_identifier->clean();
+    else if (m_externalFunction) m_externalFunction->clean();
+    for (auto it : m_arguments)
+    {
+        it->clean();
+    }
 }
     
 void IrMethodCall::print(unsigned int depth)

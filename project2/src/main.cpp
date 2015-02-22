@@ -77,8 +77,9 @@ int main(int argc, char **argv)
             parser = new Parser();
         }
         parser->parse();
-        parser->dumpAST();
+        parser->clean();
         parser->semanticChecks();
+        parser->dumpAST();
         
         delete parser;
     }

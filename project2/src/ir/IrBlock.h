@@ -25,11 +25,11 @@
 #include <string>
 #include <vector>
 #include "IrStatement.h"
+#include "IrSymbolTable.h"
 
 namespace Decaf
 {
 class IrVariableDecl;
-class IrSymbolTable;
 
 class IrBlock : public IrStatement
 {
@@ -39,17 +39,12 @@ public:
         m_variables(),
         m_statements(),
         m_symbols(nullptr)
-    {}
-    
-    virtual ~IrBlock()
     {
-        for (auto it : m_variables)
-            delete it;
-        for (auto it : m_statements)
-            delete it;
-        delete m_symbols;
+        m_symbols = new IrSymbolTable();
     }
     
+    virtual ~IrBlock();
+     
     virtual void clean(); 
     virtual void print(unsigned int depth);
     virtual bool applySemanticChecks(const std::string& filename);

@@ -32,6 +32,9 @@ namespace Decaf
 
 void IrIfStatement::clean()
 {
+    m_condition->clean();
+    if (m_trueBlock) m_trueBlock->clean();
+    if (m_falseBlock) m_falseBlock->clean();
 }
     
 void IrIfStatement::print(unsigned int depth) 

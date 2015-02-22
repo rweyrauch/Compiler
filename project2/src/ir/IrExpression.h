@@ -41,6 +41,7 @@ public:
     
     virtual void print(unsigned int depth) = 0;
     
+    void setType(IrType type) { m_type = type; }
     IrType getType() const { return m_type; }
     
 protected:

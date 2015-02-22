@@ -26,9 +26,19 @@
 #include "IrBlock.h"
 #include "IrVarDecl.h"
 #include "IrStatement.h"
+#include "IrSymbolTable.h"
 
 namespace Decaf
 {
+
+ IrBlock::~IrBlock()
+{
+    for (auto it : m_variables)
+        delete it;
+    for (auto it : m_statements)
+        delete it;
+    delete m_symbols;
+}
 
 void IrBlock::clean()
 {
@@ -54,6 +64,8 @@ void IrBlock::print(unsigned int depth)
     {
         it->print(depth+1);
     }
+    
+    m_symbols->print(depth);
 }
     
 bool IrBlock::applySemanticChecks(const std::string& filename)
@@ -69,6 +81,13 @@ bool IrBlock::applySemanticChecks(const std::string& filename)
         valid = it->applySemanticChecks(filename);
         if (!valid) return valid;
     }   
+    
+    for (auto it : m_variables)
+    {
+        if (!m_symbols->addVariable(it))
+            valid = false;            
+    }
+    
     return valid;
 }
     

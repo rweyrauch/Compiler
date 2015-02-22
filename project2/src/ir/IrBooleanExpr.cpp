@@ -30,6 +30,13 @@ namespace Decaf
 
  void IrBooleanExpression::clean()
 {
+    if (m_lhs) m_lhs->clean();
+    if (m_rhs) m_rhs->clean();
+    
+    if (getType() == IrType::Unknown)
+    {
+        setType(IrType::Boolean);
+    }   
 }
 
 void IrBooleanExpression::print(unsigned int depth) 

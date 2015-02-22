@@ -33,6 +33,11 @@ namespace Decaf
 
 void IrForStatement::clean()
 {
+    m_loopVariable->clean();
+    m_initialValue->clean();
+    m_terminatingValue->clean();
+    
+    if (m_body) m_body->clean();
 }
     
 void IrForStatement::print(unsigned int depth) 

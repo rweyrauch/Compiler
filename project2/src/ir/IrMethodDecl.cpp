@@ -32,6 +32,12 @@ namespace Decaf
 
 void IrMethodDecl::clean()
 {
+    m_identifier->clean();
+    for (auto it : m_argument_list)
+    {
+        it->clean();
+    }
+    if (m_block) m_block->clean();
 }
 
 void IrMethodDecl::print(unsigned int depth)
@@ -62,6 +68,8 @@ void IrMethodDecl::print(unsigned int depth)
     
 bool IrMethodDecl::applySemanticChecks(const std::string& filename)
 {
+    if (m_block) m_block->applySemanticChecks(filename);
+    
     return true;
 }
     

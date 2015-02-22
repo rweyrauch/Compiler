@@ -54,6 +54,10 @@ public:
     virtual void print(unsigned int depth);
     virtual bool applySemanticChecks(const std::string& filename);
         
+    size_t getNumVariables() const { return m_identifiers.size(); }
+    IrIdentifier* getVariable(size_t which) const;
+    IrType getType() const { return m_type; }
+    
 protected:
     
     IrType m_type;

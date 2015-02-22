@@ -37,6 +37,11 @@ class Parser: public ParserBase
         virtual ~Parser() {}
         int parse();
 
+        void clean()
+        {
+            if (d_root) 
+                d_root->clean();
+        }
         void dumpAST() 
         { 
             if (d_root) 

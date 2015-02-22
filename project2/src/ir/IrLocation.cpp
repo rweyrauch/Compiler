@@ -30,6 +30,10 @@
 namespace Decaf
 {
 
+void IrLocation::clean()
+{
+}
+    
 void IrLocation::print(unsigned int depth) 
 {
     IRPRINT_INDENT(depth);
@@ -46,6 +50,11 @@ void IrLocation::print(unsigned int depth)
         std::cout << "Index: " << std::endl;
         m_index->print(depth+2);
     }
+}
+
+bool IrLocation::applySemanticChecks(const std::string& filename)
+{
+    return true;
 }
 
 } // namespace Decaf

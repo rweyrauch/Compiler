@@ -24,9 +24,20 @@
 #include <iostream>
 #include "IrCommon.h"
 #include "IrClass.h"
+#include "IrSymbolTable.h"
 
 namespace Decaf
 {
+
+IrClass::~IrClass()
+{
+    delete m_identifier;
+    for (auto it : m_field_decl_list)
+        delete it;
+    for (auto it : m_method_decl_list)
+        delete it;
+    delete m_symbols;
+}
     
 void IrClass::clean()
 {
@@ -39,7 +50,7 @@ void IrClass::clean()
     {
         it->clean();
     }
-}
+ }
     
 void IrClass::print(unsigned int depth) 
 {
@@ -61,6 +72,8 @@ void IrClass::print(unsigned int depth)
     {
         it->print(depth+2);
     }
+    
+    m_symbols->print(depth);
 }
 
 bool IrClass::applySemanticChecks(const std::string& filename) 
@@ -91,13 +104,19 @@ bool IrClass::applySemanticChecks(const std::string& filename)
     for (auto it : m_field_decl_list)
     {
         if (!it->applySemanticChecks(filename))
-            break;
+            return false;
     }
     
     for (auto it : m_method_decl_list)
     {
         if (!it->applySemanticChecks(filename))
-            break;
+            return false;
+    }
+     
+    for (auto it : m_field_decl_list)
+    {
+        if (!m_symbols->addVariable(it))
+            return false;            
     }
     
     return true;

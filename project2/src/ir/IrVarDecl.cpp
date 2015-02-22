@@ -30,6 +30,10 @@ namespace Decaf
 
 void IrVariableDecl::clean()
 {
+    for (auto it : m_identifiers)
+    {
+        it->clean();
+    }
 }
     
 void IrVariableDecl::print(unsigned int depth) 
@@ -52,5 +56,14 @@ bool IrVariableDecl::applySemanticChecks(const std::string& filename)
 {
     return true;
 }
+ 
+ IrIdentifier* IrVariableDecl::getVariable(size_t which) const
+ {
+     if (which < m_identifiers.size())
+     {
+         return m_identifiers.at(which);
+     }
+     return nullptr;
+ }
  
 } // namespace Decaf

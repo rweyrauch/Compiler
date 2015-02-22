@@ -27,10 +27,10 @@
 #include "IrIdentifier.h"
 #include "IrFieldDecl.h"
 #include "IrMethodDecl.h"
+#include "IrSymbolTable.h"
 
 namespace Decaf
 {
-class IrSymbolTable;
 
 class IrClass : public IrBase
 {
@@ -41,17 +41,11 @@ public:
         m_field_decl_list(),
         m_method_decl_list(),
         m_symbols(nullptr)
-    {}
-    
-    virtual ~IrClass()
     {
-        delete m_identifier;
-        for (auto it : m_field_decl_list)
-            delete it;
-        for (auto it : m_method_decl_list)
-            delete it;
-        delete m_symbols;
+        m_symbols = new IrSymbolTable();
     }
+    
+    virtual ~IrClass();
     
     virtual void clean(); 
     virtual void print(unsigned int depth); 

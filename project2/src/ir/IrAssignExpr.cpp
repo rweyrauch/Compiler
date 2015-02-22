@@ -30,6 +30,16 @@ namespace Decaf
 
 void IrAssignExpression::clean()
 {
+    if (m_lhs) m_lhs->clean();
+    if (m_rhs) m_rhs->clean();
+    
+    if (getType() == IrType::Unknown)
+    {
+        if (m_lhs)
+            setType(m_lhs->getType());
+        else if (m_rhs)
+            setType(m_rhs->getType());
+    }
 }
 
 void IrAssignExpression::print(unsigned int depth) 

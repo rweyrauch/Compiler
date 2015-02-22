@@ -22,8 +22,10 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <iostream>
+#include <map>
 #include "IrCommon.h"
+#include "IrFieldDecl.h"
+#include "IrVarDecl.h"
 
 namespace Decaf
 {
@@ -31,15 +33,31 @@ namespace Decaf
 class IrSymbolTable
 {
 public:
-    IrSymbolTable() {}
-    ~IrSymbolTable() {}
+    IrSymbolTable() :
+        m_variables()
+    {}
     
-    void addVariable() {}
+    ~IrSymbolTable() 
+    {}
+    
+    bool addVariable(IrFieldDecl* variable);
+    bool addVariable(IrVariableDecl* variables);
     void addMethod() {}
     
     bool find() { return false; }
     
+    void print(int depth);
+    
 protected:
+    
+    struct SVariableSymbol
+    {
+        std::string m_name;
+        IrType m_type;
+        size_t m_count; // >1 for arrays
+    };
+    
+    std::map<std::string, SVariableSymbol> m_variables;
     
 };
     

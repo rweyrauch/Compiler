@@ -30,6 +30,7 @@ namespace Decaf
 
 void IrExpressionStatement::clean()
 {
+    if (m_expression) m_expression->clean();
 }
     
 void IrExpressionStatement::print(unsigned int depth) 

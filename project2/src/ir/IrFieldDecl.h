@@ -24,10 +24,11 @@
 #pragma once
 #include "IrCommon.h"
 #include "IrBase.h"
+#include "IrLocation.h"
+#include "IrIdentifier.h"
 
 namespace Decaf
 {
-class IrLocation;
 
 class IrFieldDecl : public IrBase
 {
@@ -36,7 +37,9 @@ public:
         IrBase(lineNumber, columnNumber),
         m_location(location),
         m_type(type)
-    {}
+    {
+        m_location->setType(type);
+    }
     
     virtual ~IrFieldDecl()
     {}
@@ -44,7 +47,11 @@ public:
     virtual void clean(); 
     virtual void print(unsigned int depth);
     virtual bool applySemanticChecks(const std::string& filename);
-        
+    
+    IrLocation* getLocation() const { return m_location; }
+    const std::string& getName() const { return m_location->getIdentifier()->getIdentifier(); }
+    IrType getType() const { return m_type; }
+    
 protected:
     
     IrLocation* m_location;
