@@ -30,11 +30,11 @@
 namespace Decaf
 {
 
-void IrIfStatement::clean()
+void IrIfStatement::clean(IrTraversalContext* ctx)
 {
-    m_condition->clean();
-    if (m_trueBlock) m_trueBlock->clean();
-    if (m_falseBlock) m_falseBlock->clean();
+    m_condition->clean(ctx);
+    if (m_trueBlock) m_trueBlock->clean(ctx);
+    if (m_falseBlock) m_falseBlock->clean(ctx);
 }
     
 void IrIfStatement::print(unsigned int depth) 
@@ -46,7 +46,7 @@ void IrIfStatement::print(unsigned int depth)
     if (m_falseBlock) m_falseBlock->print(depth+1);
 }
     
-bool IrIfStatement::applySemanticChecks(const std::string& filename)
+bool IrIfStatement::analyze(IrTraversalContext* ctx)
 {
     return true;
 }

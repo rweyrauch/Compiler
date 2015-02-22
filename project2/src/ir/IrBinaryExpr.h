@@ -31,8 +31,8 @@ namespace Decaf
 class IrBinaryExpression : public IrExpression
 {
 public:
-    IrBinaryExpression(int lineNumber, int columnNumber, IrType type, IrExpression* lhs, IrBinaryOperator binaryOp, IrExpression* rhs) :
-        IrExpression(lineNumber, columnNumber, type),
+    IrBinaryExpression(int lineNumber, int columnNumber, const std::string& filename, IrType type, IrExpression* lhs, IrBinaryOperator binaryOp, IrExpression* rhs) :
+        IrExpression(lineNumber, columnNumber, filename, type),
         m_lhs(lhs),
         m_operator(binaryOp),
         m_rhs(rhs)
@@ -41,9 +41,9 @@ public:
     virtual ~IrBinaryExpression()
     {}
     
-    virtual void clean(); 
+    virtual void clean(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth); 
-    virtual bool applySemanticChecks(const std::string& filename);
+    virtual bool analyze(IrTraversalContext* ctx);
    
     IrBinaryOperator getOperator() const { return m_operator; }
     IrExpression* getLeftHandSide() const { return m_lhs; }

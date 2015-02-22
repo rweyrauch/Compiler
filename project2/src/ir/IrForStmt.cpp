@@ -31,13 +31,13 @@
 namespace Decaf
 {
 
-void IrForStatement::clean()
+void IrForStatement::clean(IrTraversalContext* ctx)
 {
-    m_loopVariable->clean();
-    m_initialValue->clean();
-    m_terminatingValue->clean();
+    m_loopVariable->clean(ctx);
+    m_initialValue->clean(ctx);
+    m_terminatingValue->clean(ctx);
     
-    if (m_body) m_body->clean();
+    if (m_body) m_body->clean(ctx);
 }
     
 void IrForStatement::print(unsigned int depth) 
@@ -52,7 +52,7 @@ void IrForStatement::print(unsigned int depth)
     if (m_body) m_body->print(depth+1);
 }
   
-bool IrForStatement::applySemanticChecks(const std::string& filename)
+bool IrForStatement::analyze(IrTraversalContext* ctx)
 {
     return true;
 }

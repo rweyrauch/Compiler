@@ -33,17 +33,17 @@ namespace Decaf
 class IrExpressionStatement : public IrStatement
 {
 public:
-    IrExpressionStatement(int lineNumber, int columnNumber, IrExpression* expr) :
-        IrStatement(lineNumber, columnNumber),
+    IrExpressionStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpression* expr) :
+        IrStatement(lineNumber, columnNumber, filename),
         m_expression(expr)
     {}
     
     virtual ~IrExpressionStatement()
     {}
     
-    virtual void clean(); 
+    virtual void clean(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth); 
-    virtual bool applySemanticChecks(const std::string& filename);
+    virtual bool analyze(IrTraversalContext* ctx);
    
  protected:    
     

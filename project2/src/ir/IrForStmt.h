@@ -35,8 +35,8 @@ class IrBlock;
 class IrForStatement : public IrStatement
 {
 public:
-    IrForStatement(int lineNumber, int columnNumber, IrIdentifier* loopVar, IrExpression* initialExpr, IrExpression* endExpr, IrBlock* block = nullptr) :
-        IrStatement(lineNumber, columnNumber),
+    IrForStatement(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* loopVar, IrExpression* initialExpr, IrExpression* endExpr, IrBlock* block = nullptr) :
+        IrStatement(lineNumber, columnNumber, filename),
         m_loopVariable(loopVar),
         m_initialValue(initialExpr),
         m_terminatingValue(endExpr),
@@ -46,9 +46,9 @@ public:
     virtual ~IrForStatement()
     {}
     
-    virtual void clean(); 
+    virtual void clean(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth);
-    virtual bool applySemanticChecks(const std::string& filename);
+    virtual bool analyze(IrTraversalContext* ctx);
         
 protected:    
     

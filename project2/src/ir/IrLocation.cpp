@@ -30,7 +30,7 @@
 namespace Decaf
 {
 
-void IrLocation::clean()
+void IrLocation::clean(IrTraversalContext* ctx)
 {
 }
     
@@ -52,7 +52,7 @@ void IrLocation::print(unsigned int depth)
     }
 }
 
-bool IrLocation::applySemanticChecks(const std::string& filename)
+bool IrLocation::analyze(IrTraversalContext* ctx)
 {
     return true;
 }

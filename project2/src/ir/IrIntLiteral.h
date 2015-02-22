@@ -33,8 +33,8 @@ namespace Decaf
 class IrIntegerLiteral : public IrLiteral
 {
 public:
-    IrIntegerLiteral(int lineNumber, int columnNumber, const std::string& value) :
-        IrLiteral(lineNumber, columnNumber, IrType::Integer, value)
+    IrIntegerLiteral(int lineNumber, int columnNumber, const std::string& filename, const std::string& value) :
+        IrLiteral(lineNumber, columnNumber, filename, IrType::Integer, value)
     {
         std::stringstream conv(value);
         conv >> m_value;

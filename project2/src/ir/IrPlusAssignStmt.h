@@ -32,8 +32,8 @@ namespace Decaf
 class IrPlusAssignStatement : public IrStatement
 {
 public:
-    IrPlusAssignStatement(int lineNumber, int columnNumber) :
-        IrStatement(lineNumber, columnNumber)
+    IrPlusAssignStatement(int lineNumber, int columnNumber, const std::string& filename) :
+        IrStatement(lineNumber, columnNumber, filename)
     {}
     
     virtual ~IrPlusAssignStatement()

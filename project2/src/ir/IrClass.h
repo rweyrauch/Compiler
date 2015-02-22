@@ -35,8 +35,8 @@ namespace Decaf
 class IrClass : public IrBase
 {
 public:
-    IrClass(int lineNumber, int columnNumber, IrIdentifier* ident) :
-        IrBase(lineNumber, columnNumber),
+    IrClass(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident) :
+        IrBase(lineNumber, columnNumber, filename),
         m_identifier(ident),
         m_field_decl_list(),
         m_method_decl_list(),
@@ -47,9 +47,9 @@ public:
     
     virtual ~IrClass();
     
-    virtual void clean(); 
+    virtual void clean(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth); 
-    virtual bool applySemanticChecks(const std::string& filename);
+    virtual bool analyze(IrTraversalContext* ctx);
      
     void addFieldDecl(IrFieldDecl* field);
     void addFieldDecl(const std::vector<IrFieldDecl*>& fields);

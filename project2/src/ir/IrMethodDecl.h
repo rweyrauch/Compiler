@@ -35,8 +35,8 @@ class IrBlock;
 class IrMethodDecl : public IrBase
 {
 public:
-    IrMethodDecl(int lineNumber, int columnNumber, IrIdentifier* ident, IrType returnType) :
-        IrBase(lineNumber, columnNumber),
+    IrMethodDecl(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType returnType) :
+        IrBase(lineNumber, columnNumber, filename),
         m_identifier(ident),
         m_returnType(returnType),
         m_argument_list(),
@@ -46,9 +46,9 @@ public:
     virtual ~IrMethodDecl()
     {}
     
-    virtual void clean(); 
+    virtual void clean(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth);
-    virtual bool applySemanticChecks(const std::string& filename);
+    virtual bool analyze(IrTraversalContext* ctx);
      
     void addArgument(IrVariableDecl* arg)
     {
@@ -61,6 +61,7 @@ public:
     
     const std::string& getName() const { return m_identifier->getIdentifier(); }
     size_t getNumArguments() const { return m_argument_list.size(); }
+    IrVariableDecl* getArgument(size_t which) { return m_argument_list.at(which); }
     IrType getReturnType() const { return m_returnType; }
     
 protected:

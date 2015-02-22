@@ -33,8 +33,8 @@ namespace Decaf
 class IrReturnStatement : public IrStatement
 {
 public:
-    IrReturnStatement(int lineNumber, int columnNumber, IrExpression* returnValue = nullptr) :
-        IrStatement(lineNumber, columnNumber),
+    IrReturnStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpression* returnValue = nullptr) :
+        IrStatement(lineNumber, columnNumber, filename),
         m_returnValue(returnValue)
     {}
     

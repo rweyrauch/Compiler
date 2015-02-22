@@ -34,8 +34,8 @@ class IrBlock;
 class IrIfStatement : public IrStatement
 {
 public:
-    IrIfStatement(int lineNumber, int columnNumber, IrExpression* condition, IrBlock* trueBlock, IrBlock* falseBlock = nullptr) :
-        IrStatement(lineNumber, columnNumber),
+    IrIfStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpression* condition, IrBlock* trueBlock, IrBlock* falseBlock = nullptr) :
+        IrStatement(lineNumber, columnNumber, filename),
         m_condition(condition),
         m_trueBlock(trueBlock),
         m_falseBlock(falseBlock)
@@ -44,9 +44,9 @@ public:
     virtual ~IrIfStatement()
     {}
     
-    virtual void clean(); 
+    virtual void clean(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth);
-    virtual bool applySemanticChecks(const std::string& filename);
+    virtual bool analyze(IrTraversalContext* ctx);
         
 protected:    
     

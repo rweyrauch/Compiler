@@ -28,10 +28,10 @@
 namespace Decaf
 {
 
-void IrBinaryExpression::clean()
+void IrBinaryExpression::clean(IrTraversalContext* ctx)
 {
-    if (m_lhs) m_lhs->clean();
-    if (m_rhs) m_rhs->clean();
+    if (m_lhs) m_lhs->clean(ctx);
+    if (m_rhs) m_rhs->clean(ctx);
     
     if (getType() == IrType::Unknown)
     {
@@ -67,7 +67,7 @@ void IrBinaryExpression::print(unsigned int depth)
     }
 }
 
-bool IrBinaryExpression::applySemanticChecks(const std::string& filename)
+bool IrBinaryExpression::analyze(IrTraversalContext* ctx)
 {
     return true;
 }

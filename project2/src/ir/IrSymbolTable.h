@@ -26,9 +26,11 @@
 #include "IrCommon.h"
 #include "IrFieldDecl.h"
 #include "IrVarDecl.h"
+#include "IrMethodDecl.h"
 
 namespace Decaf
 {
+class IrTraversalContext;
 
 class IrSymbolTable
 {
@@ -42,7 +44,7 @@ public:
     
     bool addVariable(IrFieldDecl* variable);
     bool addVariable(IrVariableDecl* variables);
-    void addMethod() {}
+    bool addMethod(IrMethodDecl* method);
     
     bool find() { return false; }
     
@@ -58,6 +60,15 @@ protected:
     };
     
     std::map<std::string, SVariableSymbol> m_variables;
+    
+    struct SMethodSymbol
+    {
+        std::string m_name;
+        IrType m_type;
+        std::vector<SVariableSymbol> m_arguments;
+    };
+    
+    std::map<std::string, SMethodSymbol> m_methods;
     
 };
     

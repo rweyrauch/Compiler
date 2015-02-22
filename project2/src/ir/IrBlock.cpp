@@ -40,15 +40,15 @@ namespace Decaf
     delete m_symbols;
 }
 
-void IrBlock::clean()
+void IrBlock::clean(IrTraversalContext* ctx)
 {
     for (auto it : m_variables)
     {
-        it->clean();
+        it->clean(ctx);
     }
     for (auto it : m_statements)
     {
-        it->clean();
+        it->clean(ctx);
     }
 }
 
@@ -56,6 +56,9 @@ void IrBlock::print(unsigned int depth)
 {
     IRPRINT_INDENT(depth);
     std::cout << "Block(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
+    
+    m_symbols->print(depth+1);
+    
     for (auto it : m_variables)
     {
         it->print(depth+1);
@@ -64,31 +67,40 @@ void IrBlock::print(unsigned int depth)
     {
         it->print(depth+1);
     }
-    
-    m_symbols->print(depth);
 }
     
-bool IrBlock::applySemanticChecks(const std::string& filename)
+bool IrBlock::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
     for (auto it : m_variables)
     {
-        valid = it->applySemanticChecks(filename);
+        valid = it->analyze(ctx);
         if (!valid) return valid;
     }
     for (auto it : m_statements)
     {
-        valid = it->applySemanticChecks(filename);
+        valid = it->analyze(ctx);
         if (!valid) return valid;
     }   
     
+    return valid;
+}
+    
+void IrBlock::addVariableDecl(IrVariableDecl* var)
+{
+    m_variables.push_back(var);
+    
+    m_symbols->addVariable(var);
+}
+
+void IrBlock::addVariableDecl(const std::vector<IrVariableDecl*>& variables)
+{
+    m_variables.insert(m_variables.end(), variables.begin(), variables.end());
+    
     for (auto it : m_variables)
     {
-        if (!m_symbols->addVariable(it))
-            valid = false;            
+        m_symbols->addVariable(it);
     }
-    
-    return valid;
 }
     
 } // namespace Decaf

@@ -34,15 +34,15 @@ class IrStringLiteral;
 class IrMethodCall : public IrExpression
 {
 public:
-    IrMethodCall(int lineNumber, int columnNumber, IrIdentifier* ident, IrType type) :
-        IrExpression(lineNumber, columnNumber, type),
+    IrMethodCall(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType type) :
+        IrExpression(lineNumber, columnNumber, filename, type),
         m_identifier(ident),
         m_externalFunction(0),
         m_arguments()
     {}
 
-    IrMethodCall(int lineNumber, int columnNumber, IrStringLiteral* ident, IrType type) :
-        IrExpression(lineNumber, columnNumber, type),
+    IrMethodCall(int lineNumber, int columnNumber, const std::string& filename, IrStringLiteral* ident, IrType type) :
+        IrExpression(lineNumber, columnNumber, filename, type),
         m_identifier(0),
         m_externalFunction(ident),
         m_arguments()
@@ -51,9 +51,9 @@ public:
     virtual ~IrMethodCall()
     {}
     
-    virtual void clean(); 
+    virtual void clean(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth);
-    virtual bool applySemanticChecks(const std::string& filename);
+    virtual bool analyze(IrTraversalContext* ctx);
     
     void addArgument(IrExpression* arg)
     {

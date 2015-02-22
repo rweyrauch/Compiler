@@ -22,44 +22,30 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include <string>
 #include "IrCommon.h"
-#include "IrBase.h"
-#include "IrLocation.h"
-#include "IrIdentifier.h"
 
 namespace Decaf
 {
 
-class IrFieldDecl : public IrBase
+class IrTraversalContext
 {
 public:
-    IrFieldDecl(int lineNumber, int columnNumber, const std::string& filename, IrLocation* location, IrType type) :
-        IrBase(lineNumber, columnNumber, filename),
-        m_location(location),
-        m_type(type)
+    IrTraversalContext() {}
+    ~IrTraversalContext() {}
+    
+    void setFilename(const std::string& filename)
     {
-        m_location->setType(type);
+        m_filename = filename;
     }
-    
-    virtual ~IrFieldDecl()
-    {}
-    
-    virtual void clean(IrTraversalContext* ctx); 
-    virtual void print(unsigned int depth);
-    virtual bool analyze(IrTraversalContext* ctx);
-    
-    IrLocation* getLocation() const { return m_location; }
-    const std::string& getName() const { return m_location->getIdentifier()->getIdentifier(); }
-    IrType getType() const { return m_type; }
+    const std::string& getFilename() const 
+    {
+        return m_filename;
+    }
     
 protected:
     
-    IrLocation* m_location;
-    IrType m_type; 
-    
-private:
-    IrFieldDecl() = delete;
-    IrFieldDecl(const IrFieldDecl& rhs) = delete;
+    std::string m_filename;
 };
 
 } // namespace Decaf

@@ -32,8 +32,8 @@ namespace Decaf
 class IrIdentifier : public IrBase
 {
 public:
-    IrIdentifier(int lineNumber, int columnNumber, const std::string& ident) :
-        IrBase(lineNumber, columnNumber),
+    IrIdentifier(int lineNumber, int columnNumber, const std::string& filename, const std::string& ident) :
+        IrBase(lineNumber, columnNumber, filename),
         m_identifier(ident)
     {}
     

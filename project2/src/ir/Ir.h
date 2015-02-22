@@ -50,4 +50,8 @@
 #include "IrReturnStmt.h"
 #include "IrStatement.h"
 #include "IrStringLiteral.h"
+#include "IrSymbolTable.h"
+#include "IrTravCtx.h"
 #include "IrVarDecl.h"
+
+

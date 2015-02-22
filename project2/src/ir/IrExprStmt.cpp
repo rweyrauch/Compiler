@@ -28,9 +28,9 @@
 namespace Decaf
 {
 
-void IrExpressionStatement::clean()
+void IrExpressionStatement::clean(IrTraversalContext* ctx)
 {
-    if (m_expression) m_expression->clean();
+    if (m_expression) m_expression->clean(ctx);
 }
     
 void IrExpressionStatement::print(unsigned int depth) 
@@ -40,7 +40,7 @@ void IrExpressionStatement::print(unsigned int depth)
     if (m_expression) m_expression->print(depth+1);
 }
 
-bool IrExpressionStatement::applySemanticChecks(const std::string& filename)
+bool IrExpressionStatement::analyze(IrTraversalContext* ctx)
 {
     return true;
 }

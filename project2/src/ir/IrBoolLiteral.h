@@ -32,8 +32,8 @@ namespace Decaf
 class IrBooleanLiteral : public IrLiteral
 {
 public:
-    IrBooleanLiteral(int lineNumber, int columnNumber, const std::string& value) :
-        IrLiteral(lineNumber, columnNumber, IrType::Boolean, value)
+    IrBooleanLiteral(int lineNumber, int columnNumber, const std::string& filename, const std::string& value) :
+        IrLiteral(lineNumber, columnNumber, filename, IrType::Boolean, value)
     {
         if (value == "true")
             m_value = true;

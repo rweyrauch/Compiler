@@ -32,8 +32,8 @@ namespace Decaf
 class IrContinueStatement : public IrStatement
 {
 public:
-    IrContinueStatement(int lineNumber, int columnNumber) :
-        IrStatement(lineNumber, columnNumber)
+    IrContinueStatement(int lineNumber, int columnNumber, const std::string& filename) :
+        IrStatement(lineNumber, columnNumber, filename)
     {}
     
     virtual ~IrContinueStatement()

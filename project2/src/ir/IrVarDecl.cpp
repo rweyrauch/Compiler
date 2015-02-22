@@ -28,11 +28,11 @@
 namespace Decaf
 {
 
-void IrVariableDecl::clean()
+void IrVariableDecl::clean(IrTraversalContext* ctx)
 {
     for (auto it : m_identifiers)
     {
-        it->clean();
+        it->clean(ctx);
     }
 }
     
@@ -52,7 +52,7 @@ void IrVariableDecl::print(unsigned int depth)
     }
 }
  
-bool IrVariableDecl::applySemanticChecks(const std::string& filename)
+bool IrVariableDecl::analyze(IrTraversalContext* ctx)
 {
     return true;
 }

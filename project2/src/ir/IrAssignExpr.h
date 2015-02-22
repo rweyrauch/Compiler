@@ -32,8 +32,8 @@ namespace Decaf
 class IrAssignExpression : public IrExpression
 {
 public:
-    IrAssignExpression(int lineNumber, int columnNumber, IrExpression* lhs, IrAssignmentOperator assignOp, IrExpression* rhs) :
-        IrExpression(lineNumber, columnNumber, lhs->getType()),
+    IrAssignExpression(int lineNumber, int columnNumber, const std::string& filename, IrExpression* lhs, IrAssignmentOperator assignOp, IrExpression* rhs) :
+        IrExpression(lineNumber, columnNumber, filename, lhs->getType()),
         m_lhs(lhs),
         m_operator(assignOp),
         m_rhs(rhs)
@@ -42,9 +42,9 @@ public:
     virtual ~IrAssignExpression()
     {}
     
-    virtual void clean(); 
+    virtual void clean(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth); 
-    virtual bool applySemanticChecks(const std::string& filename);
+    virtual bool analyze(IrTraversalContext* ctx);
         
 protected:    
   

@@ -34,8 +34,8 @@ class IrVariableDecl;
 class IrBlock : public IrStatement
 {
 public:
-    IrBlock(int lineNumber, int columnNumber) :
-        IrStatement(lineNumber, columnNumber),
+    IrBlock(int lineNumber, int columnNumber, const std::string& filename) :
+        IrStatement(lineNumber, columnNumber, filename),
         m_variables(),
         m_statements(),
         m_symbols(nullptr)
@@ -45,18 +45,12 @@ public:
     
     virtual ~IrBlock();
      
-    virtual void clean(); 
+    virtual void clean(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth);
-    virtual bool applySemanticChecks(const std::string& filename);
+    virtual bool analyze(IrTraversalContext* ctx);
     
-    void addVariableDecl(IrVariableDecl* var)
-    {
-        m_variables.push_back(var);
-    }
-    void addVariableDecl(const std::vector<IrVariableDecl*>& variables)
-    {
-        m_variables.insert(m_variables.end(), variables.begin(), variables.end());
-    }
+    void addVariableDecl(IrVariableDecl* var);
+    void addVariableDecl(const std::vector<IrVariableDecl*>& variables);
     
     void addStatement(IrStatement* stmt)
     {

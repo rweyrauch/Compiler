@@ -7,11 +7,13 @@
 
 char* g_target = 0;
 char* g_outputFilename = 0;
+int g_debug = 0;
 
 poptOption appOptions[] =
 {
     { "target", 't', POPT_ARG_STRING, &g_target, 0, "scan or parse", NULL },
     { "output", 'o', POPT_ARG_STRING, &g_outputFilename, 0, "output filename", NULL },
+    { "debug", 'd', POPT_ARG_NONE, &g_debug, 0, "debugging output", NULL },
     POPT_AUTOHELP
     POPT_TABLEEND
 };
@@ -76,10 +78,11 @@ int main(int argc, char **argv)
         {
             parser = new Parser();
         }
-        parser->parse();
-        parser->clean();
+        parser->parse();        
         parser->semanticChecks();
-        parser->dumpAST();
+        
+        if (g_debug)
+            parser->dumpAST();
         
         delete parser;
     }

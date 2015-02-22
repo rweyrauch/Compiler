@@ -28,10 +28,10 @@
 namespace Decaf
 {
 
-void IrAssignExpression::clean()
+void IrAssignExpression::clean(IrTraversalContext* ctx)
 {
-    if (m_lhs) m_lhs->clean();
-    if (m_rhs) m_rhs->clean();
+    if (m_lhs) m_lhs->clean(ctx);
+    if (m_rhs) m_rhs->clean(ctx);
     
     if (getType() == IrType::Unknown)
     {
@@ -67,7 +67,7 @@ void IrAssignExpression::print(unsigned int depth)
     }
 }
 
-bool IrAssignExpression::applySemanticChecks(const std::string& filename)
+bool IrAssignExpression::analyze(IrTraversalContext* ctx)
 {
     return true;
 }

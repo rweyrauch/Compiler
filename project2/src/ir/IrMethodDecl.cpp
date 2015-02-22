@@ -30,14 +30,14 @@
 namespace Decaf
 {
 
-void IrMethodDecl::clean()
+void IrMethodDecl::clean(IrTraversalContext* ctx)
 {
-    m_identifier->clean();
+    m_identifier->clean(ctx);
     for (auto it : m_argument_list)
     {
-        it->clean();
+        it->clean(ctx);
     }
-    if (m_block) m_block->clean();
+    if (m_block) m_block->clean(ctx);
 }
 
 void IrMethodDecl::print(unsigned int depth)
@@ -66,11 +66,14 @@ void IrMethodDecl::print(unsigned int depth)
     }
 }
     
-bool IrMethodDecl::applySemanticChecks(const std::string& filename)
+bool IrMethodDecl::analyze(IrTraversalContext* ctx)
 {
-    if (m_block) m_block->applySemanticChecks(filename);
+    bool valid = true;
     
-    return true;
+    if (m_block) 
+        valid = m_block->analyze(ctx);
+    
+    return valid;
 }
     
 } // namespace Decaf

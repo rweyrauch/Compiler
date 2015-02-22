@@ -34,15 +34,15 @@ namespace Decaf
 class IrVariableDecl : public IrBase
 {
 public:
-    IrVariableDecl(int lineNumber, int columnNumber, IrIdentifier* ident, IrType type) :
-        IrBase(lineNumber, columnNumber),
+    IrVariableDecl(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType type) :
+        IrBase(lineNumber, columnNumber, filename),
         m_identifiers(),
         m_type(type)
     {
         m_identifiers.push_back(ident);
     }
-    IrVariableDecl(int lineNumber, int columnNumber, const std::vector<IrIdentifier*> ident_list, IrType type) :
-        IrBase(lineNumber, columnNumber),
+    IrVariableDecl(int lineNumber, int columnNumber, const std::string& filename, const std::vector<IrIdentifier*> ident_list, IrType type) :
+        IrBase(lineNumber, columnNumber, filename),
         m_identifiers(ident_list),
         m_type(type)
     {}
@@ -50,9 +50,9 @@ public:
     virtual ~IrVariableDecl()
     {}
     
-    virtual void clean(); 
+    virtual void clean(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth);
-    virtual bool applySemanticChecks(const std::string& filename);
+    virtual bool analyze(IrTraversalContext* ctx);
         
     size_t getNumVariables() const { return m_identifiers.size(); }
     IrIdentifier* getVariable(size_t which) const;

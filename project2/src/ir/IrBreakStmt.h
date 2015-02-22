@@ -32,8 +32,8 @@ namespace Decaf
 class IrBreakStatement : public IrStatement
 {
 public:
-    IrBreakStatement(int lineNumber, int columnNumber) :
-        IrStatement(lineNumber, columnNumber)
+    IrBreakStatement(int lineNumber, int columnNumber, const std::string& filename) :
+        IrStatement(lineNumber, columnNumber, filename)
     {}
     
     virtual ~IrBreakStatement()

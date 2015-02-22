@@ -31,8 +31,8 @@ namespace Decaf
 class IrExpression : public IrBase
 {
 public:
-    IrExpression(int lineNumber, int columnNumber, IrType type) :
-        IrBase(lineNumber, columnNumber),
+    IrExpression(int lineNumber, int columnNumber, const std::string& filename, IrType type) :
+        IrBase(lineNumber, columnNumber, filename),
         m_type(type)
     {}
     

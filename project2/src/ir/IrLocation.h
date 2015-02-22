@@ -31,14 +31,14 @@ class IrIdentifier;
 class IrLocation : public IrExpression
 {
 public:
-    IrLocation(int lineNumber, int columnNumber, IrIdentifier* ident, IrType type) :
-        IrExpression(lineNumber, columnNumber, type),
+    IrLocation(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType type) :
+        IrExpression(lineNumber, columnNumber, filename, type),
         m_identifier(ident),
         m_index(nullptr)
     {}
 
-    IrLocation(int lineNumber, int columnNumber, IrIdentifier* ident, IrType type, IrExpression* index) :
-        IrExpression(lineNumber, columnNumber, type),
+    IrLocation(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType type, IrExpression* index) :
+        IrExpression(lineNumber, columnNumber, filename, type),
         m_identifier(ident),
         m_index(index)
     {}
@@ -46,9 +46,9 @@ public:
     virtual ~IrLocation()
     {}
     
-    virtual void clean(); 
+    virtual void clean(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth);
-    virtual bool applySemanticChecks(const std::string& filename);
+    virtual bool analyze(IrTraversalContext* ctx);
     
     IrIdentifier* getIdentifier() const { return m_identifier; }
     IrExpression* getIndex() const { return m_index; }

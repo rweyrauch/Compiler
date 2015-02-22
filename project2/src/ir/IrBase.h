@@ -26,29 +26,35 @@
 
 namespace Decaf
 {
+class IrTraversalContext;
 
 class IrBase
 {
 public:
-    IrBase(int lineNumber, int columnNumber) :
+    IrBase(int lineNumber, 
+           int columnNumber, 
+           const std::string& filename) :
         m_lineNumber(lineNumber),
-        m_columnNumber(columnNumber)
+        m_columnNumber(columnNumber),
+        m_filename(filename)
     {}
     
     virtual ~IrBase() 
     {}
     
-    virtual void clean() {}
+    virtual void clean(IrTraversalContext* ctx) {}
     virtual void print(unsigned int depth) = 0;
-    virtual bool applySemanticChecks(const std::string& filename) { return true; }
+    virtual bool analyze(IrTraversalContext* ctx) { return true; }
     
     int getLineNumber() const { return m_lineNumber; }
     int getColumnNumber() const { return m_columnNumber; }
+    const std::string& getFilename() const { return m_filename; }
     
 protected:
     
-    int m_lineNumber,
-        m_columnNumber;
+    const int m_lineNumber,
+              m_columnNumber;
+    const std::string& m_filename;
     
 private:
     IrBase() = delete;

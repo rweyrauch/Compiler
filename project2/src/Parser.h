@@ -20,6 +20,7 @@ class Parser: public ParserBase
     Scanner d_scanner;
 
     IrClass* d_root;
+    IrTraversalContext* d_ctx;
     
     public:
         Parser() :
@@ -27,21 +28,19 @@ class Parser: public ParserBase
             d_root(0) 
         {
             d_scanner.setSLoc(&d_loc__);
+            d_ctx = new IrTraversalContext();
         }
         Parser(std::string const &infile, std::string const &outfile) :
             d_scanner(infile, outfile),
             d_root(0) 
         {
             d_scanner.setSLoc(&d_loc__);            
+            d_ctx = new IrTraversalContext();
+            d_ctx->setFilename(infile);
         }
         virtual ~Parser() {}
         int parse();
 
-        void clean()
-        {
-            if (d_root) 
-                d_root->clean();
-        }
         void dumpAST() 
         { 
             if (d_root) 
@@ -50,7 +49,10 @@ class Parser: public ParserBase
         bool semanticChecks() 
         { 
             if (d_root) 
-                return d_root->applySemanticChecks(d_scanner.filename()); 
+            {
+                d_root->clean(d_ctx);
+                return d_root->analyze(d_ctx); 
+            }
             return false; 
         }
         

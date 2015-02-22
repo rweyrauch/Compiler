@@ -30,8 +30,8 @@ namespace Decaf
 class IrStatement : public IrBase
 {
 public:
-    IrStatement(int lineNumber, int columnNumber) :
-        IrBase(lineNumber, columnNumber)
+    IrStatement(int lineNumber, int columnNumber, const std::string& filename) :
+        IrBase(lineNumber, columnNumber, filename)
     {}
     
     virtual ~IrStatement()

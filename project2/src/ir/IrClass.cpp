@@ -25,6 +25,7 @@
 #include "IrCommon.h"
 #include "IrClass.h"
 #include "IrSymbolTable.h"
+#include "IrTravCtx.h"
 
 namespace Decaf
 {
@@ -39,16 +40,16 @@ IrClass::~IrClass()
     delete m_symbols;
 }
     
-void IrClass::clean()
+void IrClass::clean(IrTraversalContext* ctx)
 {
-    m_identifier->clean();
+    m_identifier->clean(ctx);
     for (auto it : m_field_decl_list)
     {
-        it->clean();
+        it->clean(ctx);
     }
     for (auto it : m_method_decl_list)
     {
-        it->clean();
+        it->clean(ctx);
     }
  }
     
@@ -58,6 +59,8 @@ void IrClass::print(unsigned int depth)
     
     std::cout << "Class(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
     m_identifier->print(depth+1);
+
+    m_symbols->print(depth+1);
     
     IRPRINT_INDENT(depth+1);
     std::cout << "Field Declarations: " << std::endl;
@@ -72,17 +75,17 @@ void IrClass::print(unsigned int depth)
     {
         it->print(depth+2);
     }
-    
-    m_symbols->print(depth);
 }
 
-bool IrClass::applySemanticChecks(const std::string& filename) 
-{ 
+bool IrClass::analyze(IrTraversalContext* ctx) 
+{
+    bool valid = true;
+    
     // Rule: identifier == "Program"
     if (m_identifier->getIdentifier() != "Program")
     {
-        std::cerr << "File: " << filename << " Syntax error: Class must be named \'Program\'." << std::endl;
-        return false;
+        std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: class must be named \'Program\'." << std::endl;
+        valid = false;
     }
     
     // Rule: Valid program must contain a main function with no parameters.
@@ -97,47 +100,55 @@ bool IrClass::applySemanticChecks(const std::string& filename)
     }
     if (!mainFound)
     {
-        std::cerr << "File: " << filename << " Syntax error: Class must contain a method \'main\'." << std::endl;
-        return false;        
+        std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: class must contain a method \'main\'." << std::endl;
     }
     
     for (auto it : m_field_decl_list)
     {
-        if (!it->applySemanticChecks(filename))
-            return false;
+        if (!it->analyze(ctx))
+            valid = false;
     }
     
     for (auto it : m_method_decl_list)
     {
-        if (!it->applySemanticChecks(filename))
-            return false;
-    }
-     
-    for (auto it : m_field_decl_list)
-    {
-        if (!m_symbols->addVariable(it))
-            return false;            
+        if (!it->analyze(ctx))
+            valid = false;
     }
     
-    return true;
+    return valid;
 }
 
 void IrClass::addFieldDecl(IrFieldDecl* field)
 {
     m_field_decl_list.push_back(field);
+    
+    m_symbols->addVariable(field);    
 }
+
 void IrClass::addFieldDecl(const std::vector<IrFieldDecl*>& fields)
 {
     m_field_decl_list.insert(m_field_decl_list.end(), fields.begin(), fields.end());
+    
+    for (auto it : fields)
+    {
+        m_symbols->addVariable(it);
+    }
 }
 
 void IrClass::addMethodDecl(IrMethodDecl* method)
 {
     m_method_decl_list.push_back(method);
+    
+    m_symbols->addMethod(method);    
 }
+
 void IrClass::addMethodDecl(const std::vector<IrMethodDecl*>& methods)
 {
     m_method_decl_list.insert(m_method_decl_list.end(), methods.begin(), methods.end());
+    for (auto it : methods)
+    {
+        m_symbols->addMethod(it);
+    }
 }
 
 } // namespace Decaf

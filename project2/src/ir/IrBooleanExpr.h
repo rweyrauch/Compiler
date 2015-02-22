@@ -31,8 +31,8 @@ namespace Decaf
 class IrBooleanExpression : public IrExpression
 {
 public:
-    IrBooleanExpression(int lineNumber, int columnNumber, IrExpression* lhs, IrBooleanOperator boolOp, IrExpression* rhs) :
-        IrExpression(lineNumber, columnNumber, IrType::Boolean),
+    IrBooleanExpression(int lineNumber, int columnNumber, const std::string& filename, IrExpression* lhs, IrBooleanOperator boolOp, IrExpression* rhs) :
+        IrExpression(lineNumber, columnNumber, filename, IrType::Boolean),
         m_lhs(lhs),
         m_operator(boolOp),
         m_rhs(rhs)
@@ -41,9 +41,9 @@ public:
     virtual ~IrBooleanExpression()
     {}
     
-    virtual void clean(); 
+    virtual void clean(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth); 
-    virtual bool applySemanticChecks(const std::string& filename);
+    virtual bool analyze(IrTraversalContext* ctx);
     
     IrBooleanOperator getOperator() const { return m_operator; }
     IrExpression* getLeftHandSide() const { return m_lhs; }

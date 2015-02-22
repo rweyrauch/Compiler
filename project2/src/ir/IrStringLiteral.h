@@ -32,8 +32,8 @@ namespace Decaf
 class IrStringLiteral : public IrLiteral
 {
 public:
-    IrStringLiteral(int lineNumber, int columnNumber, const std::string& value) :
-        IrLiteral(lineNumber, columnNumber, IrType::String, value)
+    IrStringLiteral(int lineNumber, int columnNumber, const std::string& filename, const std::string& value) :
+        IrLiteral(lineNumber, columnNumber, filename, IrType::String, value)
     {
     }
     
