@@ -26,18 +26,29 @@
 #include "IrLocation.h"
 #include "IrIdentifier.h"
 #include "IrExpression.h"
+#include "IrSymbolTable.h"
+#include "IrTravCtx.h"
 
 namespace Decaf
 {
 
 void IrLocation::clean(IrTraversalContext* ctx)
 {
+    // Update type
+    SVariableSymbol symbol;
+    if (ctx->lookup(this, symbol))
+    {
+        setType(symbol.m_type);
+    }
 }
     
 void IrLocation::print(unsigned int depth) 
 {
     IRPRINT_INDENT(depth);
     std::cout << "Location(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
+    IRPRINT_INDENT(depth+1);
+    std::cout << "Type: " << IrTypeToString(m_type) << std::endl;
+    
     if (m_identifier) 
     {
         IRPRINT_INDENT(depth+1);
@@ -54,7 +65,20 @@ void IrLocation::print(unsigned int depth)
 
 bool IrLocation::analyze(IrTraversalContext* ctx)
 {
-    return true;
+    bool valid = true;
+    
+    // Location must be in symbol table
+    SVariableSymbol symbol;
+    if (!ctx->lookup(this, symbol))
+    {
+        // Variable not defined
+        std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: variable " << getIdentifier()->getIdentifier() << " not declared." << std::endl; 
+        valid = false;
+    }
+   
+    // Location index must be in range of symbol count
+    
+    return valid;
 }
 
 } // namespace Decaf

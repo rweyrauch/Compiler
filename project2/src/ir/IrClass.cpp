@@ -42,6 +42,8 @@ IrClass::~IrClass()
     
 void IrClass::clean(IrTraversalContext* ctx)
 {
+    ctx->pushSymbols(m_symbols);
+    
     m_identifier->clean(ctx);
     for (auto it : m_field_decl_list)
     {
@@ -51,6 +53,8 @@ void IrClass::clean(IrTraversalContext* ctx)
     {
         it->clean(ctx);
     }
+    
+    ctx->popSymbols();
  }
     
 void IrClass::print(unsigned int depth) 
@@ -80,6 +84,8 @@ void IrClass::print(unsigned int depth)
 bool IrClass::analyze(IrTraversalContext* ctx) 
 {
     bool valid = true;
+    
+    ctx->pushSymbols(m_symbols);
     
     // Rule: identifier == "Program"
     if (m_identifier->getIdentifier() != "Program")
@@ -114,6 +120,8 @@ bool IrClass::analyze(IrTraversalContext* ctx)
         if (!it->analyze(ctx))
             valid = false;
     }
+    
+    ctx->popSymbols();
     
     return valid;
 }

@@ -26,6 +26,7 @@
 #include "IrSymbolTable.h"
 #include "IrIntLiteral.h"
 #include "IrMethodCall.h"
+#include "IrMethodDecl.h"
 
 namespace Decaf
 {
@@ -102,6 +103,50 @@ bool IrSymbolTable::addVariable(IrVariableDecl* variables)
     return ok;
 }
  
+bool IrSymbolTable::addVariable(IrLocation* variable)
+{
+   auto it = m_variables.find(variable->getIdentifier()->getIdentifier());
+    if (it == m_variables.end())
+    {
+        SVariableSymbol symbol;
+        symbol.m_name = variable->getIdentifier()->getIdentifier();
+        symbol.m_type = variable->getType();
+        symbol.m_count = 1;
+        
+        if (variable->getIndex() != nullptr)
+        {
+            IrIntegerLiteral* size = dynamic_cast<IrIntegerLiteral*>(variable->getIndex());
+            if (size)
+            {
+                if (size->getValue() > 0)
+                {
+                    symbol.m_count = size->getValue();
+                }
+                else
+                {
+                    // Error - array size must be greater than zero
+                    std::cerr << size->getFilename() << ":" << size->getLineNumber() << ":" << size->getColumnNumber() << ": error: field " << variable->getIdentifier()->getIdentifier() << " array size must be integer greater than zero." << std::endl;
+                    return false;
+                }
+            }
+            else
+            {
+                // Error - array size must be a integer literal
+                std::cerr << size->getFilename() << ":" << size->getLineNumber() << ":" << size->getColumnNumber() << ": error: field " << variable->getIdentifier()->getIdentifier() << " array size must be integer greater than zero." << std::endl;
+                return false;
+            }
+        }
+        m_variables[symbol.m_name] = symbol;
+        
+        return true;
+    }
+    
+    // error - duplicate symbol
+    std::cerr << variable->getFilename() << ":" << variable->getLineNumber() << ":" << variable->getColumnNumber() << ": error: field " << variable->getIdentifier()->getIdentifier() << " of type " << IrTypeToString(variable->getType()) << " already declared in scope." << std::endl;
+    
+    return false;    
+}
+ 
 bool IrSymbolTable::addMethod(IrMethodDecl* method)
 {
     bool ok = true;
@@ -155,6 +200,40 @@ bool IrSymbolTable::exists(IrMethodCall* method) const
     }
     return false; 
 }
+
+bool IrSymbolTable::getSymbol(IrLocation* variable, SVariableSymbol& symbol) const
+{
+    bool valid = false;
+ 
+    auto it = m_variables.find(variable->getIdentifier()->getIdentifier());
+    if (it != m_variables.end())
+    {
+        symbol = it->second;
+        
+        valid = true;
+    }
+    
+    return valid;
+}
+
+bool IrSymbolTable::getSymbol(IrMethodCall* method, SMethodSymbol& symbol) const
+{
+    bool valid = false;
+    
+    if (method->isExternal()) return false;
+    
+    auto it = m_methods.find(method->getIdentifier()->getIdentifier());
+    if (it != m_methods.end())
+    {
+        // TODO: match signature
+        
+        symbol = it->second;
+ 
+        valid = true;
+    }
+    
+    return valid;
+}    
 
 void IrSymbolTable::print(int depth)
 {

@@ -42,7 +42,13 @@ void IrExpressionStatement::print(unsigned int depth)
 
 bool IrExpressionStatement::analyze(IrTraversalContext* ctx)
 {
-    return true;
+    bool valid = true;
+    if (m_expression) 
+    {
+        if (!m_expression->analyze(ctx))
+            valid = false;
+    }
+    return valid;
 }
 
 } // namespace Decaf

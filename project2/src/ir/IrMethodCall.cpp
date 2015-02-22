@@ -26,6 +26,7 @@
 #include "IrMethodCall.h"
 #include "IrIdentifier.h"
 #include "IrStringLiteral.h"
+#include "IrTravCtx.h"
 
 namespace Decaf
 {
@@ -38,6 +39,13 @@ void IrMethodCall::clean(IrTraversalContext* ctx)
     {
         it->clean(ctx);
     }
+    
+    // Update type
+    SMethodSymbol symbol;
+    if (ctx->lookup(this, symbol))
+    {
+        setType(symbol.m_type);
+    }    
 }
     
 void IrMethodCall::print(unsigned int depth)
@@ -61,7 +69,25 @@ void IrMethodCall::print(unsigned int depth)
 
 bool IrMethodCall::analyze(IrTraversalContext* ctx)
 {
-    return true;
+    bool valid = true;
+    
+    if (!isExternal())
+    {
+        // Method must be in symbol table
+        SMethodSymbol symbol;
+        if (!ctx->lookup(this, symbol))
+        {
+            // Method not defined
+            std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: method " << getIdentifier()->getIdentifier() << " not defined." << std::endl; 
+            valid = false;
+        }
+    }
+    else
+    {
+        // 
+    }
+    
+    return valid;
 }
 
 } // namespace Decaf

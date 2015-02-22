@@ -25,6 +25,8 @@
 #include <iostream>
 #include "IrCommon.h"
 #include "IrStatement.h"
+#include "IrSymbolTable.h"
+#include "IrLocation.h"
 
 namespace Decaf
 {
@@ -38,13 +40,22 @@ public:
     IrForStatement(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* loopVar, IrExpression* initialExpr, IrExpression* endExpr, IrBlock* block = nullptr) :
         IrStatement(lineNumber, columnNumber, filename),
         m_loopVariable(loopVar),
+        m_loopAutoLocation(nullptr),
         m_initialValue(initialExpr),
         m_terminatingValue(endExpr),
-        m_body(block)
-    {}
+        m_body(block),
+        m_symbols(nullptr)
+    {
+        m_loopAutoLocation = new IrLocation(m_loopVariable->getLineNumber(), m_loopVariable->getColumnNumber(), filename, loopVar, IrType::Integer);
+        
+        m_symbols = new IrSymbolTable();
+        m_symbols->addVariable(m_loopAutoLocation);
+    }
     
     virtual ~IrForStatement()
-    {}
+    {
+        delete m_symbols;
+    }
     
     virtual void clean(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth);
@@ -53,9 +64,11 @@ public:
 protected:    
     
     IrIdentifier* m_loopVariable;
+    IrLocation* m_loopAutoLocation;
     IrExpression* m_initialValue;
     IrExpression* m_terminatingValue;
     IrBlock* m_body;
+    IrSymbolTable* m_symbols;
     
 private:
     IrForStatement() = delete;

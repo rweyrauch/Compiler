@@ -66,7 +66,18 @@ void IrBooleanExpression::print(unsigned int depth)
 
 bool IrBooleanExpression::analyze(IrTraversalContext* ctx)
 {
-    return true;
+    bool valid = true;
+    if (m_lhs) 
+    {
+        if (!m_lhs->analyze(ctx))
+            valid = false;
+    }
+    if (m_rhs) 
+    {
+        if (!m_rhs->analyze(ctx))
+            valid = false;
+    }
+    return valid;
 }
 
 } // namespace Decaf

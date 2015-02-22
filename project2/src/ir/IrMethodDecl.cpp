@@ -26,18 +26,23 @@
 #include "IrMethodDecl.h"
 #include "IrVarDecl.h"
 #include "IrBlock.h"
+#include "IrTravCtx.h"
 
 namespace Decaf
 {
 
 void IrMethodDecl::clean(IrTraversalContext* ctx)
 {
+    ctx->pushSymbols(m_symbols);
+    
     m_identifier->clean(ctx);
     for (auto it : m_argument_list)
     {
         it->clean(ctx);
     }
     if (m_block) m_block->clean(ctx);
+    
+    ctx->popSymbols();
 }
 
 void IrMethodDecl::print(unsigned int depth)
@@ -47,6 +52,8 @@ void IrMethodDecl::print(unsigned int depth)
     IRPRINT_INDENT(depth+1);
     std::cout << "Name: " << std::endl;
     m_identifier->print(depth+2);
+    
+    m_symbols->print(depth+1);
     
     IRPRINT_INDENT(depth+1);
     std::cout << "Return Type: " << IrTypeToString(m_returnType) << std::endl;
@@ -69,9 +76,13 @@ void IrMethodDecl::print(unsigned int depth)
 bool IrMethodDecl::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
+ 
+    ctx->pushSymbols(m_symbols);
     
     if (m_block) 
         valid = m_block->analyze(ctx);
+    
+    ctx->popSymbols();
     
     return valid;
 }

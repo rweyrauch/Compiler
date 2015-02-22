@@ -27,17 +27,22 @@
 #include "IrIdentifier.h"
 #include "IrExpression.h"
 #include "IrBlock.h"
+#include "IrTravCtx.h"
 
 namespace Decaf
 {
 
 void IrForStatement::clean(IrTraversalContext* ctx)
 {
+    ctx->pushSymbols(m_symbols);
+    
     m_loopVariable->clean(ctx);
     m_initialValue->clean(ctx);
     m_terminatingValue->clean(ctx);
     
     if (m_body) m_body->clean(ctx);
+    
+    ctx->popSymbols();
 }
     
 void IrForStatement::print(unsigned int depth) 
@@ -54,7 +59,26 @@ void IrForStatement::print(unsigned int depth)
   
 bool IrForStatement::analyze(IrTraversalContext* ctx)
 {
-    return true;
+    bool valid = true;
+    
+    ctx->pushSymbols(m_symbols);
+    
+    if (!m_loopVariable->analyze(ctx))
+        valid = false;
+    if (!m_initialValue->analyze(ctx))
+        valid = false;
+    if (!m_terminatingValue->analyze(ctx))
+        valid = false;
+    
+    if (m_body) 
+    {
+        if (!m_body->analyze(ctx))
+            valid = false;
+    }
+    
+    ctx->popSymbols();
+    
+    return valid;
 }
   
 } // namespace Decaf

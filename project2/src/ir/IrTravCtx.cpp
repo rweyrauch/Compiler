@@ -30,13 +30,13 @@
 namespace Decaf
 {
 
-bool IrTraversalContext::lookup(IrLocation* location) const
+bool IrTraversalContext::lookup(IrLocation* location, SVariableSymbol& symbol) const
 {
     bool found = false;
     // TODO: make this a vector with reverse iterator
     for (auto it : m_symbols)
     {
-        if (it->exists(location))
+        if (it->getSymbol(location, symbol))
         {
             found = true;
             break;
@@ -45,13 +45,13 @@ bool IrTraversalContext::lookup(IrLocation* location) const
     return found;
 }
 
-bool IrTraversalContext::lookup(IrMethodCall* method) const
+bool IrTraversalContext::lookup(IrMethodCall* method, SMethodSymbol& symbol) const
 {
     bool found = false;
     // TODO: make this a vector with reverse iterator
     for (auto it : m_symbols)
     {
-        if (it->exists(method))
+        if (it->getSymbol(method, symbol))
         {
             found = true;
             break;

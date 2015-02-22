@@ -26,11 +26,11 @@
 #include "IrCommon.h"
 #include "IrFieldDecl.h"
 #include "IrVarDecl.h"
-#include "IrMethodDecl.h"
 
 namespace Decaf
 {
 class IrMethodCall;
+class IrMethodDecl;
 class IrLocation;
 
 class IrSymbolTable
@@ -45,30 +45,21 @@ public:
     
     bool addVariable(IrFieldDecl* variable);
     bool addVariable(IrVariableDecl* variables);
+    bool addVariable(IrLocation* variable);
+    
     bool addMethod(IrMethodDecl* method);
     
     bool exists(IrLocation* variable) const;
     bool exists(IrMethodCall* method) const;
     
+    bool getSymbol(IrLocation* variable, SVariableSymbol& symbol) const;
+    bool getSymbol(IrMethodCall* method, SMethodSymbol& symbol) const;
+    
     void print(int depth);
     
 protected:
-    
-    struct SVariableSymbol
-    {
-        std::string m_name;
-        IrType m_type;
-        size_t m_count; // >1 for arrays
-    };
-    
+        
     std::map<std::string, SVariableSymbol> m_variables;
-    
-    struct SMethodSymbol
-    {
-        std::string m_name;
-        IrType m_type;
-        std::vector<SVariableSymbol> m_arguments;
-    };
     
     std::map<std::string, SMethodSymbol> m_methods;
     

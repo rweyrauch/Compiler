@@ -54,7 +54,13 @@ void IrVariableDecl::print(unsigned int depth)
  
 bool IrVariableDecl::analyze(IrTraversalContext* ctx)
 {
-    return true;
+    bool valid = true;
+    for (auto it : m_identifiers)
+    {
+        if (!it->analyze(ctx))
+            valid = false;
+    }
+    return valid;
 }
  
  IrIdentifier* IrVariableDecl::getVariable(size_t which) const

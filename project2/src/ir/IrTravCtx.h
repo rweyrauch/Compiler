@@ -40,8 +40,8 @@ public:
     void pushSymbols(IrSymbolTable* symbols) { m_symbols.push_front(symbols); }
     void popSymbols() { m_symbols.pop_front(); }
     
-    bool lookup(IrLocation* variable) const;
-    bool lookup(IrMethodCall* method) const;
+    bool lookup(IrLocation* variable, SVariableSymbol& symbol) const;
+    bool lookup(IrMethodCall* method, SMethodSymbol& symbol) const;
     
 protected:
     

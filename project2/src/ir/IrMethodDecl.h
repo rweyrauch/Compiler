@@ -26,6 +26,7 @@
 #include "IrCommon.h"
 #include "IrBase.h"
 #include "IrIdentifier.h"
+#include "IrSymbolTable.h"
 
 namespace Decaf
 {
@@ -40,11 +41,16 @@ public:
         m_identifier(ident),
         m_returnType(returnType),
         m_argument_list(),
-        m_block(nullptr)
-    {}
+        m_block(nullptr),
+        m_symbols(nullptr)
+    {
+        m_symbols = new IrSymbolTable();
+    }
     
     virtual ~IrMethodDecl()
-    {}
+    {
+        delete m_symbols;
+    }
     
     virtual void clean(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth);
@@ -53,6 +59,7 @@ public:
     void addArgument(IrVariableDecl* arg)
     {
         m_argument_list.push_back(arg);
+        m_symbols->addVariable(arg);
     }
     void addBlock(IrBlock* block)
     {
@@ -70,6 +77,7 @@ protected:
     IrType m_returnType;
     std::vector<IrVariableDecl*> m_argument_list;
     IrBlock* m_block;
+    IrSymbolTable* m_symbols;
     
 private:
     IrMethodDecl() = delete;

@@ -23,6 +23,7 @@
 //
 #pragma once
 #include <string>
+#include <vector>
 
 namespace Decaf
 {
@@ -81,5 +82,20 @@ const std::string& IrBooleanOperatorToString(IrBooleanOperator op);
 const std::string& IrAssignmentOperatorToString(IrAssignmentOperator op);
 
 #define IRPRINT_INDENT(depth) { for (auto d = 0; d < (depth); d++) std::cout << "  "; }
+
+
+struct SVariableSymbol
+{
+    std::string m_name;
+    IrType m_type;
+    size_t m_count; // >1 for arrays
+};
+  
+struct SMethodSymbol
+{
+    std::string m_name;
+    IrType m_type;
+    std::vector<SVariableSymbol> m_arguments;
+};
 
 } // namespace Decaf

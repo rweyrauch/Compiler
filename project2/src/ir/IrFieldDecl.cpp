@@ -31,6 +31,7 @@ namespace Decaf
 
 void IrFieldDecl::clean(IrTraversalContext* ctx)
 {
+    m_location->clean(ctx);
 }
     
 void IrFieldDecl::print(unsigned int depth) 
@@ -47,7 +48,12 @@ void IrFieldDecl::print(unsigned int depth)
     
 bool IrFieldDecl::analyze(IrTraversalContext* ctx)
 {
-    return true;
+    bool valid = true;
+    
+    if (!m_location->analyze(ctx))
+        valid = false;
+    
+    return valid;
 }
     
 } // namespace Decaf

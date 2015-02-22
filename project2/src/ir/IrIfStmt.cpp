@@ -48,7 +48,21 @@ void IrIfStatement::print(unsigned int depth)
     
 bool IrIfStatement::analyze(IrTraversalContext* ctx)
 {
-    return true;
+    bool valid = true;
+    
+    if (!m_condition->analyze(ctx))
+        valid = false;
+    
+    if (m_trueBlock)
+    {
+        if (!m_trueBlock->analyze(ctx))
+            valid = false;
+    }
+    if (m_falseBlock)
+    {
+        if (!m_falseBlock->analyze(ctx))
+            valid = false;
+    }
 }
     
 } // namespace Decaf

@@ -330,7 +330,7 @@ method_call
     }
     | CALLOUT LPAREN string_literal COMMA expr_list RPAREN
     {
-        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $3, Decaf::IrType::Unknown);
+        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $3, Decaf::IrType::Integer);
         for (auto it : *$5) 
         {
             $$->addArgument(it);
@@ -338,7 +338,7 @@ method_call
     }
     | CALLOUT LPAREN string_literal RPAREN
     {
-        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $3, Decaf::IrType::Unknown);
+        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $3, Decaf::IrType::Integer);
     }
     ;
     

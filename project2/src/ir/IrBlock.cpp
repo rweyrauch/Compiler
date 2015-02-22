@@ -27,6 +27,7 @@
 #include "IrVarDecl.h"
 #include "IrStatement.h"
 #include "IrSymbolTable.h"
+#include "IrTravCtx.h"
 
 namespace Decaf
 {
@@ -42,6 +43,8 @@ namespace Decaf
 
 void IrBlock::clean(IrTraversalContext* ctx)
 {
+    ctx->pushSymbols(m_symbols);
+    
     for (auto it : m_variables)
     {
         it->clean(ctx);
@@ -50,6 +53,8 @@ void IrBlock::clean(IrTraversalContext* ctx)
     {
         it->clean(ctx);
     }
+    
+    ctx->popSymbols();
 }
 
 void IrBlock::print(unsigned int depth) 
@@ -72,6 +77,9 @@ void IrBlock::print(unsigned int depth)
 bool IrBlock::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
+    
+    ctx->pushSymbols(m_symbols);
+    
     for (auto it : m_variables)
     {
         if (!it->analyze(ctx))
@@ -82,6 +90,8 @@ bool IrBlock::analyze(IrTraversalContext* ctx)
         if (!it->analyze(ctx))
             valid = false;
     }   
+    
+    ctx->popSymbols();
     
     return valid;
 }
