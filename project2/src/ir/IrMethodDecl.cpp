@@ -27,6 +27,7 @@
 #include "IrVarDecl.h"
 #include "IrBlock.h"
 #include "IrTravCtx.h"
+#include "IrReturnStmt.h"
 
 namespace Decaf
 {
@@ -80,7 +81,26 @@ bool IrMethodDecl::analyze(IrTraversalContext* ctx)
     ctx->pushSymbols(m_symbols);
     
     if (m_block) 
+    {
         valid = m_block->analyze(ctx);
+    
+        // Check return statement(s) types.    
+        const size_t numStmts = m_block->getNumStatements();
+        for (size_t i = 0; i < numStmts; i++)
+        {
+            const IrReturnStatement* retStmt = dynamic_cast<const IrReturnStatement*>(m_block->getStatement(i));
+            if (retStmt)
+            {
+                if (retStmt->getReturnType() != m_returnType)
+                {
+                    // Error - incorrect return type.
+                    std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() <<  ": error incorrect return type.  Expected " << IrTypeToString(m_returnType)
+                              << " but found " << IrTypeToString(retStmt->getReturnType()) << std::endl;
+                    valid = false;
+                }
+            }
+        }
+    }
     
     ctx->popSymbols();
     

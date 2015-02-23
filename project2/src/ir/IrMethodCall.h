@@ -62,6 +62,8 @@ public:
     
     bool isExternal() const { return (m_externalFunction != nullptr); }
     const IrIdentifier* getIdentifier() const { return m_identifier; }
+    size_t getNumArguments() const { return m_arguments.size(); }
+    IrType getArgumentType(size_t which) const { return m_arguments.at(which)->getType(); }
     
 protected:    
     

@@ -34,13 +34,15 @@ public:
     IrLocation(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType type) :
         IrExpression(lineNumber, columnNumber, filename, type),
         m_identifier(ident),
-        m_index(nullptr)
+        m_index(nullptr),
+        m_asDeclaration(false)
     {}
 
     IrLocation(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType type, IrExpression* index) :
         IrExpression(lineNumber, columnNumber, filename, type),
         m_identifier(ident),
-        m_index(index)
+        m_index(index),
+        m_asDeclaration(false)
     {}
     
     virtual ~IrLocation()
@@ -50,6 +52,9 @@ public:
     virtual void print(unsigned int depth);
     virtual bool analyze(IrTraversalContext* ctx);
     
+    void setAsDeclaration() { m_asDeclaration = true; }
+    bool usedAsDeclaration() const { return m_asDeclaration; }
+    
     IrIdentifier* getIdentifier() const { return m_identifier; }
     IrExpression* getIndex() const { return m_index; }
     
@@ -57,6 +62,7 @@ protected:
     
     IrIdentifier* m_identifier;
     IrExpression* m_index;
+    bool m_asDeclaration;
     
 private:
     IrLocation() = delete;

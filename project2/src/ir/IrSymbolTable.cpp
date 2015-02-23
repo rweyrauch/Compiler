@@ -192,13 +192,41 @@ bool IrSymbolTable::exists(IrMethodCall* method) const
 { 
     if (method->isExternal()) return false;
     
+    bool exists = false;
+    
     auto it = m_methods.find(method->getIdentifier()->getIdentifier());
     if (it != m_methods.end())
     {
-        // TODO: match signature
-        return true;
+        // match signature
+        const SMethodSymbol& symbol = it->second;
+        
+        if (symbol.m_arguments.size() == method->getNumArguments())
+        {
+            exists = true;
+            for (size_t i = 0; i < method->getNumArguments(); i++)
+            {
+                if (method->getArgumentType(i) != symbol.m_arguments.at(i).m_type)
+                {
+                    exists = false;
+                    // Error incorrect argument type.
+                    std::cerr << method->getFilename() << ":" << method->getLineNumber() << ":" << method->getColumnNumber() << ": error: method " << method->getIdentifier()->getIdentifier() << " incorrect argument type for argument, " 
+                              << i << ".  Expected type " << IrTypeToString(symbol.m_arguments.at(i).m_type) << " but given " << IrTypeToString(method->getArgumentType(i)) << std::endl;                            
+                    break;
+                }
+            }
+        }
+        else
+        {
+            // Error incorrect number of arguments.
+            std::cerr << method->getFilename() << ":" << method->getLineNumber() << ":" << method->getColumnNumber() << ": error: method " << method->getIdentifier()->getIdentifier() << " incorrect number of arguments." << std::endl;                            
+        }
     }
-    return false; 
+    else
+    {
+        // Error - not found
+        //std::cerr << method->getFilename() << ":" << method->getLineNumber() << ":" << method->getColumnNumber() << ": error: method " << method->getIdentifier()->getIdentifier() << " is not defined." << std::endl;                
+    }
+    return exists; 
 }
 
 bool IrSymbolTable::getSymbol(IrLocation* variable, SVariableSymbol& symbol) const
@@ -220,16 +248,14 @@ bool IrSymbolTable::getSymbol(IrMethodCall* method, SMethodSymbol& symbol) const
 {
     bool valid = false;
     
-    if (method->isExternal()) return false;
-    
-    auto it = m_methods.find(method->getIdentifier()->getIdentifier());
-    if (it != m_methods.end())
+    if (exists(method))
     {
-        // TODO: match signature
-        
-        symbol = it->second;
- 
-        valid = true;
+        auto it = m_methods.find(method->getIdentifier()->getIdentifier());
+        if (it != m_methods.end())
+        {
+            symbol = it->second;
+            valid = true;
+        }
     }
     
     return valid;

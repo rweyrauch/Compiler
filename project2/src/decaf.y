@@ -128,6 +128,7 @@ field_decl
         for (auto it = $2->begin(); it != $2->end(); ++it) 
         { 
             Decaf::IrLocation* location = *it; 
+            location->setAsDeclaration();
             Decaf::IrFieldDecl* decl = new Decaf::IrFieldDecl(@1.first_line, @1.first_column, d_scanner.filename(), location, (Decaf::IrType)$1); 
             $$->push_back(decl); 
         } 

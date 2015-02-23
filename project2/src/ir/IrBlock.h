@@ -61,6 +61,9 @@ public:
         m_statements.insert(m_statements.end(), statements.begin(), statements.end());
     }
   
+    size_t getNumStatements() const { return m_statements.size(); }
+    const IrStatement* getStatement(size_t which) const { return m_statements.at(which); }
+    
     IrSymbolTable* getSymbols()
     {
         return m_symbols;

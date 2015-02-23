@@ -28,12 +28,15 @@
 #include "IrExpression.h"
 #include "IrSymbolTable.h"
 #include "IrTravCtx.h"
+#include "IrIntLiteral.h"
 
 namespace Decaf
 {
 
 void IrLocation::clean(IrTraversalContext* ctx)
 {
+    if (m_index) m_index->clean(ctx);
+    
     // Update type
     SVariableSymbol symbol;
     if (ctx->lookup(this, symbol))
@@ -66,6 +69,7 @@ void IrLocation::print(unsigned int depth)
 bool IrLocation::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
+    bool symbolValid = false;
     
     // Location must be in symbol table
     SVariableSymbol symbol;
@@ -75,9 +79,38 @@ bool IrLocation::analyze(IrTraversalContext* ctx)
         std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: variable " << getIdentifier()->getIdentifier() << " not declared." << std::endl; 
         valid = false;
     }
+    else
+    {
+        symbolValid = true;
+    }
    
-    // Location index must be in range of symbol count
-    
+    if (m_index)
+    {
+        // Location index must be an integer expression
+        if (m_index->getType() != IrType::Integer)
+        {
+            // Error - index not an integer
+            std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: array " << getIdentifier()->getIdentifier() 
+                      << " index must be an integer expression.  Got: " << IrTypeToString(m_index->getType()) << std::endl; 
+            valid = false;
+        }
+        else
+        {
+            // Location index must be in range of symbol count when not declaring an array.
+            IrIntegerLiteral* intLit = dynamic_cast<IrIntegerLiteral*>(m_index);
+            if (intLit && !usedAsDeclaration())
+            {
+                if (intLit->getValue() < 0 || (size_t)intLit->getValue() >= symbol.m_count)
+                {
+                    // Error - index out of range
+                    std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: array " << getIdentifier()->getIdentifier() << " index out of range.  Max value: "
+                              << symbol.m_count << " but given " << intLit->getValue() << std::endl; 
+                    valid = false;                    
+                }
+            }
+        }
+    }
+       
     return valid;
 }
 

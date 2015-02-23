@@ -21,47 +21,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#pragma once
-#include <iostream>
-#include "IrCommon.h"
-#include "IrStatement.h"
-#include "IrExpression.h"
+#include "IrReturnStmt.h"
 
 namespace Decaf
 {
-
-class IrReturnStatement : public IrStatement
+    
+void IrReturnStatement::clean(IrTraversalContext* ctx)
 {
-public:
-    IrReturnStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpression* returnValue = nullptr) :
-        IrStatement(lineNumber, columnNumber, filename),
-        m_returnValue(returnValue)
-    {}
+    if (m_returnValue) m_returnValue->clean(ctx);
+}
     
-    virtual ~IrReturnStatement()
-    {}
+void IrReturnStatement::print(unsigned int depth)
+{
+    IRPRINT_INDENT(depth);
+    std::cout << "Return(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
+    if (m_returnValue) m_returnValue->print(depth+1);
+}
     
-    virtual void clean(IrTraversalContext* ctx); 
-    virtual void print(unsigned int depth);
-    virtual bool analyze(IrTraversalContext* ctx);
-
- 
-    IrType getReturnType() const
-    {
-        if (m_returnValue)
-        {
-            return m_returnValue->getType();
-        }
-        return IrType::Void;
-    }
+bool IrReturnStatement::analyze(IrTraversalContext* ctx)
+{
+    bool valid = true;
+    if (m_returnValue)
+        valid = m_returnValue->analyze(ctx);
     
-protected:    
-    
-    IrExpression* m_returnValue;
-    
-private:
-    IrReturnStatement() = delete;
-    IrReturnStatement(const IrReturnStatement& rhs) = delete;
-};
+    return valid;
+}
 
 } // namespace Decaf
