@@ -35,6 +35,7 @@ namespace Decaf
 void IrForStatement::clean(IrTraversalContext* ctx)
 {
     ctx->pushSymbols(m_symbols);
+	ctx->pushParent(this);
     
     m_loopVariable->clean(ctx);
     m_initialValue->clean(ctx);
@@ -42,6 +43,7 @@ void IrForStatement::clean(IrTraversalContext* ctx)
     
     if (m_body) m_body->clean(ctx);
     
+    ctx->popParent();
     ctx->popSymbols();
 }
     
@@ -62,6 +64,7 @@ bool IrForStatement::analyze(IrTraversalContext* ctx)
     bool valid = true;
     
     ctx->pushSymbols(m_symbols);
+	ctx->pushParent(this);
     
     if (!m_loopVariable->analyze(ctx))
         valid = false;
@@ -76,6 +79,21 @@ bool IrForStatement::analyze(IrTraversalContext* ctx)
             valid = false;
     }
     
+    // Initial variable and terminal value expressions must be of type integer.
+    if (m_initialValue->getType() != IrType::Integer)
+    {
+		std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: for loop initial value expression must be of type integer.  Got: "
+		          << IrTypeToString(m_initialValue->getType()) << std::endl;		
+		valid = false;
+	}
+    if (m_terminatingValue->getType() != IrType::Integer)
+    {
+		std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: for loop ending value expression must be of type integer.  Got: "
+		          << IrTypeToString(m_terminatingValue->getType()) << std::endl;		
+		valid = false;
+	}
+	
+    ctx->popParent();
     ctx->popSymbols();
     
     return valid;

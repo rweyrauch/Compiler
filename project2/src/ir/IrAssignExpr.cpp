@@ -24,12 +24,15 @@
 #include <iostream>
 #include "IrCommon.h"
 #include "IrAssignExpr.h"
+#include "IrTravCtx.h"
 
 namespace Decaf
 {
 
 void IrAssignExpression::clean(IrTraversalContext* ctx)
 {
+	ctx->pushParent(this);
+	
     if (m_lhs) m_lhs->clean(ctx);
     if (m_rhs) m_rhs->clean(ctx);
     
@@ -40,6 +43,8 @@ void IrAssignExpression::clean(IrTraversalContext* ctx)
         else if (m_rhs)
             setType(m_rhs->getType());
     }
+    
+    ctx->popParent();
 }
 
 void IrAssignExpression::print(unsigned int depth) 
@@ -69,6 +74,8 @@ void IrAssignExpression::print(unsigned int depth)
 
 bool IrAssignExpression::analyze(IrTraversalContext* ctx)
 {
+	ctx->pushParent(this);
+	
     bool valid = true;
     if (m_lhs) 
     {
@@ -80,6 +87,9 @@ bool IrAssignExpression::analyze(IrTraversalContext* ctx)
         if (!m_rhs->analyze(ctx))
             valid = false;
     }
+    
+    ctx->popParent();
+    
     return valid;
 }
 

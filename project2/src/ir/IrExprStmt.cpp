@@ -24,13 +24,18 @@
 #include <iostream>
 #include "IrCommon.h"
 #include "IrExprStmt.h"
+#include "IrTravCtx.h"
 
 namespace Decaf
 {
 
 void IrExpressionStatement::clean(IrTraversalContext* ctx)
 {
+	ctx->pushParent(this);
+	
     if (m_expression) m_expression->clean(ctx);
+    
+    ctx->popParent();    
 }
     
 void IrExpressionStatement::print(unsigned int depth) 
@@ -43,11 +48,17 @@ void IrExpressionStatement::print(unsigned int depth)
 bool IrExpressionStatement::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
+    
+	ctx->pushParent(this);
+    
     if (m_expression) 
     {
         if (!m_expression->analyze(ctx))
             valid = false;
     }
+    
+    ctx->popParent();
+    
     return valid;
 }
 

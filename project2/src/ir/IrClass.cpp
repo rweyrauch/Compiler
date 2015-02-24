@@ -43,6 +43,7 @@ IrClass::~IrClass()
 void IrClass::clean(IrTraversalContext* ctx)
 {
     ctx->pushSymbols(m_symbols);
+	ctx->pushParent(this);
     
     m_identifier->clean(ctx);
     for (auto it : m_field_decl_list)
@@ -54,6 +55,7 @@ void IrClass::clean(IrTraversalContext* ctx)
         it->clean(ctx);
     }
     
+    ctx->popParent();
     ctx->popSymbols();
  }
     
@@ -86,6 +88,7 @@ bool IrClass::analyze(IrTraversalContext* ctx)
     bool valid = true;
     
     ctx->pushSymbols(m_symbols);
+	ctx->pushParent(this);
     
     // Rule: identifier == "Program"
     if (m_identifier->getIdentifier() != "Program")
@@ -107,6 +110,7 @@ bool IrClass::analyze(IrTraversalContext* ctx)
     if (!mainFound)
     {
         std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: class must contain a method \'main\'." << std::endl;
+		valid = false;
     }
     
     for (auto it : m_field_decl_list)
@@ -121,6 +125,7 @@ bool IrClass::analyze(IrTraversalContext* ctx)
             valid = false;
     }
     
+    ctx->popParent();
     ctx->popSymbols();
     
     return valid;

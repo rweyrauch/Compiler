@@ -24,12 +24,15 @@
 #include <iostream>
 #include "IrCommon.h"
 #include "IrBooleanExpr.h"
+#include "IrTravCtx.h"
 
 namespace Decaf
 {
 
  void IrBooleanExpression::clean(IrTraversalContext* ctx)
 {
+	ctx->pushParent(this);
+	
     if (m_lhs) m_lhs->clean(ctx);
     if (m_rhs) m_rhs->clean(ctx);
     
@@ -37,6 +40,8 @@ namespace Decaf
     {
         setType(IrType::Boolean);
     }   
+    
+    ctx->popParent();    
 }
 
 void IrBooleanExpression::print(unsigned int depth) 
@@ -67,6 +72,9 @@ void IrBooleanExpression::print(unsigned int depth)
 bool IrBooleanExpression::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
+    
+	ctx->pushParent(this);
+    
     if (m_lhs) 
     {
         if (!m_lhs->analyze(ctx))
@@ -77,6 +85,9 @@ bool IrBooleanExpression::analyze(IrTraversalContext* ctx)
         if (!m_rhs->analyze(ctx))
             valid = false;
     }
+    
+    ctx->popParent();
+    
     return valid;
 }
 

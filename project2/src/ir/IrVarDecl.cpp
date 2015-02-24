@@ -24,16 +24,21 @@
 #include <iostream>
 #include "IrCommon.h"
 #include "IrVarDecl.h"
+#include "IrTravCtx.h"
 
 namespace Decaf
 {
 
 void IrVariableDecl::clean(IrTraversalContext* ctx)
 {
+	ctx->pushParent(this);
+	
     for (auto it : m_identifiers)
     {
         it->clean(ctx);
     }
+    
+    ctx->popParent();  
 }
     
 void IrVariableDecl::print(unsigned int depth) 
@@ -55,11 +60,17 @@ void IrVariableDecl::print(unsigned int depth)
 bool IrVariableDecl::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
+    
+	ctx->pushParent(this);
+    
     for (auto it : m_identifiers)
     {
         if (!it->analyze(ctx))
             valid = false;
     }
+    
+    ctx->popParent();
+    
     return valid;
 }
  

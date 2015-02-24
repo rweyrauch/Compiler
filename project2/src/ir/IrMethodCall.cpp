@@ -33,6 +33,8 @@ namespace Decaf
 
 void IrMethodCall::clean(IrTraversalContext* ctx)
 {
+	ctx->pushParent(this);
+	
     if (m_identifier) m_identifier->clean(ctx);
     else if (m_externalFunction) m_externalFunction->clean(ctx);
     for (auto it : m_arguments)
@@ -46,6 +48,8 @@ void IrMethodCall::clean(IrTraversalContext* ctx)
     {
         setType(symbol.m_type);
     }    
+    
+    ctx->popParent();    
 }
     
 void IrMethodCall::print(unsigned int depth)
@@ -71,6 +75,8 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
     
+	ctx->pushParent(this);
+    
     if (!isExternal())
     {
         // Method must be in symbol table
@@ -86,6 +92,8 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
     {
         // 
     }
+    
+    ctx->popParent();
     
     return valid;
 }
