@@ -366,11 +366,31 @@ unary_expr
     : primary_expr { $$ = $1; }
     | MINUS unary_expr 
     { 
-        $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, nullptr, Decaf::IrBinaryOperator::Subtract, $2); 
+        Decaf::IrIntegerLiteral* intLit = dynamic_cast<Decaf::IrIntegerLiteral*>($2);
+        if (intLit == nullptr)
+        {
+            $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, nullptr, Decaf::IrBinaryOperator::Subtract, $2); 
+        }
+        else
+        {
+            // convert expression into negative integer literal
+            intLit->setValue(-intLit->getValue());            
+            $$ = $2;
+        }
     }
     | BANG unary_expr  
     { 
-        $$ = new Decaf::IrBooleanExpression(@1.first_line, @1.first_column, d_scanner.filename(), nullptr, Decaf::IrBooleanOperator::Not, $2); 
+        Decaf::IrBooleanLiteral* boolLit = dynamic_cast<Decaf::IrBooleanLiteral*>($2);
+        if (boolLit == nullptr)
+        {
+            $$ = new Decaf::IrBooleanExpression(@1.first_line, @1.first_column, d_scanner.filename(), nullptr, Decaf::IrBooleanOperator::Not, $2); 
+        }
+        else
+        {
+            // negate boolean literal
+            boolLit->setValue(!boolLit->getValue());
+            $$ = $2;
+        }
     }
     ;
 

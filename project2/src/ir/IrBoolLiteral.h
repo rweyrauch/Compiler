@@ -51,7 +51,8 @@ public:
     }
     
     bool getValue() const { return m_value; }
-    
+    void setValue(bool value) { m_value = value; }
+     
 protected:
     
     bool m_value;
