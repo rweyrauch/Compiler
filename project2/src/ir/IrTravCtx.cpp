@@ -30,6 +30,14 @@
 namespace Decaf
 {
 
+const IrBase* IrTraversalContext::getParent(size_t generation) const
+{
+    if (generation < m_parents.size()) 
+    {
+        return (m_parents.at(m_parents.size() - 1 - generation));
+    }
+}
+
 bool IrTraversalContext::lookup(IrLocation* location, SVariableSymbol& symbol) const
 {
     bool found = false;

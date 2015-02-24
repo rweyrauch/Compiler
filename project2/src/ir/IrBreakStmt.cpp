@@ -21,45 +21,46 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#pragma once
 #include <iostream>
 #include "IrCommon.h"
-#include "IrLiteral.h"
+#include "IrBreakStmt.h"
+#include "IrTravCtx.h"
+#include "IrForStmt.h"
 
 namespace Decaf
 {
- 
-class IrBooleanLiteral : public IrLiteral
+    
+void IrBreakStatement::clean(IrTraversalContext* ctx)
 {
-public:
-    IrBooleanLiteral(int lineNumber, int columnNumber, const std::string& filename, const std::string& value) :
-        IrLiteral(lineNumber, columnNumber, filename, IrType::Boolean, value)
-    {
-        if (value == "true")
-            m_value = true;
-        else
-            m_value = false;
-    }
-    
-    virtual ~IrBooleanLiteral()
-    {}
-    
-    virtual void print(unsigned int depth) 
-    {
-        IRPRINT_INDENT(depth);
-        std::cout << "Boolean(" << getLineNumber() << "," << getColumnNumber() << ") = " << m_valueAsString << std::endl;        
-    }
-    
-    bool getValue() const { return m_value; }
-    void setValue(bool value) { m_value = value; }
-     
-protected:
-    
-    bool m_value;
-    
-private:
-    IrBooleanLiteral() = delete;
-    IrBooleanLiteral(const IrBooleanLiteral& rhs) = delete;
-};
-
+    // nothing to do
 }
+    
+void IrBreakStatement::print(unsigned int depth)
+{
+    IRPRINT_INDENT(depth);
+    std::cout << "Break(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
+}
+        
+bool IrBreakStatement::analyze(IrTraversalContext* ctx)
+{
+    bool valid = false;
+    
+    // Walk up the parent list, looking for a for-loop statement.
+    for (size_t i = 0; i < ctx->getNumParents(); i++)
+    {
+        const IrForStatement* forloop = dynamic_cast<const IrForStatement*>(ctx->getParent(i));
+        if (forloop)
+        {
+            valid = true;
+            break;
+        }
+    }
+    
+    if (!valid)
+    {
+        std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: break statement not found in a for-loop." << std::endl;
+    }
+    return valid;
+}
+
+} // namespace Decaf

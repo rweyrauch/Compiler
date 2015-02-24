@@ -25,14 +25,15 @@
 #include "IrCommon.h"
 #include "IrAssignExpr.h"
 #include "IrTravCtx.h"
+#include "IrLocation.h"
 
 namespace Decaf
 {
 
 void IrAssignExpression::clean(IrTraversalContext* ctx)
 {
-	ctx->pushParent(this);
-	
+    ctx->pushParent(this);
+    
     if (m_lhs) m_lhs->clean(ctx);
     if (m_rhs) m_rhs->clean(ctx);
     
@@ -74,8 +75,8 @@ void IrAssignExpression::print(unsigned int depth)
 
 bool IrAssignExpression::analyze(IrTraversalContext* ctx)
 {
-	ctx->pushParent(this);
-	
+    ctx->pushParent(this);
+    
     bool valid = true;
     if (m_lhs) 
     {
@@ -88,6 +89,47 @@ bool IrAssignExpression::analyze(IrTraversalContext* ctx)
             valid = false;
     }
     
+    // Rule: lhs must be assignable (a location)
+    if (m_lhs)
+    {
+        if (nullptr == dynamic_cast<IrLocation*>(m_lhs))
+        {
+            std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: lhs of assigment operator must be a." << std::endl;
+            
+            valid = false;
+        }
+    }
+       
+    if (m_lhs && m_rhs)
+    {
+        // Rule: both sides of assignment must have the same type.
+        if (m_operator == IrAssignmentOperator::Assign)
+        {
+            if (m_lhs->getType() != m_rhs->getType())
+            {
+                std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: lhs and rhs of assigment operator must be of the same type." << std::endl;
+                
+                valid = false;
+            }
+        }
+        else 
+        {
+            // Rule: both side of increment/decrement assignment must be integer.
+            if (m_lhs->getType() != IrType::Integer)
+            {
+                std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: lhs of increment/decrement assigment operator must be of type integer." << std::endl;
+                
+                valid = false;
+            }
+            if (m_rhs->getType() != IrType::Integer)
+            {
+                std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: rhs of increment/decrement assigment operator must be of type integer." << std::endl;
+                
+                valid = false;
+            }
+        }
+    }
+//    
     ctx->popParent();
     
     return valid;

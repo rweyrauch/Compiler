@@ -55,7 +55,7 @@ bool IrIfStatement::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
     
-	ctx->pushParent(this);
+    ctx->pushParent(this);
     
     if (!m_condition->analyze(ctx))
         valid = false;
@@ -74,11 +74,11 @@ bool IrIfStatement::analyze(IrTraversalContext* ctx)
     // Condition express must be of type boolean.
     if (m_condition->getType() != IrType::Boolean)
     {
-		std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: if conditional expression must be of type boolean.  Got: "
-		          << IrTypeToString(m_condition->getType()) << std::endl;
-		valid = false;
-	}
-	
+        std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: if conditional expression must be of type boolean.  Got: "
+                << IrTypeToString(m_condition->getType()) << std::endl;
+        valid = false;
+    }
+    
     ctx->popParent();	
 }
     

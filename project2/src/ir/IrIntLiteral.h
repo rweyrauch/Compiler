@@ -50,7 +50,8 @@ public:
     }
     
     int getValue() const { return m_value; }
-    
+    void setValue(int value) { m_value = value; }
+
 protected:
     
     int m_value;

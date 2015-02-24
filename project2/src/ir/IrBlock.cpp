@@ -45,7 +45,7 @@ void IrBlock::clean(IrTraversalContext* ctx)
 {
     ctx->pushSymbols(m_symbols);
  	ctx->pushParent(this);
-   
+    
     for (auto it : m_variables)
     {
         it->clean(ctx);

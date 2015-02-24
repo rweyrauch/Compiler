@@ -119,6 +119,8 @@ bool IrLocation::analyze(IrTraversalContext* ctx)
      
     ctx->popParent();
        
+    ctx->popParent();
+       
     return valid;
 }
 

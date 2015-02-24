@@ -22,8 +22,6 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <iostream>
-#include "IrCommon.h"
 #include "IrStatement.h"
 
 namespace Decaf
@@ -39,11 +37,9 @@ public:
     virtual ~IrBreakStatement()
     {}
     
-    virtual void print(unsigned int depth)
-    {
-        IRPRINT_INDENT(depth);
-        std::cout << "Break(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
-    }
+    virtual void clean(IrTraversalContext* ctx); 
+    virtual void print(unsigned int depth);
+    virtual bool analyze(IrTraversalContext* ctx);
         
 protected:    
     
