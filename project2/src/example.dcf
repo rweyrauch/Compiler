@@ -4,13 +4,28 @@ class Program
     int x;
     int foo(int z)
     {
-        xx = z + 2; // xx not defined
+		int xx;
+        xx = z + 2;
         return xx;
     }
     
     void main()
     {
         int t;
+        boolean ok;
+        
+        ok = true;
+        
         t = foo(42);
+        
+        t = -1;
+        
+        if (!ok)
+        {
+        
+        }
+        
+        ok = !true;
+        
     }
 }

@@ -1,0 +1,48 @@
+// simply Decaf program with many semantic errors
+class _Program // bad program name
+{    
+    int x;
+    boolean x; // duplicate vars
+    int bar;
+    int A[10];
+    
+    int foo(int z)
+    {
+        xx = z + 2; // xx not declared
+        return xx;
+    }
+    
+    void doh(boolean b, int i)
+    {
+		return true; // no return
+    }
+    
+    int main(int argc)  // invalid main
+    {
+        int t;
+        boolean bar; // duplicate vars
+        
+        t = foo(42);
+        
+        t = foo(42, 1); // invalid arg list
+        
+        t = bar(); // invalid call, not a method
+        
+        if (foo(42)) // method must return bool
+        {
+        
+        }
+        
+        t = doh(1,true) + 6; // doh does not return a value
+        
+        {
+			return; // expects a argument
+        }
+        
+        t = A; // A is an array
+        
+        t = A[false]; // index must be integer
+        
+        t = A[-2]; // index must be >= 0
+    }
+}

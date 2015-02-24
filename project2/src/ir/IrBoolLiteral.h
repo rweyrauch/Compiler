@@ -51,7 +51,12 @@ public:
     }
     
     bool getValue() const { return m_value; }
-    void setValue(bool value) { m_value = value; }
+    void setValue(bool value) 
+    { 
+		m_value = value;
+		if (m_value) m_valueAsString = "true";
+		else m_valueAsString = "false"; 
+	}
      
 protected:
     
