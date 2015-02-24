@@ -75,7 +75,7 @@ bool IrLocation::analyze(IrTraversalContext* ctx)
     bool valid = true;
     bool symbolValid = false;
     
-	ctx->pushParent(this);
+    ctx->pushParent(this);
     
     // Location must be in symbol table
     SVariableSymbol symbol;
@@ -116,8 +116,6 @@ bool IrLocation::analyze(IrTraversalContext* ctx)
             }
         }
     }
-     
-    ctx->popParent();
        
     ctx->popParent();
        
