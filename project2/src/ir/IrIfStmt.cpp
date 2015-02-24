@@ -26,15 +26,20 @@
 #include "IrIfStmt.h"
 #include "IrExpression.h"
 #include "IrBlock.h"
+#include "IrTravCtx.h"
 
 namespace Decaf
 {
 
 void IrIfStatement::clean(IrTraversalContext* ctx)
 {
+	ctx->pushParent(this);
+	
     m_condition->clean(ctx);
     if (m_trueBlock) m_trueBlock->clean(ctx);
     if (m_falseBlock) m_falseBlock->clean(ctx);
+    
+    ctx->popParent();    
 }
     
 void IrIfStatement::print(unsigned int depth) 
@@ -50,6 +55,8 @@ bool IrIfStatement::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
     
+	ctx->pushParent(this);
+    
     if (!m_condition->analyze(ctx))
         valid = false;
     
@@ -63,6 +70,16 @@ bool IrIfStatement::analyze(IrTraversalContext* ctx)
         if (!m_falseBlock->analyze(ctx))
             valid = false;
     }
+    
+    // Condition express must be of type boolean.
+    if (m_condition->getType() != IrType::Boolean)
+    {
+		std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: if conditional expression must be of type boolean.  Got: "
+		          << IrTypeToString(m_condition->getType()) << std::endl;
+		valid = false;
+	}
+	
+    ctx->popParent();	
 }
     
 } // namespace Decaf

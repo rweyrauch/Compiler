@@ -23,7 +23,9 @@
 //
 #pragma once
 #include <list>
+#include <vector>
 #include "IrCommon.h"
+#include "IrBase.h"
 
 namespace Decaf
 {
@@ -40,12 +42,16 @@ public:
     void pushSymbols(IrSymbolTable* symbols) { m_symbols.push_front(symbols); }
     void popSymbols() { m_symbols.pop_front(); }
     
+    void pushParent(IrBase* parent) { m_parents.push_back(parent); }
+    void popParent() { m_parents.pop_back(); }
+    
     bool lookup(IrLocation* variable, SVariableSymbol& symbol) const;
     bool lookup(IrMethodCall* method, SMethodSymbol& symbol) const;
     
 protected:
     
     std::list<IrSymbolTable*> m_symbols;
+    std::vector<IrBase*> m_parents;
 };
 
 } // namespace Decaf

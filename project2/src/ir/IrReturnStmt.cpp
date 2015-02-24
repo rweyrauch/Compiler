@@ -22,13 +22,18 @@
 // THE SOFTWARE.
 //
 #include "IrReturnStmt.h"
+#include "IrTravCtx.h"
 
 namespace Decaf
 {
     
 void IrReturnStatement::clean(IrTraversalContext* ctx)
 {
+	ctx->pushParent(this);
+	
     if (m_returnValue) m_returnValue->clean(ctx);
+    
+    ctx->popParent();    
 }
     
 void IrReturnStatement::print(unsigned int depth)
@@ -41,8 +46,13 @@ void IrReturnStatement::print(unsigned int depth)
 bool IrReturnStatement::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
+    
+	ctx->pushParent(this);
+    
     if (m_returnValue)
         valid = m_returnValue->analyze(ctx);
+    
+    ctx->popParent();
     
     return valid;
 }

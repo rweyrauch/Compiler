@@ -35,6 +35,7 @@ namespace Decaf
 void IrMethodDecl::clean(IrTraversalContext* ctx)
 {
     ctx->pushSymbols(m_symbols);
+	ctx->pushParent(this);
     
     m_identifier->clean(ctx);
     for (auto it : m_argument_list)
@@ -43,6 +44,7 @@ void IrMethodDecl::clean(IrTraversalContext* ctx)
     }
     if (m_block) m_block->clean(ctx);
     
+    ctx->popParent();
     ctx->popSymbols();
 }
 
@@ -79,6 +81,7 @@ bool IrMethodDecl::analyze(IrTraversalContext* ctx)
     bool valid = true;
  
     ctx->pushSymbols(m_symbols);
+	ctx->pushParent(this);
     
     if (m_block) 
     {
@@ -94,7 +97,7 @@ bool IrMethodDecl::analyze(IrTraversalContext* ctx)
                 if (retStmt->getReturnType() != m_returnType)
                 {
                     // Error - incorrect return type.
-                    std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() <<  ": error incorrect return type.  Expected " << IrTypeToString(m_returnType)
+                    std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() <<  ": error: incorrect return type.  Expected " << IrTypeToString(m_returnType)
                               << " but found " << IrTypeToString(retStmt->getReturnType()) << std::endl;
                     valid = false;
                 }
@@ -102,6 +105,7 @@ bool IrMethodDecl::analyze(IrTraversalContext* ctx)
         }
     }
     
+    ctx->popParent();
     ctx->popSymbols();
     
     return valid;

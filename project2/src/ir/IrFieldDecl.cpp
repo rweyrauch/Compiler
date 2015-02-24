@@ -25,13 +25,18 @@
 #include "IrCommon.h"
 #include "IrFieldDecl.h"
 #include "IrLocation.h"
+#include "IrTravCtx.h"
 
 namespace Decaf
 {
 
 void IrFieldDecl::clean(IrTraversalContext* ctx)
 {
+	ctx->pushParent(this);
+	
     m_location->clean(ctx);
+    
+    ctx->popParent();    
 }
     
 void IrFieldDecl::print(unsigned int depth) 
@@ -50,8 +55,12 @@ bool IrFieldDecl::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
     
+	ctx->pushParent(this);
+    
     if (!m_location->analyze(ctx))
         valid = false;
+    
+    ctx->popParent();
     
     return valid;
 }

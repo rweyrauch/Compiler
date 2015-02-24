@@ -44,7 +44,8 @@ namespace Decaf
 void IrBlock::clean(IrTraversalContext* ctx)
 {
     ctx->pushSymbols(m_symbols);
-    
+ 	ctx->pushParent(this);
+   
     for (auto it : m_variables)
     {
         it->clean(ctx);
@@ -54,6 +55,7 @@ void IrBlock::clean(IrTraversalContext* ctx)
         it->clean(ctx);
     }
     
+    ctx->popParent();
     ctx->popSymbols();
 }
 
@@ -79,6 +81,7 @@ bool IrBlock::analyze(IrTraversalContext* ctx)
     bool valid = true;
     
     ctx->pushSymbols(m_symbols);
+	ctx->pushParent(this);
     
     for (auto it : m_variables)
     {
@@ -91,6 +94,7 @@ bool IrBlock::analyze(IrTraversalContext* ctx)
             valid = false;
     }   
     
+    ctx->popParent();
     ctx->popSymbols();
     
     return valid;

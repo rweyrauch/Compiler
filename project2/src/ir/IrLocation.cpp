@@ -35,6 +35,8 @@ namespace Decaf
 
 void IrLocation::clean(IrTraversalContext* ctx)
 {
+	ctx->pushParent(this);
+	
     if (m_index) m_index->clean(ctx);
     
     // Update type
@@ -43,6 +45,8 @@ void IrLocation::clean(IrTraversalContext* ctx)
     {
         setType(symbol.m_type);
     }
+    
+    ctx->popParent();
 }
     
 void IrLocation::print(unsigned int depth) 
@@ -70,6 +74,8 @@ bool IrLocation::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
     bool symbolValid = false;
+    
+	ctx->pushParent(this);
     
     // Location must be in symbol table
     SVariableSymbol symbol;
@@ -110,6 +116,8 @@ bool IrLocation::analyze(IrTraversalContext* ctx)
             }
         }
     }
+     
+    ctx->popParent();
        
     return valid;
 }

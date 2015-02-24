@@ -24,6 +24,7 @@
 #include <iostream>
 #include "IrCommon.h"
 #include "IrIdentifier.h"
+#include "IrTravCtx.h"
 
 namespace Decaf
 {
