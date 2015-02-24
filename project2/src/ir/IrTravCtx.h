@@ -45,6 +45,9 @@ public:
     void pushParent(IrBase* parent) { m_parents.push_back(parent); }
     void popParent() { m_parents.pop_back(); }
     
+    size_t getNumParents() const { return m_parents.size(); }
+    const IrBase* getParent(size_t generation) const;
+    
     bool lookup(IrLocation* variable, SVariableSymbol& symbol) const;
     bool lookup(IrMethodCall* method, SMethodSymbol& symbol) const;
     

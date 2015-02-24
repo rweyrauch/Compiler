@@ -31,8 +31,8 @@ namespace Decaf
 
 void IrBinaryExpression::clean(IrTraversalContext* ctx)
 {
-	ctx->pushParent(this);
-	
+    ctx->pushParent(this);
+
     if (m_lhs) m_lhs->clean(ctx);
     if (m_rhs) m_rhs->clean(ctx);
     
@@ -74,8 +74,8 @@ void IrBinaryExpression::print(unsigned int depth)
 
 bool IrBinaryExpression::analyze(IrTraversalContext* ctx)
 {
-	ctx->pushParent(this);
-	
+    ctx->pushParent(this);
+
     bool valid = true;
     if (m_lhs) 
     {
@@ -86,6 +86,26 @@ bool IrBinaryExpression::analyze(IrTraversalContext* ctx)
     {
         if (!m_rhs->analyze(ctx))
             valid = false;
+    }
+    
+    if (m_lhs)
+    {
+        if (m_lhs->getType() != IrType::Integer)
+        {
+            std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: lhs of binary expression must be of type integer." << std::endl;
+            
+            valid = false;
+        }
+    }
+    
+    if (m_rhs)
+    {
+        if (m_rhs->getType() != IrType::Integer)
+        {
+            std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: rhs of binary expression must be of type integer." << std::endl;
+           
+            valid = false;
+        }
     }
     
     ctx->popParent();

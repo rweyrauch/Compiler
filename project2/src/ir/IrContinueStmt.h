@@ -22,8 +22,6 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <string>
-#include <vector>
 #include "IrStatement.h"
 
 namespace Decaf
@@ -39,7 +37,9 @@ public:
     virtual ~IrContinueStatement()
     {}
     
-    virtual void print(unsigned int depth) {}
+    virtual void clean(IrTraversalContext* ctx); 
+    virtual void print(unsigned int depth);
+    virtual bool analyze(IrTraversalContext* ctx);
         
 protected:    
     

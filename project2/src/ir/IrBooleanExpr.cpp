@@ -31,8 +31,8 @@ namespace Decaf
 
  void IrBooleanExpression::clean(IrTraversalContext* ctx)
 {
-	ctx->pushParent(this);
-	
+    ctx->pushParent(this);
+
     if (m_lhs) m_lhs->clean(ctx);
     if (m_rhs) m_rhs->clean(ctx);
     
@@ -73,7 +73,7 @@ bool IrBooleanExpression::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
     
-	ctx->pushParent(this);
+    ctx->pushParent(this);
     
     if (m_lhs) 
     {
@@ -84,6 +84,26 @@ bool IrBooleanExpression::analyze(IrTraversalContext* ctx)
     {
         if (!m_rhs->analyze(ctx))
             valid = false;
+    }
+    
+    if (m_lhs)
+    {
+        if (m_lhs->getType() != IrType::Integer)
+        {
+            std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: lhs of boolean expression must be of type integer." << std::endl;
+            
+            valid = false;
+        }
+    }
+    
+    if (m_rhs)
+    {
+        if (m_rhs->getType() != IrType::Integer)
+        {
+            std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: rhs of boolean expression must be of type integer." << std::endl;
+           
+            valid = false;
+        }
     }
     
     ctx->popParent();

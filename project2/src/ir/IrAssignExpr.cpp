@@ -31,8 +31,8 @@ namespace Decaf
 
 void IrAssignExpression::clean(IrTraversalContext* ctx)
 {
-	ctx->pushParent(this);
-	
+    ctx->pushParent(this);
+    
     if (m_lhs) m_lhs->clean(ctx);
     if (m_rhs) m_rhs->clean(ctx);
     
@@ -74,8 +74,8 @@ void IrAssignExpression::print(unsigned int depth)
 
 bool IrAssignExpression::analyze(IrTraversalContext* ctx)
 {
-	ctx->pushParent(this);
-	
+    ctx->pushParent(this);
+    
     bool valid = true;
     if (m_lhs) 
     {
@@ -86,6 +86,16 @@ bool IrAssignExpression::analyze(IrTraversalContext* ctx)
     {
         if (!m_rhs->analyze(ctx))
             valid = false;
+    }
+    
+    if (m_lhs && m_rhs)
+    {
+        if (m_lhs->getType() != m_rhs->getType())
+        {
+            std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: lhs and rhs of assigment operator must be of the same type." << std::endl;
+            
+            valid = false;
+        }
     }
     
     ctx->popParent();

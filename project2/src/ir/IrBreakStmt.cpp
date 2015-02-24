@@ -21,31 +21,46 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#pragma once
-#include "IrStatement.h"
+#include <iostream>
+#include "IrCommon.h"
+#include "IrBreakStmt.h"
+#include "IrTravCtx.h"
+#include "IrForStmt.h"
 
 namespace Decaf
 {
-
-class IrBreakStatement : public IrStatement
+    
+void IrBreakStatement::clean(IrTraversalContext* ctx)
 {
-public:
-    IrBreakStatement(int lineNumber, int columnNumber, const std::string& filename) :
-        IrStatement(lineNumber, columnNumber, filename)
-    {}
+    // nothing to do
+}
     
-    virtual ~IrBreakStatement()
-    {}
-    
-    virtual void clean(IrTraversalContext* ctx); 
-    virtual void print(unsigned int depth);
-    virtual bool analyze(IrTraversalContext* ctx);
+void IrBreakStatement::print(unsigned int depth)
+{
+    IRPRINT_INDENT(depth);
+    std::cout << "Break(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
+}
         
-protected:    
+bool IrBreakStatement::analyze(IrTraversalContext* ctx)
+{
+    bool valid = false;
     
-private:
-    IrBreakStatement() = delete;
-    IrBreakStatement(const IrBreakStatement& rhs) = delete;
-};
+    // Walk up the parent list, looking for a for-loop statement.
+    for (size_t i = 0; i < ctx->getNumParents(); i++)
+    {
+        const IrForStatement* forloop = dynamic_cast<const IrForStatement*>(ctx->getParent(i));
+        if (forloop)
+        {
+            valid = true;
+            break;
+        }
+    }
+    
+    if (!valid)
+    {
+        std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: break statement not found in a for-loop." << std::endl;
+    }
+    return valid;
+}
 
 } // namespace Decaf
