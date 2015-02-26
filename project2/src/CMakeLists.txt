@@ -33,4 +33,9 @@ target_link_libraries(
 	popt
 )
 
+install(
+    TARGETS dcc
+    DESTINATION ${CMAKE_SOURCE_DIR}/..
+)
+
 add_subdirectory("ir")
