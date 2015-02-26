@@ -64,6 +64,7 @@ int main(int argc, char **argv)
                     break;
             }
             std::cout << scanner->matched() << std::endl;
+            //std::cout << scanner->line() << std::endl;
         }
         delete scanner;
     }
@@ -76,7 +77,7 @@ int main(int argc, char **argv)
         }
         else
         {
-            parser = new Parser();
+            parser = new Parser(std::cin, std::cout);
         }
         parser->parse();        
         parser->semanticChecks();

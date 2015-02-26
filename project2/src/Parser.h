@@ -23,8 +23,8 @@ class Parser: public ParserBase
     IrTraversalContext* d_ctx;
     
     public:
-        Parser() :
-            d_scanner(),
+        Parser(std::istream &in, std::ostream &out) :
+            d_scanner(in, out),
             d_root(0) 
         {
             d_scanner.setSLoc(&d_loc__);

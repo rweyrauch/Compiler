@@ -23,6 +23,7 @@ add_custom_command(
 add_executable(
 	dcc
 	main.cpp
+	ScannerStreambuf.cpp
 	${FlexOutput}
 	${BisonOutput}
 )

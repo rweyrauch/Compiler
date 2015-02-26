@@ -3,6 +3,7 @@
 #ifndef Scanner_H_INCLUDED_
 #define Scanner_H_INCLUDED_
 
+#include <iostream>
 #include "Ir.h"
 
 using namespace Decaf;
@@ -10,9 +11,10 @@ using namespace Decaf;
 // $insert baseclass_h
 #include "Scannerbase.h"
 #include "Parserbase.h"
+#include "ScannerStreambuf.h"
 
 // $insert classHead
-class Scanner: public ScannerBase
+class Scanner: private ScannerStreambuf, private std::istream, public ScannerBase
 {
     public:
         explicit Scanner(std::istream &in = std::cin,
@@ -27,6 +29,9 @@ class Scanner: public ScannerBase
         
         void setSLoc(ParserBase::LTYPE__ *location) { m_loc = location; }
         
+		using ScannerStreambuf::line;
+		using ScannerStreambuf::column;
+		
     protected:
     
         int m_current_column;
@@ -52,6 +57,8 @@ class Scanner: public ScannerBase
 // $insert scannerConstructors
 inline Scanner::Scanner(std::istream &in, std::ostream &out)
 :
+	ScannerStreambuf(&in),
+	std::istream(this),
     ScannerBase(in, out),
     m_current_column(0),
     m_loc(nullptr)
@@ -59,6 +66,8 @@ inline Scanner::Scanner(std::istream &in, std::ostream &out)
 
 inline Scanner::Scanner(std::string const &infile, std::string const &outfile)
 :
+	ScannerStreambuf(infile),
+	std::istream(this),
     ScannerBase(infile, outfile),
     m_current_column(0),
     m_loc(nullptr)
@@ -82,7 +91,7 @@ inline void Scanner::postCode(PostEnum__ type)
 
 inline void Scanner::error()
 {
-    std::cout << filename() << " line " << lineNr() << ":" << columnNr() << ": unexpected char: \'" << matched().front() << "\'" << std::endl;    
+    std::cout << filename() << " line " << lineNr() << ":" << columnNr() << ": unexpected char: \'" << matched().front() << "\'" << std::endl; 
 }
 
 inline void Scanner::track_column()
