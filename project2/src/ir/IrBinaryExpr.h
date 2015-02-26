@@ -33,8 +33,8 @@ class IrBinaryExpression : public IrExpression
 public:
     IrBinaryExpression(int lineNumber, int columnNumber, const std::string& filename, IrType type, IrExpression* lhs, IrBinaryOperator binaryOp, IrExpression* rhs) :
         IrExpression(lineNumber, columnNumber, filename, type),
-        m_lhs(lhs),
         m_operator(binaryOp),
+        m_lhs(lhs),
         m_rhs(rhs)
     {}
     

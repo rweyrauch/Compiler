@@ -36,15 +36,15 @@ class IrVariableDecl : public IrBase
 public:
     IrVariableDecl(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType type) :
         IrBase(lineNumber, columnNumber, filename),
-        m_identifiers(),
-        m_type(type)
+        m_type(type),
+        m_identifiers()
     {
         m_identifiers.push_back(ident);
     }
     IrVariableDecl(int lineNumber, int columnNumber, const std::string& filename, const std::vector<IrIdentifier*> ident_list, IrType type) :
         IrBase(lineNumber, columnNumber, filename),
-        m_identifiers(ident_list),
-        m_type(type)
+        m_type(type),
+        m_identifiers(ident_list)
     {}
     
     virtual ~IrVariableDecl()

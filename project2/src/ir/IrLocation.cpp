@@ -104,7 +104,7 @@ bool IrLocation::analyze(IrTraversalContext* ctx)
         {
             // Location index must be in range of symbol count when not declaring an array.
             IrIntegerLiteral* intLit = dynamic_cast<IrIntegerLiteral*>(m_index);
-            if (intLit && !usedAsDeclaration())
+            if (intLit && !usedAsDeclaration() && symbolValid)
             {
                 if (intLit->getValue() < 0 || (size_t)intLit->getValue() >= symbol.m_count)
                 {

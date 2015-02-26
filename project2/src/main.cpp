@@ -42,7 +42,7 @@ int main(int argc, char **argv)
             scanner = new Scanner();
         }
         int token = 0;
-        while (token = scanner->lex())
+        while ((token = scanner->lex()))
         {
             std::cout << scanner->lineNr() << " ";
             switch (token)

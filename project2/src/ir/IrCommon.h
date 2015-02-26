@@ -81,7 +81,7 @@ const std::string& IrBinaryOperatorToString(IrBinaryOperator op);
 const std::string& IrBooleanOperatorToString(IrBooleanOperator op);
 const std::string& IrAssignmentOperatorToString(IrAssignmentOperator op);
 
-#define IRPRINT_INDENT(depth) { for (auto d = 0; d < (depth); d++) std::cout << "  "; }
+#define IRPRINT_INDENT(depth) { for (int d = 0; d < (int)(depth); d++) std::cout << "  "; }
 
 
 struct SVariableSymbol

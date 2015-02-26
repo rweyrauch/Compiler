@@ -79,7 +79,9 @@ bool IrIfStatement::analyze(IrTraversalContext* ctx)
         valid = false;
     }
     
-    ctx->popParent();	
+    ctx->popParent();
+    
+    return valid;
 }
     
 } // namespace Decaf

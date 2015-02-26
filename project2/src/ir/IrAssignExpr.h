@@ -34,8 +34,8 @@ class IrAssignExpression : public IrExpression
 public:
     IrAssignExpression(int lineNumber, int columnNumber, const std::string& filename, IrExpression* lhs, IrAssignmentOperator assignOp, IrExpression* rhs) :
         IrExpression(lineNumber, columnNumber, filename, lhs->getType()),
-        m_lhs(lhs),
         m_operator(assignOp),
+        m_lhs(lhs),
         m_rhs(rhs)
     {}
     

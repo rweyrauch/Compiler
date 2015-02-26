@@ -33,8 +33,8 @@ class IrBooleanExpression : public IrExpression
 public:
     IrBooleanExpression(int lineNumber, int columnNumber, const std::string& filename, IrExpression* lhs, IrBooleanOperator boolOp, IrExpression* rhs) :
         IrExpression(lineNumber, columnNumber, filename, IrType::Boolean),
-        m_lhs(lhs),
         m_operator(boolOp),
+        m_lhs(lhs),
         m_rhs(rhs)
     {}
     

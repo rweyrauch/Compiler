@@ -36,6 +36,7 @@ const IrBase* IrTraversalContext::getParent(size_t generation) const
     {
         return (m_parents.at(m_parents.size() - 1 - generation));
     }
+    return nullptr;
 }
 
 bool IrTraversalContext::lookup(IrLocation* location, SVariableSymbol& symbol) const
