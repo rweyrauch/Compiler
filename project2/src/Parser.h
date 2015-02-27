@@ -3,6 +3,7 @@
 #ifndef Parser_h_included
 #define Parser_h_included
 
+#include <fstream>
 #include "Ir.h"
 
 using namespace Decaf;
@@ -22,6 +23,9 @@ class Parser: public ParserBase
     IrClass* d_root;
     IrTraversalContext* d_ctx;
     
+    std::vector<std::string> d_source;
+    std::string d_blank;
+    
     public:
         Parser(std::istream &in, std::ostream &out) :
             d_scanner(in, out),
@@ -34,6 +38,7 @@ class Parser: public ParserBase
             d_scanner(infile, outfile),
             d_root(0) 
         {
+            preloadSource(infile);            
             d_scanner.setSLoc(&d_loc__);            
             d_ctx = new IrTraversalContext();
         }
@@ -63,6 +68,10 @@ class Parser: public ParserBase
 
         void setRoot(IrClass* root) { d_root = root; }
         
+        const std::string& line(size_t line_num) const;
+        
+        void preloadSource(const std::string &infile);
+
     // support functions for parse():
         void executeAction(int ruleNr);
         void errorRecovery();

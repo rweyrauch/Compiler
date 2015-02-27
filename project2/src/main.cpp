@@ -3,7 +3,6 @@
 #include <string>
 #include <popt.h>
 #include "Parser.h"
-//#include "Scanner.h"
 
 char* g_target = 0;
 char* g_outputFilename = 0;
@@ -64,7 +63,6 @@ int main(int argc, char **argv)
                     break;
             }
             std::cout << scanner->matched() << std::endl;
-            //std::cout << scanner->line() << std::endl;
         }
         delete scanner;
     }
