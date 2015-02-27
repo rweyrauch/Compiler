@@ -97,6 +97,13 @@ bool IrBinaryExpression::analyze(IrTraversalContext* ctx)
             
             valid = false;
         }
+        if (m_lhs->isArray())
+        {
+            std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: lhs of binary expression may not be an array name." << std::endl;
+            ctx->highlightError(getLineNumber(), getColumnNumber());
+            
+            valid = false;            
+        }
     }
     
     if (m_rhs)
@@ -107,6 +114,13 @@ bool IrBinaryExpression::analyze(IrTraversalContext* ctx)
             ctx->highlightError(getLineNumber(), getColumnNumber());
            
             valid = false;
+        }
+        if (m_rhs->isArray())
+        {
+            std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: rhs of binary expression may not be an array name." << std::endl;
+            ctx->highlightError(getLineNumber(), getColumnNumber());
+            
+            valid = false;            
         }
     }
     

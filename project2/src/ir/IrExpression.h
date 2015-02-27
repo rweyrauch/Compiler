@@ -33,7 +33,8 @@ class IrExpression : public IrBase
 public:
     IrExpression(int lineNumber, int columnNumber, const std::string& filename, IrType type) :
         IrBase(lineNumber, columnNumber, filename),
-        m_type(type)
+        m_type(type),
+        m_isArray(false)
     {}
     
     virtual ~IrExpression()
@@ -41,12 +42,14 @@ public:
     
     virtual void print(unsigned int depth) = 0;
     
-    void setType(IrType type) { m_type = type; }
+    void setType(IrType type, bool isArray = false) { m_type = type; m_isArray = isArray; }
     IrType getType() const { return m_type; }
+    bool isArray() const { return m_isArray; }
     
 protected:
     
     IrType m_type;
+    bool m_isArray;
     
 private:
     IrExpression() = delete;

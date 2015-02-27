@@ -103,6 +103,13 @@ bool IrBooleanExpression::analyze(IrTraversalContext* ctx)
                 ctx->highlightError(getLineNumber(), getColumnNumber());
                 valid = false;             
             }
+            if (m_rhs->isArray())
+            {
+                std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: rhs of not operator(!) may not be an array name." << std::endl;
+                ctx->highlightError(getLineNumber(), getColumnNumber());
+                
+                valid = false;            
+            }
         }
         else
         {
@@ -122,6 +129,13 @@ bool IrBooleanExpression::analyze(IrTraversalContext* ctx)
                 ctx->highlightError(getLineNumber(), getColumnNumber());
                 valid = false;
             }
+            if (m_lhs->isArray())
+            {
+                std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: lhs of boolean expression may not be an array name." << std::endl;
+                ctx->highlightError(getLineNumber(), getColumnNumber());
+                
+                valid = false;            
+            }
         }
         
         if (m_rhs)
@@ -131,6 +145,13 @@ bool IrBooleanExpression::analyze(IrTraversalContext* ctx)
                 std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: rhs of boolean expression must be of type integer." << std::endl;           
                 ctx->highlightError(getLineNumber(), getColumnNumber());
                 valid = false;
+            }
+            if (m_rhs->isArray())
+            {
+                std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: rhs of boolean expression may not be an array name." << std::endl;
+                ctx->highlightError(getLineNumber(), getColumnNumber());
+                
+                valid = false;            
             }
         }
     }

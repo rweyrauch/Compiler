@@ -43,7 +43,16 @@ void IrLocation::clean(IrTraversalContext* ctx)
     SVariableSymbol symbol;
     if (ctx->lookup(this, symbol))
     {
-        setType(symbol.m_type);
+        bool isArray = false;
+        if (usedAsDeclaration() && (m_index != nullptr))
+        {
+            isArray = true;
+        }
+        else // variable
+        {
+            isArray = (m_index == nullptr) && (symbol.m_count > 1);
+        }
+        setType(symbol.m_type, isArray);
     }
     
     ctx->popParent();
@@ -54,7 +63,7 @@ void IrLocation::print(unsigned int depth)
     IRPRINT_INDENT(depth);
     std::cout << "Location(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
     IRPRINT_INDENT(depth+1);
-    std::cout << "Type: " << IrTypeToString(m_type) << std::endl;
+    std::cout << "Type: " << IrTypeToString(m_type) << " Array: " << (isArray() ? "true" : "false") << std::endl;
     
     if (m_identifier) 
     {
