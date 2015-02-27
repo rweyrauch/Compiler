@@ -53,14 +53,14 @@ bool IrSymbolTable::addVariable(IrFieldDecl* variable)
                 else
                 {
                     // Error - array size must be greater than zero
-                    std::cerr << size->getFilename() << ":" << size->getLineNumber() << ":" << size->getColumnNumber() << ": error: field " << variable->getName() << " array size must be integer greater than zero." << std::endl;
+                    std::cerr << size->getFilename() << ":" << size->getLineNumber() << ":" << size->getColumnNumber() << ": error: field \'" << variable->getName() << "\' array size must be integer greater than zero." << std::endl;
                     return false;
                 }
             }
             else
             {
                 // Error - array size must be a integer literal
-                std::cerr << size->getFilename() << ":" << size->getLineNumber() << ":" << size->getColumnNumber() << ": error: field " << variable->getName() << " array size must be integer greater than zero." << std::endl;
+                std::cerr << size->getFilename() << ":" << size->getLineNumber() << ":" << size->getColumnNumber() << ": error: field \'" << variable->getName() << "\' array size must be integer greater than zero." << std::endl;
                 return false;
             }
         }
@@ -70,7 +70,7 @@ bool IrSymbolTable::addVariable(IrFieldDecl* variable)
     }
     
     // error - duplicate symbol
-    std::cerr << variable->getFilename() << ":" << variable->getLineNumber() << ":" << variable->getColumnNumber() << ": error: field " << variable->getName() << " of type " << IrTypeToString(variable->getType()) << " already declared in scope." << std::endl;
+    std::cerr << variable->getFilename() << ":" << variable->getLineNumber() << ":" << variable->getColumnNumber() << ": error: field \'" << variable->getName() << "\' of type " << IrTypeToString(variable->getType()) << " already declared in scope." << std::endl;
     
     return false;
 }
@@ -95,7 +95,7 @@ bool IrSymbolTable::addVariable(IrVariableDecl* variables)
             else
             {
                 // Error - duplicate
-                std::cerr << variable->getFilename() << ":" << variable->getLineNumber() << ":" << variable->getColumnNumber() << ": error: variable " << variable->getIdentifier() << " of type " << IrTypeToString(variables->getType()) << " already declared in scope." << std::endl;                
+                std::cerr << variable->getFilename() << ":" << variable->getLineNumber() << ":" << variable->getColumnNumber() << ": error: variable \'" << variable->getIdentifier() << "\' of type " << IrTypeToString(variables->getType()) << " already declared in scope." << std::endl;                
                 ok = false;
             }
         }
@@ -125,14 +125,14 @@ bool IrSymbolTable::addVariable(IrLocation* variable)
                 else
                 {
                     // Error - array size must be greater than zero
-                    std::cerr << size->getFilename() << ":" << size->getLineNumber() << ":" << size->getColumnNumber() << ": error: field " << variable->getIdentifier()->getIdentifier() << " array size must be integer greater than zero." << std::endl;
+                    std::cerr << size->getFilename() << ":" << size->getLineNumber() << ":" << size->getColumnNumber() << ": error: field \'" << variable->getIdentifier()->getIdentifier() << "\' array size must be integer greater than zero." << std::endl;
                     return false;
                 }
             }
             else
             {
                 // Error - array size must be a integer literal
-                std::cerr << size->getFilename() << ":" << size->getLineNumber() << ":" << size->getColumnNumber() << ": error: field " << variable->getIdentifier()->getIdentifier() << " array size must be integer greater than zero." << std::endl;
+                std::cerr << size->getFilename() << ":" << size->getLineNumber() << ":" << size->getColumnNumber() << ": error: field \'" << variable->getIdentifier()->getIdentifier() << "\' array size must be integer greater than zero." << std::endl;
                 return false;
             }
         }
@@ -142,7 +142,7 @@ bool IrSymbolTable::addVariable(IrLocation* variable)
     }
     
     // error - duplicate symbol
-    std::cerr << variable->getFilename() << ":" << variable->getLineNumber() << ":" << variable->getColumnNumber() << ": error: field " << variable->getIdentifier()->getIdentifier() << " of type " << IrTypeToString(variable->getType()) << " already declared in scope." << std::endl;
+    std::cerr << variable->getFilename() << ":" << variable->getLineNumber() << ":" << variable->getColumnNumber() << ": error: field \'" << variable->getIdentifier()->getIdentifier() << "\' of type " << IrTypeToString(variable->getType()) << " already declared in scope." << std::endl;
     
     return false;    
 }
@@ -171,7 +171,7 @@ bool IrSymbolTable::addMethod(IrMethodDecl* method)
     else
     {
         // Error - duplicate
-        std::cerr << method->getFilename() << ":" << method->getLineNumber() << ":" << method->getColumnNumber() << ": error: method " << method->getName() << " already declared in scope." << std::endl;                
+        std::cerr << method->getFilename() << ":" << method->getLineNumber() << ":" << method->getColumnNumber() << ": error: method \'" << method->getName() << "\' already declared in scope." << std::endl;                
         ok = false;
     }
     
@@ -209,7 +209,7 @@ bool IrSymbolTable::exists(IrMethodCall* method) const
                 {
                     exists = false;
                     // Error incorrect argument type.
-                    std::cerr << method->getFilename() << ":" << method->getLineNumber() << ":" << method->getColumnNumber() << ": error: method " << method->getIdentifier()->getIdentifier() << " incorrect argument type for argument, " 
+                    std::cerr << method->getFilename() << ":" << method->getLineNumber() << ":" << method->getColumnNumber() << ": error: method \'" << method->getIdentifier()->getIdentifier() << "\' incorrect argument type for argument, " 
                               << i << ".  Expected type " << IrTypeToString(symbol.m_arguments.at(i).m_type) << " but given " << IrTypeToString(method->getArgumentType(i)) << std::endl;                            
                     break;
                 }
@@ -218,7 +218,7 @@ bool IrSymbolTable::exists(IrMethodCall* method) const
         else
         {
             // Error incorrect number of arguments.
-            std::cerr << method->getFilename() << ":" << method->getLineNumber() << ":" << method->getColumnNumber() << ": error: method " << method->getIdentifier()->getIdentifier() << " incorrect number of arguments." << std::endl;                            
+            std::cerr << method->getFilename() << ":" << method->getLineNumber() << ":" << method->getColumnNumber() << ": error: method \'" << method->getIdentifier()->getIdentifier() << "\' incorrect number of arguments." << std::endl;                            
         }
     }
     else
