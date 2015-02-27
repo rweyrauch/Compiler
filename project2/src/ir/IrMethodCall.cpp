@@ -33,8 +33,8 @@ namespace Decaf
 
 void IrMethodCall::clean(IrTraversalContext* ctx)
 {
-	ctx->pushParent(this);
-	
+    ctx->pushParent(this);
+
     if (m_identifier) m_identifier->clean(ctx);
     else if (m_externalFunction) m_externalFunction->clean(ctx);
     for (auto it : m_arguments)
@@ -75,7 +75,7 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
     
-	ctx->pushParent(this);
+    ctx->pushParent(this);
     
     if (!isExternal())
     {
@@ -85,6 +85,7 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
         {
             // Method not defined
             std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: method " << getIdentifier()->getIdentifier() << " not defined." << std::endl; 
+            ctx->highlightError(getLineNumber(), getColumnNumber());
             valid = false;
         }
     }

@@ -36,7 +36,13 @@ class IrMethodCall;
 class IrTraversalContext
 {
 public:
-    IrTraversalContext() {}
+    IrTraversalContext() :
+        m_symbols(),
+        m_parents(),
+        m_source(nullptr),
+        m_blank("")
+    {}
+    
     ~IrTraversalContext() {}
     
     void pushSymbols(IrSymbolTable* symbols) { m_symbols.push_front(symbols); }
@@ -51,10 +57,26 @@ public:
     bool lookup(IrLocation* variable, SVariableSymbol& symbol) const;
     bool lookup(IrMethodCall* method, SMethodSymbol& symbol) const;
     
+    void setSource(std::vector<std::string> const* source) { m_source = source; }
+    const std::string& sourceAt(int line_num) const
+    {
+        
+        if (m_source && line_num > 0 && line_num <= (int)m_source->size())
+        {
+            return m_source->at((size_t)line_num-1);
+        }
+        return m_blank;
+    }
+    
+    void highlightError(int line, int column, int length = 1) const;
+    
 protected:
     
     std::list<IrSymbolTable*> m_symbols;
     std::vector<IrBase*> m_parents;
+    
+    std::vector<std::string> const* m_source;
+    std::string m_blank;
 };
 
 } // namespace Decaf

@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 
+#include <iostream>
 #include "IrTravCtx.h"
 #include "IrSymbolTable.h"
 #include "IrIdentifier.h"
@@ -69,4 +70,16 @@ bool IrTraversalContext::lookup(IrMethodCall* method, SMethodSymbol& symbol) con
     return found;
 }
    
+void IrTraversalContext::highlightError(int line, int column, int length) const
+{
+    const std::string& bad_line = sourceAt(line);
+    if (bad_line.size() > 0)
+    {
+        std::cerr << bad_line << std::endl;
+        for (int i = 0; i < column; i++) std::cerr << " ";
+        for (int i = 0; i < length; i++) std::cerr << "^";
+        std::cerr << std::endl;
+    }    
+}
+  
 } // namespace Decaf

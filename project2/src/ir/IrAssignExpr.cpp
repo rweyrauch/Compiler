@@ -95,7 +95,7 @@ bool IrAssignExpression::analyze(IrTraversalContext* ctx)
         if (nullptr == dynamic_cast<IrLocation*>(m_lhs))
         {
             std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: lhs of assigment operator must be a." << std::endl;
-            
+            ctx->highlightError(getLineNumber(), getColumnNumber());
             valid = false;
         }
     }
@@ -108,6 +108,7 @@ bool IrAssignExpression::analyze(IrTraversalContext* ctx)
             if (m_lhs->getType() != m_rhs->getType())
             {
                 std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: lhs and rhs of assigment operator must be of the same type." << std::endl;
+                ctx->highlightError(getLineNumber(), getColumnNumber());
                 
                 valid = false;
             }
@@ -118,18 +119,20 @@ bool IrAssignExpression::analyze(IrTraversalContext* ctx)
             if (m_lhs->getType() != IrType::Integer)
             {
                 std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: lhs of increment/decrement assigment operator must be of type integer." << std::endl;
-                
+                ctx->highlightError(getLineNumber(), getColumnNumber());
+
                 valid = false;
             }
             if (m_rhs->getType() != IrType::Integer)
             {
                 std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: rhs of increment/decrement assigment operator must be of type integer." << std::endl;
-                
+                ctx->highlightError(getLineNumber(), getColumnNumber());
+               
                 valid = false;
             }
         }
     }
-//    
+    
     ctx->popParent();
     
     return valid;

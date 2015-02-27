@@ -32,8 +32,8 @@ namespace Decaf
 
 void IrFieldDecl::clean(IrTraversalContext* ctx)
 {
-	ctx->pushParent(this);
-	
+    ctx->pushParent(this);
+
     m_location->clean(ctx);
     
     ctx->popParent();    
@@ -55,7 +55,7 @@ bool IrFieldDecl::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
     
-	ctx->pushParent(this);
+    ctx->pushParent(this);
     
     if (!m_location->analyze(ctx))
         valid = false;

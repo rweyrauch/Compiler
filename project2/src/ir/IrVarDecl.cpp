@@ -31,8 +31,8 @@ namespace Decaf
 
 void IrVariableDecl::clean(IrTraversalContext* ctx)
 {
-	ctx->pushParent(this);
-	
+    ctx->pushParent(this);
+
     for (auto it : m_identifiers)
     {
         it->clean(ctx);
@@ -61,7 +61,7 @@ bool IrVariableDecl::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
     
-	ctx->pushParent(this);
+    ctx->pushParent(this);
     
     for (auto it : m_identifiers)
     {

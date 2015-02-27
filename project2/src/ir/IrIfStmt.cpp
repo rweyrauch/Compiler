@@ -33,8 +33,8 @@ namespace Decaf
 
 void IrIfStatement::clean(IrTraversalContext* ctx)
 {
-	ctx->pushParent(this);
-	
+    ctx->pushParent(this);
+
     m_condition->clean(ctx);
     if (m_trueBlock) m_trueBlock->clean(ctx);
     if (m_falseBlock) m_falseBlock->clean(ctx);
@@ -76,6 +76,7 @@ bool IrIfStatement::analyze(IrTraversalContext* ctx)
     {
         std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: if conditional expression must be of type boolean.  Got: "
                 << IrTypeToString(m_condition->getType()) << std::endl;
+        ctx->highlightError(getLineNumber(), getColumnNumber());
         valid = false;
     }
     

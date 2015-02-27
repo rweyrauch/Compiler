@@ -100,13 +100,14 @@ bool IrBooleanExpression::analyze(IrTraversalContext* ctx)
             if (m_rhs->getType() != IrType::Boolean)
             {
                 std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: rhs of not operator(!) must of type boolean." << std::endl;               
-                valid = false;
-               
+                ctx->highlightError(getLineNumber(), getColumnNumber());
+                valid = false;             
             }
         }
         else
         {
             std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: not operator(!) requires a rhs expression." << std::endl;
+            ctx->highlightError(getLineNumber(), getColumnNumber());
             valid = false;
         }
     }
@@ -118,6 +119,7 @@ bool IrBooleanExpression::analyze(IrTraversalContext* ctx)
             if (m_lhs->getType() != IrType::Integer)
             {
                 std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: lhs of boolean expression must be of type integer." << std::endl;               
+                ctx->highlightError(getLineNumber(), getColumnNumber());
                 valid = false;
             }
         }
@@ -127,6 +129,7 @@ bool IrBooleanExpression::analyze(IrTraversalContext* ctx)
             if (m_rhs->getType() != IrType::Integer)
             {
                 std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: rhs of boolean expression must be of type integer." << std::endl;           
+                ctx->highlightError(getLineNumber(), getColumnNumber());
                 valid = false;
             }
         }

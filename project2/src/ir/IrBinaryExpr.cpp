@@ -93,6 +93,7 @@ bool IrBinaryExpression::analyze(IrTraversalContext* ctx)
         if (m_lhs->getType() != IrType::Integer)
         {
             std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: lhs of binary expression must be of type integer." << std::endl;
+            ctx->highlightError(getLineNumber(), getColumnNumber());
             
             valid = false;
         }
@@ -103,6 +104,7 @@ bool IrBinaryExpression::analyze(IrTraversalContext* ctx)
         if (m_rhs->getType() != IrType::Integer)
         {
             std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: rhs of binary expression must be of type integer." << std::endl;
+            ctx->highlightError(getLineNumber(), getColumnNumber());
            
             valid = false;
         }

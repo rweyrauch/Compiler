@@ -35,7 +35,7 @@ namespace Decaf
 void IrForStatement::clean(IrTraversalContext* ctx)
 {
     ctx->pushSymbols(m_symbols);
-	ctx->pushParent(this);
+    ctx->pushParent(this);
     
     m_loopVariable->clean(ctx);
     m_initialValue->clean(ctx);
@@ -64,7 +64,7 @@ bool IrForStatement::analyze(IrTraversalContext* ctx)
     bool valid = true;
     
     ctx->pushSymbols(m_symbols);
-	ctx->pushParent(this);
+    ctx->pushParent(this);
     
     if (!m_loopVariable->analyze(ctx))
         valid = false;
@@ -82,17 +82,19 @@ bool IrForStatement::analyze(IrTraversalContext* ctx)
     // Initial variable and terminal value expressions must be of type integer.
     if (m_initialValue->getType() != IrType::Integer)
     {
-		std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: for loop initial value expression must be of type integer.  Got: "
-		          << IrTypeToString(m_initialValue->getType()) << std::endl;		
-		valid = false;
-	}
+        std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: for loop initial value expression must be of type integer.  Got: "
+                  << IrTypeToString(m_initialValue->getType()) << std::endl;		
+        ctx->highlightError(getLineNumber(), getColumnNumber());
+        valid = false;
+    }
     if (m_terminatingValue->getType() != IrType::Integer)
     {
-		std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: for loop ending value expression must be of type integer.  Got: "
-		          << IrTypeToString(m_terminatingValue->getType()) << std::endl;		
-		valid = false;
-	}
-	
+        std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: for loop ending value expression must be of type integer.  Got: "
+                  << IrTypeToString(m_terminatingValue->getType()) << std::endl;		
+        ctx->highlightError(getLineNumber(), getColumnNumber());
+        valid = false;
+    }
+
     ctx->popParent();
     ctx->popSymbols();
     

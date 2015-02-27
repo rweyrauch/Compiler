@@ -59,6 +59,7 @@ bool IrContinueStatement::analyze(IrTraversalContext* ctx)
     if (!valid)
     {
         std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: continue statement not found in a for-loop." << std::endl;
+        ctx->highlightError(getLineNumber(), getColumnNumber());
     }
     
     return valid;

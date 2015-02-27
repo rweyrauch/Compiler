@@ -31,8 +31,8 @@ namespace Decaf
 
 void IrExpressionStatement::clean(IrTraversalContext* ctx)
 {
-	ctx->pushParent(this);
-	
+    ctx->pushParent(this);
+
     if (m_expression) m_expression->clean(ctx);
     
     ctx->popParent();    
@@ -49,7 +49,7 @@ bool IrExpressionStatement::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
     
-	ctx->pushParent(this);
+    ctx->pushParent(this);
     
     if (m_expression) 
     {

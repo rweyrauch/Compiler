@@ -35,8 +35,8 @@ namespace Decaf
 
 void IrLocation::clean(IrTraversalContext* ctx)
 {
-	ctx->pushParent(this);
-	
+    ctx->pushParent(this);
+
     if (m_index) m_index->clean(ctx);
     
     // Update type
@@ -83,6 +83,7 @@ bool IrLocation::analyze(IrTraversalContext* ctx)
     {
         // Variable not defined
         std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: variable " << getIdentifier()->getIdentifier() << " not declared." << std::endl; 
+        ctx->highlightError(getLineNumber(), getColumnNumber());
         valid = false;
     }
     else
@@ -98,6 +99,7 @@ bool IrLocation::analyze(IrTraversalContext* ctx)
             // Error - index not an integer
             std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: array " << getIdentifier()->getIdentifier() 
                       << " index must be an integer expression.  Got: " << IrTypeToString(m_index->getType()) << std::endl; 
+            ctx->highlightError(getLineNumber(), getColumnNumber());
             valid = false;
         }
         else
@@ -111,6 +113,7 @@ bool IrLocation::analyze(IrTraversalContext* ctx)
                     // Error - index out of range
                     std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: array " << getIdentifier()->getIdentifier() << " index out of range.  Max value: "
                               << symbol.m_count << " but given " << intLit->getValue() << std::endl; 
+                    ctx->highlightError(getLineNumber(), getColumnNumber());
                     valid = false;                    
                 }
             }
