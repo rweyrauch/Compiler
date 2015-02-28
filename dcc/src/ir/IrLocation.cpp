@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #include <iostream>
+#include <sstream>
 #include "IrCommon.h"
 #include "IrLocation.h"
 #include "IrIdentifier.h"
@@ -91,8 +92,9 @@ bool IrLocation::analyze(IrTraversalContext* ctx)
     if (!ctx->lookup(this, symbol))
     {
         // Variable not defined
-        std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: variable \'" << getIdentifier()->getIdentifier() << "\' not declared." << std::endl; 
-        ctx->highlightError(getLineNumber(), getColumnNumber());
+        std::stringstream msg;
+        msg  << "variable \'" << getIdentifier()->getIdentifier() << "\' not declared."; 
+        ctx->error(this, msg.str());
         valid = false;
     }
     else
@@ -106,9 +108,9 @@ bool IrLocation::analyze(IrTraversalContext* ctx)
         if (m_index->getType() != IrType::Integer)
         {
             // Error - index not an integer
-            std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: array \'" << getIdentifier()->getIdentifier() 
-                      << "\' index must be an integer expression.  Got: " << IrTypeToString(m_index->getType()) << std::endl; 
-            ctx->highlightError(getLineNumber(), getColumnNumber());
+            std::stringstream msg;
+            msg << "array \'" << getIdentifier()->getIdentifier() << "\' index must be an integer expression.  Got: " << IrTypeToString(m_index->getType()) << "."; 
+            ctx->error(this, msg.str());
             valid = false;
         }
         else
@@ -120,9 +122,10 @@ bool IrLocation::analyze(IrTraversalContext* ctx)
                 if (intLit->getValue() < 0 || (size_t)intLit->getValue() >= symbol.m_count)
                 {
                     // Error - index out of range
-                    std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: array \'" << getIdentifier()->getIdentifier() << "\' index out of range.  Max value: "
-                              << symbol.m_count << " but given " << intLit->getValue() << std::endl; 
-                    ctx->highlightError(getLineNumber(), getColumnNumber());
+                    std::stringstream msg;                    
+                    msg << "array \'" << getIdentifier()->getIdentifier() << "\' index out of range.  Max value: "
+                        << symbol.m_count << " but given " << intLit->getValue() << "."; 
+                    ctx->error(this, msg.str());
                     valid = false;                    
                 }
             }

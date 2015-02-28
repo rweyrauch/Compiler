@@ -22,30 +22,35 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <string>
-#include <vector>
-#include "IrStatement.h"
 
 namespace Decaf
 {
-
-class IrPlusAssignStatement : public IrStatement
+    
+enum class IrOpcode : int
 {
-public:
-    IrPlusAssignStatement(int lineNumber, int columnNumber, const std::string& filename) :
-        IrStatement(lineNumber, columnNumber, filename)
-    {}
+    NOOP = 0,
+    ADD,        // arg0 + arg1 -> arg2
+    SUB,        // arg0 - arg1 -> arg2
+    MUL,        // arg0 * arg1 -> arg2
+    DIV,        // arg0 / arg1 -> arg2
+    MOD,        // arg0 % arg1 -> arg2
+    LOAD,       // *[arg0 + arg2] -> arg2
+    STORE,      // arg0 -> *[arg1 + arg2]
+    CALL,       // call arg0
+    FBEGIN,     // begin function
+    FEND,       // end function
+    RETURN,     // return
+    EQUAL,      // arg0 == arg1 -> arg2 (0 or 1)
+    LESS,       // arg0 < arg1 -> arg2 (0 or 1)
+    AND,        // arg0 && arg1 -> arg2 (0 or 1)
+    OR,         // arg0 || arg1 -> arg2 (0 or 1)
+    LABEL,      //
+    GOTO,       // jump arg0
+    IFZ,        // branch arg0 == 0 to arg1
+    PUSH,       // push arg0 -> stack
+    POP,        // pop stack -> arg0
     
-    virtual ~IrPlusAssignStatement()
-    {}
-    
-    virtual void print(unsigned int depth) {}
-        
-protected:    
-    
-private:
-    IrPlusAssignStatement() = delete;
-    IrPlusAssignStatement(const IrPlusAssignStatement& rhs) = delete;
+    NUM_OPCODES
 };
 
 } // namespace Decaf

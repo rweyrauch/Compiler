@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #include <iostream>
+#include <sstream>
 #include "IrCommon.h"
 #include "IrMethodDecl.h"
 #include "IrVarDecl.h"
@@ -97,9 +98,9 @@ bool IrMethodDecl::analyze(IrTraversalContext* ctx)
                 if (retStmt->getReturnType() != m_returnType)
                 {
                     // Error - incorrect return type.
-                    std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() <<  ": error: incorrect return type.  Expected " << IrTypeToString(m_returnType)
-                              << " but found " << IrTypeToString(retStmt->getReturnType()) << std::endl;
-                    ctx->highlightError(getLineNumber(), getColumnNumber());
+                    std::stringstream msg;                    
+                    msg << "incorrect return type.  Expected " << IrTypeToString(m_returnType) << " but found " << IrTypeToString(retStmt->getReturnType()) << ".";
+                    ctx->error(this, msg.str());
                     valid = false;
                 }
             }

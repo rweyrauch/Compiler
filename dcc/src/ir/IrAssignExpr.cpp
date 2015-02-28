@@ -94,8 +94,7 @@ bool IrAssignExpression::analyze(IrTraversalContext* ctx)
     {
         if (nullptr == dynamic_cast<IrLocation*>(m_lhs))
         {
-            std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: lhs of assigment operator must be assignable." << std::endl;
-            ctx->highlightError(getLineNumber(), getColumnNumber());
+            ctx->error(this, "lhs of assigment operator must be assignable.");
             valid = false;
         }
     }
@@ -107,23 +106,17 @@ bool IrAssignExpression::analyze(IrTraversalContext* ctx)
         {
             if (m_lhs->getType() != m_rhs->getType())
             {
-                std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: lhs and rhs of assigment operator must be of the same type." << std::endl;
-                ctx->highlightError(getLineNumber(), getColumnNumber());
-                
+                ctx->error(this, "lhs and rhs of assigment operator must be of the same type.");               
                 valid = false;
             }
             if (m_lhs->isArray())
             {
-                std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: lhs of assignment operator may not be an array name." << std::endl;
-                ctx->highlightError(getLineNumber(), getColumnNumber());
-                
+                ctx->error(this, "lhs of assignment operator may not be an array name.");               
                 valid = false;            
             }
             if (m_rhs->isArray())
             {
-                std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: rhs of assignment operator may not be an array name." << std::endl;
-                ctx->highlightError(getLineNumber(), getColumnNumber());
-                
+                ctx->error(this, "rhs of assignment operator may not be an array name.");                
                 valid = false;            
             }
         }
@@ -132,30 +125,22 @@ bool IrAssignExpression::analyze(IrTraversalContext* ctx)
             // Rule: both side of increment/decrement assignment must be integer.
             if (m_lhs->getType() != IrType::Integer)
             {
-                std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: lhs of increment/decrement assigment operator must be of type integer." << std::endl;
-                ctx->highlightError(getLineNumber(), getColumnNumber());
-
+                ctx->error(this, "lhs of increment/decrement assigment operator must be of type integer.");
                 valid = false;
             }
             if (m_rhs->getType() != IrType::Integer)
             {
-                std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: rhs of increment/decrement assigment operator must be of type integer." << std::endl;
-                ctx->highlightError(getLineNumber(), getColumnNumber());
-               
+                ctx->error(this, "rhs of increment/decrement assigment operator must be of type integer.");              
                 valid = false;
             }
             if (m_lhs->isArray())
             {
-                std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: lhs of increment/decrement assigment operator may not be an array name." << std::endl;
-                ctx->highlightError(getLineNumber(), getColumnNumber());
-                
+                ctx->error(this, "lhs of increment/decrement assigment operator may not be an array name.");              
                 valid = false;            
             }
             if (m_rhs->isArray())
             {
-                std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: rhs of increment/decrement assigment operator may not be an array name." << std::endl;
-                ctx->highlightError(getLineNumber(), getColumnNumber());
-                
+                ctx->error(this, "rhs of increment/decrement assigment operator may not be an array name.");                
                 valid = false;            
             }
         }

@@ -70,6 +70,25 @@ bool IrTraversalContext::lookup(IrMethodCall* method, SMethodSymbol& symbol) con
     return found;
 }
    
+const std::string& IrTraversalContext::sourceAt(int line_num) const
+{
+    
+    if (m_source && line_num > 0 && line_num <= (int)m_source->size())
+    {
+        return m_source->at((size_t)line_num-1);
+    }
+    return m_blank;
+}
+   
+void IrTraversalContext::error(const IrBase* node, const std::string& message) const
+{
+    if (node != nullptr)
+    {
+        std::cerr << node->getFilename() << ":" << node->getLineNumber() << ":" << node->getColumnNumber() << ": error: " << message << std::endl;
+        highlightError(node->getLineNumber(), node->getColumnNumber());
+    }
+}
+   
 void IrTraversalContext::highlightError(int line, int column, int length) const
 {
     const std::string& bad_line = sourceAt(line);

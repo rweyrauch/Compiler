@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #include <iostream>
+#include <sstream>
 #include "IrCommon.h"
 #include "IrForStmt.h"
 #include "IrIdentifier.h"
@@ -82,16 +83,16 @@ bool IrForStatement::analyze(IrTraversalContext* ctx)
     // Initial variable and terminal value expressions must be of type integer.
     if (m_initialValue->getType() != IrType::Integer)
     {
-        std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: for loop initial value expression must be of type integer.  Got: "
-                  << IrTypeToString(m_initialValue->getType()) << std::endl;		
-        ctx->highlightError(getLineNumber(), getColumnNumber());
+        std::stringstream msg;
+        msg << "for loop initial value expression must be of type integer.  Got: " << IrTypeToString(m_initialValue->getType()) << ".";
+        ctx->error(this, msg.str());
         valid = false;
     }
     if (m_terminatingValue->getType() != IrType::Integer)
     {
-        std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: for loop ending value expression must be of type integer.  Got: "
-                  << IrTypeToString(m_terminatingValue->getType()) << std::endl;		
-        ctx->highlightError(getLineNumber(), getColumnNumber());
+        std::stringstream msg;
+        msg << "for loop ending value expression must be of type integer.  Got: " << IrTypeToString(m_terminatingValue->getType()) << ".";
+        ctx->error(this, msg.str());
         valid = false;
     }
 

@@ -93,8 +93,7 @@ bool IrClass::analyze(IrTraversalContext* ctx)
     // Rule: identifier == "Program"
     if (m_identifier->getIdentifier() != "Program")
     {
-        std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: class must be named \'Program\'." << std::endl;
-        ctx->highlightError(getLineNumber(), getColumnNumber());
+        ctx->error(this, "class must be named \'Program\'.");
         valid = false;
     }
     
@@ -110,8 +109,7 @@ bool IrClass::analyze(IrTraversalContext* ctx)
     }
     if (!mainFound)
     {
-        std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: class must contain a method \'main\'." << std::endl;
-        ctx->highlightError(getLineNumber(), getColumnNumber());
+        ctx->error(this, "class must contain a method \'main\'.");
         valid = false;
     }
     

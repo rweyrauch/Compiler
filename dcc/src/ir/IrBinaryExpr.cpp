@@ -92,16 +92,12 @@ bool IrBinaryExpression::analyze(IrTraversalContext* ctx)
     {
         if (m_lhs->getType() != IrType::Integer)
         {
-            std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: lhs of binary expression must be of type integer." << std::endl;
-            ctx->highlightError(getLineNumber(), getColumnNumber());
-            
+            ctx->error(this, "lhs of binary expression must be of type integer.");           
             valid = false;
         }
         if (m_lhs->isArray())
         {
-            std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: lhs of binary expression may not be an array name." << std::endl;
-            ctx->highlightError(getLineNumber(), getColumnNumber());
-            
+            ctx->error(this, "lhs of binary expression may not be an array name.");            
             valid = false;            
         }
     }
@@ -110,16 +106,12 @@ bool IrBinaryExpression::analyze(IrTraversalContext* ctx)
     {
         if (m_rhs->getType() != IrType::Integer)
         {
-            std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: rhs of binary expression must be of type integer." << std::endl;
-            ctx->highlightError(getLineNumber(), getColumnNumber());
-           
+            ctx->error(this, "rhs of binary expression must be of type integer.");          
             valid = false;
         }
         if (m_rhs->isArray())
         {
-            std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: rhs of binary expression may not be an array name." << std::endl;
-            ctx->highlightError(getLineNumber(), getColumnNumber());
-            
+            ctx->error(this, "rhs of binary expression may not be an array name.");
             valid = false;            
         }
     }

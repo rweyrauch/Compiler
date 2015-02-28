@@ -2,13 +2,12 @@
 
 clear
 
-echo "Running IR tests."
+echo "Running IR semantic tests."
 
-
-pushd testdata
+pushd testdata/semantic
 for input in *.dcf
 do
-    ../dcc --target parse > ../out/$input.out $input
+    ../../dcc --target parse > ../../out/$input.out $input
 done
 popd
 

@@ -58,16 +58,9 @@ public:
     bool lookup(IrMethodCall* method, SMethodSymbol& symbol) const;
     
     void setSource(std::vector<std::string> const* source) { m_source = source; }
-    const std::string& sourceAt(int line_num) const
-    {
-        
-        if (m_source && line_num > 0 && line_num <= (int)m_source->size())
-        {
-            return m_source->at((size_t)line_num-1);
-        }
-        return m_blank;
-    }
+    const std::string& sourceAt(int line_num) const;
     
+    void error(const IrBase* node, const std::string& message) const;
     void highlightError(int line, int column, int length = 1) const;
     
 protected:

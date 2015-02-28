@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #include <iostream>
+#include <sstream>
 #include "IrCommon.h"
 #include "IrIfStmt.h"
 #include "IrExpression.h"
@@ -74,9 +75,9 @@ bool IrIfStatement::analyze(IrTraversalContext* ctx)
     // Condition express must be of type boolean.
     if (m_condition->getType() != IrType::Boolean)
     {
-        std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: if conditional expression must be of type boolean.  Got: "
-                << IrTypeToString(m_condition->getType()) << std::endl;
-        ctx->highlightError(getLineNumber(), getColumnNumber());
+        std::stringstream msg;        
+        msg <<  "if conditional expression must be of type boolean.  Got: " << IrTypeToString(m_condition->getType()) << ".";
+        ctx->error(this, msg.str());
         valid = false;
     }
     

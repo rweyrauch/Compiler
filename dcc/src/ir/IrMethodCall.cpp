@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #include <iostream>
+#include <sstream>
 #include "IrCommon.h"
 #include "IrMethodCall.h"
 #include "IrIdentifier.h"
@@ -84,8 +85,9 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
         if (!ctx->lookup(this, symbol))
         {
             // Method not defined
-            std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: method " << getIdentifier()->getIdentifier() << " not defined." << std::endl; 
-            ctx->highlightError(getLineNumber(), getColumnNumber());
+            std::stringstream msg;
+            msg << "method " << getIdentifier()->getIdentifier() << " not defined."; 
+            ctx->error(this, msg.str());
             valid = false;
         }
     }
