@@ -46,7 +46,6 @@
 #include "IrLocation.h"
 #include "IrMethodCall.h"
 #include "IrMethodDecl.h"
-#include "IrPlusAssignStmt.h"
 #include "IrReturnStmt.h"
 #include "IrStatement.h"
 #include "IrStringLiteral.h"

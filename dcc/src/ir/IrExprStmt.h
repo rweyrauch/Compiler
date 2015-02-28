@@ -44,7 +44,8 @@ public:
     virtual void clean(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth); 
     virtual bool analyze(IrTraversalContext* ctx);
-   
+    virtual bool codegen(IrTraversalContext* ctx);
+  
  protected:    
     
     IrExpression* m_expression;

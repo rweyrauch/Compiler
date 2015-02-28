@@ -131,6 +131,27 @@ bool IrClass::analyze(IrTraversalContext* ctx)
     return valid;
 }
 
+bool IrClass::codegen(IrTraversalContext* ctx) 
+{ 
+    ctx->pushSymbols(m_symbols);
+    ctx->pushParent(this);
+    
+    m_identifier->codegen(ctx);
+    for (auto it : m_field_decl_list)
+    {
+        it->codegen(ctx);
+    }
+    for (auto it : m_method_decl_list)
+    {
+        it->codegen(ctx);
+    }
+    
+    ctx->popParent();
+    ctx->popSymbols();
+    
+    return true; 
+}
+
 void IrClass::addFieldDecl(IrFieldDecl* field)
 {
     m_field_decl_list.push_back(field);

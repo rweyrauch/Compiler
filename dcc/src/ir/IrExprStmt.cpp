@@ -62,4 +62,15 @@ bool IrExpressionStatement::analyze(IrTraversalContext* ctx)
     return valid;
 }
 
+bool IrExpressionStatement::codegen(IrTraversalContext* ctx)
+{
+    ctx->pushParent(this);
+
+    if (m_expression) m_expression->codegen(ctx);
+    
+    ctx->popParent();  
+    
+    return true;
+}
+
 } // namespace Decaf

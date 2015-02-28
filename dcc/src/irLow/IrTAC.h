@@ -53,4 +53,11 @@ enum class IrOpcode : int
     NUM_OPCODES
 };
 
+struct IrTacStmt
+{
+    IrOpcode m_opcode;
+    int m_arg0, m_arg1, m_arg2;
+    std::string m_label;
+};
+
 } // namespace Decaf

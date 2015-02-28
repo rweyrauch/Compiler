@@ -113,4 +113,26 @@ bool IrMethodDecl::analyze(IrTraversalContext* ctx)
     return valid;
 }
     
+bool IrMethodDecl::codegen(IrTraversalContext* ctx) 
+{ 
+    std::cout << ".global " << m_identifier->getIdentifier() << std::endl;
+    std::cout << ".text" << std::endl;
+    std::cout << m_identifier->getIdentifier() << ":" << std::endl;
+    
+    ctx->pushSymbols(m_symbols);
+    ctx->pushParent(this);
+    
+    m_identifier->codegen(ctx);
+    for (auto it : m_argument_list)
+    {
+        it->codegen(ctx);
+    }
+    if (m_block) m_block->codegen(ctx);
+    
+    ctx->popParent();
+    ctx->popSymbols();
+    
+    return true; 
+}
+    
 } // namespace Decaf

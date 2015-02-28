@@ -101,4 +101,14 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
     return valid;
 }
 
+bool IrMethodCall::codegen(IrTraversalContext* ctx) 
+{ 
+    std::cout << "mov $message, %rdi" << std::endl;
+    std::cout << "call puts" << std::endl;
+    std::cout << "ret" << std::endl;
+    std::cout << "message:" << std::endl;
+    std::cout << ".asciz \"Hello world.\"" << std::endl;
+    return true; 
+}
+
 } // namespace Decaf

@@ -45,7 +45,14 @@ class Parser: public ParserBase
         }
         virtual ~Parser() {}
         int parse();
-
+        bool codegen()
+        {
+            if (d_root)
+            {
+                return d_root->codegen(d_ctx);
+            }
+            return false;
+        }
         void dumpAST() 
         { 
             if (d_root) 

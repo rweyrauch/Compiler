@@ -100,6 +100,26 @@ bool IrBlock::analyze(IrTraversalContext* ctx)
     return valid;
 }
     
+bool IrBlock::codegen(IrTraversalContext* ctx) 
+{
+    ctx->pushSymbols(m_symbols);
+    ctx->pushParent(this);
+    
+    for (auto it : m_variables)
+    {
+        it->codegen(ctx);
+    }
+    for (auto it : m_statements)
+    {
+        it->codegen(ctx);
+    }
+    
+    ctx->popParent();
+    ctx->popSymbols();
+    
+    return true; 
+}
+    
 void IrBlock::addVariableDecl(IrVariableDecl* var)
 {
     m_variables.push_back(var);

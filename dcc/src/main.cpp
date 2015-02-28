@@ -77,9 +77,11 @@ int main(int argc, char **argv)
         {
             parser = new Parser(std::cin, std::cout);
         }
+        
         parser->parse();        
         parser->semanticChecks();
-        
+        parser->codegen();
+           
         if (g_debug)
             parser->dumpAST();
         

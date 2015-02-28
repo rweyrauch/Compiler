@@ -1,4 +1,6 @@
 // simplest Decaf program
+badd
+
 class Program
 {    
     int x;
