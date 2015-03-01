@@ -21,46 +21,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#include "IrReturnStmt.h"
-#include "IrTravCtx.h"
+#include <iostream>
+#include "IrCommon.h"
+#include "IrStringLiteral.h"
 
 namespace Decaf
 {
-    
-void IrReturnStatement::clean(IrTraversalContext* ctx)
-{
-    ctx->pushParent(this);
-
-    if (m_returnValue) m_returnValue->clean(ctx);
-    
-    ctx->popParent();    
-}
-    
-void IrReturnStatement::print(unsigned int depth)
+   
+void IrStringLiteral::print(unsigned int depth) 
 {
     IRPRINT_INDENT(depth);
-    std::cout << "Return(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
-    if (m_returnValue) m_returnValue->print(depth+1);
+    std::cout << "String(" << getLineNumber() << "," << getColumnNumber() << ") = \"" << getValue() << "\"" << std::endl;
 }
     
-bool IrReturnStatement::analyze(IrTraversalContext* ctx)
+bool IrStringLiteral::codegen(IrTraversalContext* ctx)
 {
-    bool valid = true;
-    
-    ctx->pushParent(this);
-    
-    if (m_returnValue)
-        valid = m_returnValue->analyze(ctx);
-    
-    ctx->popParent();
-    
-    return valid;
-}
-
-bool IrReturnStatement::codegen(IrTraversalContext* ctx)
-{
-    std::cout << "ret" << std::endl;
-    
+    std::cout << ".asciz " << getValue() << std::endl;
     return true;
 }
-} // namespace Decaf
+
+}

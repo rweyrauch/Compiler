@@ -22,13 +22,13 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <iostream>
 #include "IrCommon.h"
 #include "IrLiteral.h"
 
 namespace Decaf
 {
- 
+class IrTraversalContext;
+
 class IrStringLiteral : public IrLiteral
 {
 public:
@@ -40,11 +40,8 @@ public:
     virtual ~IrStringLiteral()
     {}
     
-    virtual void print(unsigned int depth) 
-    {
-        IRPRINT_INDENT(depth);
-        std::cout << "String(" << getLineNumber() << "," << getColumnNumber() << ") = \"" << getValue() << "\"" << std::endl;
-    }
+    virtual void print(unsigned int depth);
+    virtual bool codegen(IrTraversalContext* ctx);
     
     const std::string& getValue() { return m_valueAsString; }
     

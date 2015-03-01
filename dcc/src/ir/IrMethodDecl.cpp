@@ -88,6 +88,7 @@ bool IrMethodDecl::analyze(IrTraversalContext* ctx)
     {
         valid = m_block->analyze(ctx);
     
+        bool returnFound = false;
         // Check return statement(s) types.    
         const size_t numStmts = m_block->getNumStatements();
         for (size_t i = 0; i < numStmts; i++)
@@ -103,6 +104,21 @@ bool IrMethodDecl::analyze(IrTraversalContext* ctx)
                     ctx->error(this, msg.str());
                     valid = false;
                 }
+                returnFound = true;
+            }
+        }
+        
+        if (!returnFound)
+        {
+            if (m_returnType != IrType::Void)
+            {
+                ctx->error(this, "method must have a return statement.");
+                valid = false;
+            }
+            else
+            {
+                // add the implied return statement
+                m_block->addStatement(new IrReturnStatement(m_block->getLineNumber(), m_block->getColumnNumber(), m_block->getFilename()));
             }
         }
     }
