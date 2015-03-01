@@ -32,15 +32,15 @@
 namespace Decaf
 {
 
-void IrMethodCall::clean(IrTraversalContext* ctx)
+void IrMethodCall::propagateTypes(IrTraversalContext* ctx)
 {
     ctx->pushParent(this);
 
-    if (m_identifier) m_identifier->clean(ctx);
-    else if (m_externalFunction) m_externalFunction->clean(ctx);
+    if (m_identifier) m_identifier->propagateTypes(ctx);
+    else if (m_externalFunction) m_externalFunction->propagateTypes(ctx);
     for (auto it : m_arguments)
     {
-        it->clean(ctx);
+        it->propagateTypes(ctx);
     }
     
     // Update type
@@ -49,7 +49,7 @@ void IrMethodCall::clean(IrTraversalContext* ctx)
     {
         setType(symbol.m_type);
     }    
-    
+     
     ctx->popParent();    
 }
     
@@ -103,11 +103,15 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
 
 bool IrMethodCall::codegen(IrTraversalContext* ctx) 
 { 
-    std::cout << "mov $message, %rdi" << std::endl;
-    std::cout << "call puts" << std::endl;
-    std::cout << "ret" << std::endl;
-    std::cout << "message:" << std::endl;
-    std::cout << ".asciz \"Hello world.\"" << std::endl;
+    if (isExternal())
+    {    
+        std::cout << "message:" << std::endl;
+        std::cout << ".asciz \"Hello world.\"" << std::endl;
+       
+        std::cout << "mov $message, %rdi" << std::endl;
+        std::cout << "call " << m_externalFunction->getValue() << std::endl;
+    }
+    
     return true; 
 }
 

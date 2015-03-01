@@ -32,6 +32,9 @@ namespace Decaf
 class IrIdentifier : public IrBase
 {
 public:
+    
+    static IrIdentifier* CreateTemporary();
+    
     IrIdentifier(int lineNumber, int columnNumber, const std::string& filename, const std::string& ident) :
         IrBase(lineNumber, columnNumber, filename),
         m_identifier(ident)
@@ -47,6 +50,8 @@ public:
 protected:
     
     std::string m_identifier;
+    
+    static int s_tempLocationCounter;
     
 private:
     IrIdentifier() = delete;

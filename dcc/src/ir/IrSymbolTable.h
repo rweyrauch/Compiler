@@ -32,6 +32,7 @@ namespace Decaf
 class IrMethodCall;
 class IrMethodDecl;
 class IrLocation;
+class IrIdentifier;
 
 class IrSymbolTable
 {
@@ -46,6 +47,7 @@ public:
     bool addVariable(IrFieldDecl* variable);
     bool addVariable(IrVariableDecl* variables);
     bool addVariable(IrLocation* variable);
+    bool addVariable(IrIdentifier* variable, IrType type);
     
     bool addMethod(IrMethodDecl* method);
     
@@ -53,6 +55,7 @@ public:
     bool exists(IrMethodCall* method) const;
     
     bool getSymbol(IrLocation* variable, SVariableSymbol& symbol) const;
+    bool getSymbol(IrIdentifier* variable, SVariableSymbol& symbol) const;
     bool getSymbol(IrMethodCall* method, SMethodSymbol& symbol) const;
     
     void print(int depth);

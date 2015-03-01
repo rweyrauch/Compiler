@@ -40,19 +40,19 @@ IrClass::~IrClass()
     delete m_symbols;
 }
     
-void IrClass::clean(IrTraversalContext* ctx)
+void IrClass::propagateTypes(IrTraversalContext* ctx)
 {
     ctx->pushSymbols(m_symbols);
     ctx->pushParent(this);
     
-    m_identifier->clean(ctx);
+    m_identifier->propagateTypes(ctx);
     for (auto it : m_field_decl_list)
     {
-        it->clean(ctx);
+        it->propagateTypes(ctx);
     }
     for (auto it : m_method_decl_list)
     {
-        it->clean(ctx);
+        it->propagateTypes(ctx);
     }
     
     ctx->popParent();

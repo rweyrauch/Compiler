@@ -32,13 +32,13 @@
 namespace Decaf
 {
 
-void IrIfStatement::clean(IrTraversalContext* ctx)
+void IrIfStatement::propagateTypes(IrTraversalContext* ctx)
 {
     ctx->pushParent(this);
 
-    m_condition->clean(ctx);
-    if (m_trueBlock) m_trueBlock->clean(ctx);
-    if (m_falseBlock) m_falseBlock->clean(ctx);
+    m_condition->propagateTypes(ctx);
+    if (m_trueBlock) m_trueBlock->propagateTypes(ctx);
+    if (m_falseBlock) m_falseBlock->propagateTypes(ctx);
     
     ctx->popParent();    
 }
@@ -85,5 +85,39 @@ bool IrIfStatement::analyze(IrTraversalContext* ctx)
     
     return valid;
 }
+
+bool IrIfStatement::codegen(IrTraversalContext* ctx)
+{
+    bool valid = true;
     
+    // Template:
+    // <evaluate condition>
+    // jump<oper> <label_true>
+    // <false_body>
+    // jmp <label_end>
+    // label_true:
+    // <true_body>
+    // label_end:
+    
+    ctx->pushParent(this);
+    
+    if (!m_condition->codegen(ctx))
+        valid = false;
+    
+    if (m_trueBlock)
+    {
+        if (!m_trueBlock->codegen(ctx))
+            valid = false;
+    }
+    if (m_falseBlock)
+    {
+        if (!m_falseBlock->codegen(ctx))
+            valid = false;
+    }
+    
+    ctx->popParent();
+    
+    return valid;
+}
+
 } // namespace Decaf

@@ -29,12 +29,12 @@
 
 namespace Decaf
 {
-
-void IrFieldDecl::clean(IrTraversalContext* ctx)
+    
+void IrFieldDecl::propagateTypes(IrTraversalContext* ctx)
 {
     ctx->pushParent(this);
 
-    m_location->clean(ctx);
+    m_location->propagateTypes(ctx);
     
     ctx->popParent();    
 }
@@ -65,4 +65,20 @@ bool IrFieldDecl::analyze(IrTraversalContext* ctx)
     return valid;
 }
     
+bool IrFieldDecl::codegen(IrTraversalContext* ctx)
+{
+    bool valid = false;
+    
+    SVariableSymbol symbol;
+    if (ctx->lookup(m_location, symbol))
+    {
+        // create a global .comm for this field
+        // .comm <ident> <size> <alignment>
+        //std::cout << ".comm " << symbol.m_name << "," << symbol.m_count * sizeof(double) << "," << sizeof(double) << std::endl;
+        valid = true;
+    }
+    
+    return valid;
+}
+
 } // namespace Decaf

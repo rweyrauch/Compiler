@@ -29,11 +29,11 @@
 namespace Decaf
 {
 
-void IrExpressionStatement::clean(IrTraversalContext* ctx)
+void IrExpressionStatement::propagateTypes(IrTraversalContext* ctx)
 {
     ctx->pushParent(this);
 
-    if (m_expression) m_expression->clean(ctx);
+    if (m_expression) m_expression->propagateTypes(ctx);
     
     ctx->popParent();    
 }
@@ -64,13 +64,15 @@ bool IrExpressionStatement::analyze(IrTraversalContext* ctx)
 
 bool IrExpressionStatement::codegen(IrTraversalContext* ctx)
 {
+    bool valid = true;
+    
     ctx->pushParent(this);
 
-    if (m_expression) m_expression->codegen(ctx);
+    if (m_expression) valid = m_expression->codegen(ctx);
     
     ctx->popParent();  
     
-    return true;
+    return valid;
 }
 
 } // namespace Decaf

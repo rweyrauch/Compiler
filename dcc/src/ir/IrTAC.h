@@ -22,19 +22,22 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include <string>
 
 namespace Decaf
 {
-    
+class IrBase;
+
 enum class IrOpcode : int
 {
     NOOP = 0,
+    MOV,        // arg0 -> arg2
     ADD,        // arg0 + arg1 -> arg2
     SUB,        // arg0 - arg1 -> arg2
     MUL,        // arg0 * arg1 -> arg2
     DIV,        // arg0 / arg1 -> arg2
     MOD,        // arg0 % arg1 -> arg2
-    LOAD,       // *[arg0 + arg2] -> arg2
+    LOAD,       // *[arg0 + arg1] -> arg2
     STORE,      // arg0 -> *[arg1 + arg2]
     CALL,       // call arg0
     FBEGIN,     // begin function
@@ -44,8 +47,8 @@ enum class IrOpcode : int
     LESS,       // arg0 < arg1 -> arg2 (0 or 1)
     AND,        // arg0 && arg1 -> arg2 (0 or 1)
     OR,         // arg0 || arg1 -> arg2 (0 or 1)
-    LABEL,      //
-    GOTO,       // jump arg0
+    LABEL,      // arg0:
+    JUMP,       // jump arg0
     IFZ,        // branch arg0 == 0 to arg1
     PUSH,       // push arg0 -> stack
     POP,        // pop stack -> arg0
@@ -53,11 +56,14 @@ enum class IrOpcode : int
     NUM_OPCODES
 };
 
+const std::string& IrOpcodeToString(IrOpcode opcode);
+
 struct IrTacStmt
 {
     IrOpcode m_opcode;
-    int m_arg0, m_arg1, m_arg2;
-    std::string m_label;
+    IrBase* m_arg0, *m_arg1, *m_arg2;
 };
+
+void IrPrintTac(const IrTacStmt& stmt);
 
 } // namespace Decaf

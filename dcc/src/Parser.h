@@ -62,7 +62,7 @@ class Parser: public ParserBase
         { 
             if (d_root) 
             {
-                d_root->clean(d_ctx);
+                d_root->propagateTypes(d_ctx);
                 return d_root->analyze(d_ctx); 
             }
             return false; 

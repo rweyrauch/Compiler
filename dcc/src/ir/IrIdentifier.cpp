@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #include <iostream>
+#include <sstream>
 #include "IrCommon.h"
 #include "IrIdentifier.h"
 #include "IrTravCtx.h"
@@ -29,6 +30,16 @@
 namespace Decaf
 {
 
+int IrIdentifier::s_tempLocationCounter = 0;
+
+IrIdentifier* IrIdentifier::CreateTemporary()
+{
+    std::stringstream tempName;
+    tempName << "__tmp__" << s_tempLocationCounter++;
+    IrIdentifier* tempId = new IrIdentifier(0, 0, "temp", tempName.str());
+    return tempId;
+}
+    
 void IrIdentifier::print(unsigned int depth) 
 {
     IRPRINT_INDENT(depth);

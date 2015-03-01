@@ -23,6 +23,7 @@ add_library(
     IrReturnStmt.cpp
     IrStringLiteral.cpp
     IrSymbolTable.cpp
+    IrTAC.cpp
     IrTravCtx.cpp
     IrVarDecl.cpp
 )

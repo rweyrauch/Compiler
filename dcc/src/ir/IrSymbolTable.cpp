@@ -105,7 +105,7 @@ bool IrSymbolTable::addVariable(IrVariableDecl* variables)
  
 bool IrSymbolTable::addVariable(IrLocation* variable)
 {
-   auto it = m_variables.find(variable->getIdentifier()->getIdentifier());
+    auto it = m_variables.find(variable->getIdentifier()->getIdentifier());
     if (it == m_variables.end())
     {
         SVariableSymbol symbol;
@@ -145,6 +145,26 @@ bool IrSymbolTable::addVariable(IrLocation* variable)
     std::cerr << variable->getFilename() << ":" << variable->getLineNumber() << ":" << variable->getColumnNumber() << ": error: field \'" << variable->getIdentifier()->getIdentifier() << "\' of type " << IrTypeToString(variable->getType()) << " already declared in scope." << std::endl;
     
     return false;    
+}
+ 
+bool IrSymbolTable::addVariable(IrIdentifier* variable, IrType type)
+{
+    auto it = m_variables.find(variable->getIdentifier());
+    if (it == m_variables.end())
+    {
+        SVariableSymbol symbol;
+        symbol.m_name = variable->getIdentifier();
+        symbol.m_type = type;
+        symbol.m_count = 1;
+        m_variables[symbol.m_name] = symbol;
+        
+        return true;
+    }
+    
+    // error - duplicate symbol
+    std::cerr << variable->getFilename() << ":" << variable->getLineNumber() << ":" << variable->getColumnNumber() << ": error: field \'" << variable->getIdentifier() << "\' of type " << IrTypeToString(type) << " already declared in scope." << std::endl;
+    
+    return false;        
 }
  
 bool IrSymbolTable::addMethod(IrMethodDecl* method)
@@ -231,9 +251,14 @@ bool IrSymbolTable::exists(IrMethodCall* method) const
 
 bool IrSymbolTable::getSymbol(IrLocation* variable, SVariableSymbol& symbol) const
 {
+    return getSymbol(variable->getIdentifier(), symbol);
+}
+
+bool IrSymbolTable::getSymbol(IrIdentifier* variable, SVariableSymbol& symbol) const
+{
     bool valid = false;
  
-    auto it = m_variables.find(variable->getIdentifier()->getIdentifier());
+    auto it = m_variables.find(variable->getIdentifier());
     if (it != m_variables.end())
     {
         symbol = it->second;
@@ -241,7 +266,7 @@ bool IrSymbolTable::getSymbol(IrLocation* variable, SVariableSymbol& symbol) con
         valid = true;
     }
     
-    return valid;
+    return valid;    
 }
 
 bool IrSymbolTable::getSymbol(IrMethodCall* method, SMethodSymbol& symbol) const

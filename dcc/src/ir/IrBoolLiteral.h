@@ -49,14 +49,14 @@ public:
         IRPRINT_INDENT(depth);
         std::cout << "Boolean(" << getLineNumber() << "," << getColumnNumber() << ") = " << m_valueAsString << std::endl;        
     }
-    
+  
     bool getValue() const { return m_value; }
     void setValue(bool value) 
     { 
-		m_value = value;
-		if (m_value) m_valueAsString = "true";
-		else m_valueAsString = "false"; 
-	}
+        m_value = value;
+        if (m_value) m_valueAsString = "true";
+        else m_valueAsString = "false"; 
+    }
      
 protected:
     

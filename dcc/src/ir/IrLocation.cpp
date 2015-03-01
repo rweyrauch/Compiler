@@ -34,11 +34,11 @@
 namespace Decaf
 {
 
-void IrLocation::clean(IrTraversalContext* ctx)
+void IrLocation::propagateTypes(IrTraversalContext* ctx)
 {
     ctx->pushParent(this);
 
-    if (m_index) m_index->clean(ctx);
+    if (m_index) m_index->propagateTypes(ctx);
     
     // Update type
     SVariableSymbol symbol;
@@ -137,4 +137,27 @@ bool IrLocation::analyze(IrTraversalContext* ctx)
     return valid;
 }
 
+bool IrLocation::codegen(IrTraversalContext* ctx)
+{
+    bool valid = true;
+    ctx->pushParent(this);
+    
+    if (m_index) 
+    {
+       if (!m_index->codegen(ctx)) valid = false;
+    }
+    
+    if (!m_index)
+    {
+        m_result = m_identifier;
+    }
+    else
+    {
+        m_result = m_index->getResultIdentifier();
+    }
+    ctx->popParent();
+    
+    return valid;
+}
+ 
 } // namespace Decaf

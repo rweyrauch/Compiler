@@ -30,7 +30,7 @@
 namespace Decaf
 {
     
-void IrBreakStatement::clean(IrTraversalContext* ctx)
+void IrBreakStatement::propagateTypes(IrTraversalContext* ctx)
 {
     // nothing to do
 }

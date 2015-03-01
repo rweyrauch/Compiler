@@ -40,19 +40,33 @@ const IrBase* IrTraversalContext::getParent(size_t generation) const
     return nullptr;
 }
 
-bool IrTraversalContext::lookup(IrLocation* location, SVariableSymbol& symbol) const
+bool IrTraversalContext::addTempVariable(IrIdentifier* variable, IrType type)
+{
+    if (!m_symbols.empty())
+    {
+        return m_symbols.front()->addVariable(variable, type);
+    }
+    return false;
+}
+
+bool IrTraversalContext::lookup(IrIdentifier* variable, SVariableSymbol& symbol) const
 {
     bool found = false;
     // TODO: make this a vector with reverse iterator
     for (auto it : m_symbols)
     {
-        if (it->getSymbol(location, symbol))
+        if (it->getSymbol(variable, symbol))
         {
             found = true;
             break;
         }
     }
     return found;
+}
+
+bool IrTraversalContext::lookup(IrLocation* location, SVariableSymbol& symbol) const
+{
+    return lookup(location->getIdentifier(), symbol);
 }
 
 bool IrTraversalContext::lookup(IrMethodCall* method, SMethodSymbol& symbol) const

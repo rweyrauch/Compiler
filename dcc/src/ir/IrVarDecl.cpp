@@ -29,13 +29,13 @@
 namespace Decaf
 {
 
-void IrVariableDecl::clean(IrTraversalContext* ctx)
+void IrVariableDecl::propagateTypes(IrTraversalContext* ctx)
 {
     ctx->pushParent(this);
 
     for (auto it : m_identifiers)
     {
-        it->clean(ctx);
+        it->propagateTypes(ctx);
     }
     
     ctx->popParent();  
@@ -74,13 +74,30 @@ bool IrVariableDecl::analyze(IrTraversalContext* ctx)
     return valid;
 }
  
- IrIdentifier* IrVariableDecl::getVariable(size_t which) const
- {
-     if (which < m_identifiers.size())
-     {
-         return m_identifiers.at(which);
-     }
-     return nullptr;
- }
- 
+IrIdentifier* IrVariableDecl::getVariable(size_t which) const
+{
+    if (which < m_identifiers.size())
+    {
+        return m_identifiers.at(which);
+    }
+    return nullptr;
+}
+
+bool IrVariableDecl::codegen(IrTraversalContext* ctx)
+{
+    bool valid = true;
+    
+    ctx->pushParent(this);
+    
+    for (auto it : m_identifiers)
+    {
+        if (!it->codegen(ctx))
+            valid = false;
+    }
+    
+    ctx->popParent();
+    
+    return valid;
+}
+
 } // namespace Decaf

@@ -33,16 +33,16 @@
 namespace Decaf
 {
 
-void IrForStatement::clean(IrTraversalContext* ctx)
+void IrForStatement::propagateTypes(IrTraversalContext* ctx)
 {
     ctx->pushSymbols(m_symbols);
     ctx->pushParent(this);
     
-    m_loopVariable->clean(ctx);
-    m_initialValue->clean(ctx);
-    m_terminatingValue->clean(ctx);
+    m_loopVariable->propagateTypes(ctx);
+    m_initialValue->propagateTypes(ctx);
+    m_terminatingValue->propagateTypes(ctx);
     
-    if (m_body) m_body->clean(ctx);
+    if (m_body) m_body->propagateTypes(ctx);
     
     ctx->popParent();
     ctx->popSymbols();
@@ -96,6 +96,25 @@ bool IrForStatement::analyze(IrTraversalContext* ctx)
         valid = false;
     }
 
+    ctx->popParent();
+    ctx->popSymbols();
+    
+    return valid;
+}
+  
+bool IrForStatement::codegen(IrTraversalContext* ctx)
+{
+    bool valid = true;
+    
+    ctx->pushSymbols(m_symbols);
+    ctx->pushParent(this);
+    
+    m_loopVariable->codegen(ctx);
+    m_initialValue->codegen(ctx);
+    m_terminatingValue->codegen(ctx);
+    
+    if (m_body) m_body->codegen(ctx);
+    
     ctx->popParent();
     ctx->popSymbols();
     

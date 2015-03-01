@@ -40,6 +40,8 @@ public:
     
     virtual void print(unsigned int depth) = 0;
     
+    const std::string& getValueAsString() const { return m_valueAsString; }
+    
 protected:
     
     std::string m_valueAsString;

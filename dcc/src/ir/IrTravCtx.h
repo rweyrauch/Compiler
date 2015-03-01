@@ -32,6 +32,7 @@ namespace Decaf
 class IrSymbolTable;
 class IrLocation;
 class IrMethodCall;
+class IrIdentifier;
 
 class IrTraversalContext
 {
@@ -53,10 +54,12 @@ public:
     
     size_t getNumParents() const { return m_parents.size(); }
     const IrBase* getParent(size_t generation) const;
-    
+   
+    bool addTempVariable(IrIdentifier* variable, IrType type);
+    bool lookup(IrIdentifier* variable, SVariableSymbol& symbol) const;
     bool lookup(IrLocation* variable, SVariableSymbol& symbol) const;
     bool lookup(IrMethodCall* method, SMethodSymbol& symbol) const;
-    
+   
     void setSource(std::vector<std::string> const* source) { m_source = source; }
     const std::string& sourceAt(int line_num) const;
     

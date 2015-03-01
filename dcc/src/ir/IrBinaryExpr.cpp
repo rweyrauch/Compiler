@@ -24,17 +24,31 @@
 #include <iostream>
 #include "IrCommon.h"
 #include "IrBinaryExpr.h"
+#include "IrLiteral.h"
 #include "IrTravCtx.h"
 
 namespace Decaf
 {
+static const IrOpcode g_binaryOpcodes[(int)IrBinaryOperator::NUM_IR_BINARY_OPERATORS] =
+{
+    IrOpcode::ADD,
+    IrOpcode::SUB,
+    IrOpcode::MUL,
+    IrOpcode::DIV,
+    IrOpcode::MOD
+};
 
-void IrBinaryExpression::clean(IrTraversalContext* ctx)
+static IrOpcode opcodeFor(IrBinaryOperator binop)
+{
+    return g_binaryOpcodes[(int)binop];
+}
+
+void IrBinaryExpression::propagateTypes(IrTraversalContext* ctx)
 {
     ctx->pushParent(this);
 
-    if (m_lhs) m_lhs->clean(ctx);
-    if (m_rhs) m_rhs->clean(ctx);
+    if (m_lhs) m_lhs->propagateTypes(ctx);
+    if (m_rhs) m_rhs->propagateTypes(ctx);
     
     if (getType() == IrType::Unknown)
     {
@@ -116,6 +130,70 @@ bool IrBinaryExpression::analyze(IrTraversalContext* ctx)
         }
     }
     
+    ctx->popParent();
+    
+    return valid;
+}
+
+bool IrBinaryExpression::codegen(IrTraversalContext* ctx)
+{ 
+    bool valid = true;
+    
+    ctx->pushParent(this);
+    
+    if (m_lhs) 
+    {
+        valid = m_lhs->codegen(ctx);
+    }
+    if (m_rhs) 
+    {
+        valid = m_rhs->codegen(ctx);
+    }
+    
+    if (valid)
+    {
+        // allocate a temporary variable for the result of this expression
+        m_result = IrIdentifier::CreateTemporary();
+        if (!ctx->addTempVariable(m_result, m_type))
+        {
+            ctx->error(m_result, "Internal compiler error.  Failed to add temporary variable to symbol table.");
+            valid = false;
+        }
+        
+        // TAC:
+        // tempResult = lhs operator rhs
+        m_tac.m_opcode = opcodeFor(m_operator);
+        m_tac.m_arg0 = nullptr;
+        m_tac.m_arg1 = nullptr;
+        m_tac.m_arg2 = nullptr;
+        if (m_lhs != nullptr)
+        {
+            IrLiteral* literal = dynamic_cast<IrLiteral*>(m_lhs);
+            if (literal)
+            {
+                m_tac.m_arg0 = m_lhs;
+            }
+            else
+            {
+                m_tac.m_arg0 = m_lhs->getResultIdentifier();
+            }
+        }
+        if (m_rhs != nullptr)
+        {
+            IrLiteral* literal = dynamic_cast<IrLiteral*>(m_rhs);
+            if (literal)
+            {
+                m_tac.m_arg1 = m_rhs;
+            }
+            else
+            {
+                m_tac.m_arg1 = m_rhs->getResultIdentifier();
+            }
+        }       
+        m_tac.m_arg2 = getResultIdentifier();
+        
+        IrPrintTac(m_tac);
+    }
     ctx->popParent();
     
     return valid;

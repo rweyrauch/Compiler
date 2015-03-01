@@ -27,11 +27,11 @@
 namespace Decaf
 {
     
-void IrReturnStatement::clean(IrTraversalContext* ctx)
+void IrReturnStatement::propagateTypes(IrTraversalContext* ctx)
 {
     ctx->pushParent(this);
 
-    if (m_returnValue) m_returnValue->clean(ctx);
+    if (m_returnValue) m_returnValue->propagateTypes(ctx);
     
     ctx->popParent();    
 }

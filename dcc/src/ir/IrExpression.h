@@ -24,17 +24,20 @@
 #pragma once
 #include "IrCommon.h"
 #include "IrBase.h"
+#include "IrTAC.h"
+#include "IrIdentifier.h"
 
 namespace Decaf
 {
-    
+
 class IrExpression : public IrBase
 {
 public:
     IrExpression(int lineNumber, int columnNumber, const std::string& filename, IrType type) :
         IrBase(lineNumber, columnNumber, filename),
         m_type(type),
-        m_isArray(false)
+        m_isArray(false),
+        m_result(nullptr)
     {}
     
     virtual ~IrExpression()
@@ -46,10 +49,15 @@ public:
     IrType getType() const { return m_type; }
     bool isArray() const { return m_isArray; }
     
+    IrIdentifier* getResultIdentifier() const { return m_result; }
+    
 protected:
     
     IrType m_type;
     bool m_isArray;
+    
+    IrIdentifier* m_result;
+    IrTacStmt m_tac;
     
 private:
     IrExpression() = delete;

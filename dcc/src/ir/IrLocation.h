@@ -31,6 +31,7 @@ class IrIdentifier;
 class IrLocation : public IrExpression
 {
 public:
+    
     IrLocation(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType type) :
         IrExpression(lineNumber, columnNumber, filename, type),
         m_identifier(ident),
@@ -48,9 +49,10 @@ public:
     virtual ~IrLocation()
     {}
     
-    virtual void clean(IrTraversalContext* ctx); 
+    virtual void propagateTypes(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth);
     virtual bool analyze(IrTraversalContext* ctx);
+    virtual bool codegen(IrTraversalContext* ctx);
     
     void setAsDeclaration() { m_asDeclaration = true; }
     bool usedAsDeclaration() const { return m_asDeclaration; }

@@ -41,18 +41,18 @@ namespace Decaf
     delete m_symbols;
 }
 
-void IrBlock::clean(IrTraversalContext* ctx)
+void IrBlock::propagateTypes(IrTraversalContext* ctx)
 {
     ctx->pushSymbols(m_symbols);
     ctx->pushParent(this);
     
     for (auto it : m_variables)
     {
-        it->clean(ctx);
+        it->propagateTypes(ctx);
     }
     for (auto it : m_statements)
     {
-        it->clean(ctx);
+        it->propagateTypes(ctx);
     }
     
     ctx->popParent();
@@ -102,22 +102,23 @@ bool IrBlock::analyze(IrTraversalContext* ctx)
     
 bool IrBlock::codegen(IrTraversalContext* ctx) 
 {
+    bool valid = true;
     ctx->pushSymbols(m_symbols);
     ctx->pushParent(this);
     
     for (auto it : m_variables)
     {
-        it->codegen(ctx);
+        if (!it->codegen(ctx)) valid = false;
     }
     for (auto it : m_statements)
     {
-        it->codegen(ctx);
+        if (!it->codegen(ctx)) valid = false;
     }
     
     ctx->popParent();
     ctx->popSymbols();
     
-    return true; 
+    return valid; 
 }
     
 void IrBlock::addVariableDecl(IrVariableDecl* var)

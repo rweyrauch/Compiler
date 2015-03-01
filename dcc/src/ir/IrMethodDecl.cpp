@@ -33,17 +33,17 @@
 namespace Decaf
 {
 
-void IrMethodDecl::clean(IrTraversalContext* ctx)
+void IrMethodDecl::propagateTypes(IrTraversalContext* ctx)
 {
     ctx->pushSymbols(m_symbols);
     ctx->pushParent(this);
     
-    m_identifier->clean(ctx);
+    m_identifier->propagateTypes(ctx);
     for (auto it : m_argument_list)
     {
-        it->clean(ctx);
+        it->propagateTypes(ctx);
     }
-    if (m_block) m_block->clean(ctx);
+    if (m_block) m_block->propagateTypes(ctx);
     
     ctx->popParent();
     ctx->popSymbols();

@@ -45,7 +45,7 @@ public:
     
     virtual ~IrBlock();
      
-    virtual void clean(IrTraversalContext* ctx); 
+    virtual void propagateTypes(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth);
     virtual bool analyze(IrTraversalContext* ctx);
     virtual bool codegen(IrTraversalContext* ctx);

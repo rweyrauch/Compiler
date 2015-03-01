@@ -42,7 +42,7 @@ public:
     virtual ~IrBase() 
     {}
     
-    virtual void clean(IrTraversalContext* ctx) {}
+    virtual void propagateTypes(IrTraversalContext* ctx) {}
     virtual void print(unsigned int depth) = 0;
     virtual bool analyze(IrTraversalContext* ctx) { return true; }
     virtual bool codegen(IrTraversalContext* ctx) { return true; }
