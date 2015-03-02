@@ -25,6 +25,7 @@
 #include "IrCommon.h"
 #include "IrBooleanExpr.h"
 #include "IrLiteral.h"
+#include "IrIdentifier.h"
 #include "IrTravCtx.h"
 
 namespace Decaf
@@ -196,9 +197,6 @@ bool IrBooleanExpression::codegen(IrTraversalContext* ctx)
         // TAC:
         // tempResult = lhs operator rhs
         m_tac.m_opcode = opcodeFor(m_operator);
-        m_tac.m_arg0 = nullptr;
-        m_tac.m_arg1 = nullptr;
-        m_tac.m_arg2 = nullptr;
         if (m_lhs != nullptr)
         {
             IrLiteral* literal = dynamic_cast<IrLiteral*>(m_lhs);

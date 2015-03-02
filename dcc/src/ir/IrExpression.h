@@ -22,13 +22,14 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include <vector>
 #include "IrCommon.h"
 #include "IrBase.h"
 #include "IrTAC.h"
-#include "IrIdentifier.h"
 
 namespace Decaf
 {
+class IrIdentifier;
 
 class IrExpression : public IrBase
 {

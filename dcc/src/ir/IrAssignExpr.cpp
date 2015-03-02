@@ -180,33 +180,12 @@ bool IrAssignExpression::codegen(IrTraversalContext* ctx)
     }
     
     if (valid)
-    {
-        // allocate a temporary variable for the result of this expression
-        m_result = IrIdentifier::CreateTemporary();
-        if (!ctx->addTempVariable(m_result, m_type))
-        {
-            ctx->error(m_result, "Internal compiler error.  Failed to add temporary variable to symbol table.");
-            valid = false;
-        }
-        
+    {             
         // TAC:
-        // tempResult = lhs operator rhs
+        // MOV rhs lhs ||
+        // ADD rhs lhs lhs ||
+        // SUB rhs lhs lhs
         m_tac.m_opcode = opcodeFor(m_operator);
-        m_tac.m_arg0 = nullptr;
-        m_tac.m_arg1 = nullptr;
-        m_tac.m_arg2 = nullptr;
-        if (m_lhs != nullptr)
-        {
-            IrLiteral* literal = dynamic_cast<IrLiteral*>(m_lhs);
-            if (literal)
-            {
-                m_tac.m_arg2 = m_lhs;
-            }
-            else
-            {
-                m_tac.m_arg2 = m_lhs->getResultIdentifier();
-            }
-        }
         if (m_rhs != nullptr)
         {
             IrLiteral* literal = dynamic_cast<IrLiteral*>(m_rhs);
@@ -219,8 +198,25 @@ bool IrAssignExpression::codegen(IrTraversalContext* ctx)
                 m_tac.m_arg0 = m_rhs->getResultIdentifier();
             }
         }       
-        
-        IrPrintTac(m_tac);
+        if (m_lhs != nullptr)
+        {
+            IrLiteral* literal = dynamic_cast<IrLiteral*>(m_lhs);
+            if (literal)
+            {
+                m_tac.m_arg2 = m_lhs;
+            }
+            else
+            {
+                m_tac.m_arg2 = m_lhs->getResultIdentifier();
+            }
+            
+            if (m_operator != IrAssignmentOperator::Assign)
+            {
+                m_tac.m_arg1 = m_tac.m_arg2;
+            }
+        }
+    
+        IrPrintTac(m_tac);      
     }
     ctx->popParent();
     

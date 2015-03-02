@@ -42,7 +42,7 @@ enum class IrOpcode : int
     CALL,       // call arg0
     FBEGIN,     // begin function
     FEND,       // end function
-    RETURN,     // return
+    RETURN,     // return |arg0|
     EQUAL,      // arg0 == arg1 -> arg2 (0 or 1)
     LESS,       // arg0 < arg1 -> arg2 (0 or 1)
     AND,        // arg0 && arg1 -> arg2 (0 or 1)
@@ -60,6 +60,13 @@ const std::string& IrOpcodeToString(IrOpcode opcode);
 
 struct IrTacStmt
 {
+    IrTacStmt() :
+        m_opcode(IrOpcode::NOOP),
+        m_arg0(nullptr),
+        m_arg1(nullptr),
+        m_arg2(nullptr) 
+    {}
+        
     IrOpcode m_opcode;
     IrBase* m_arg0, *m_arg1, *m_arg2;
 };

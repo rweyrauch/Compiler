@@ -131,19 +131,27 @@ bool IrMethodDecl::analyze(IrTraversalContext* ctx)
     
 bool IrMethodDecl::codegen(IrTraversalContext* ctx) 
 { 
-    std::cout << ".global " << m_identifier->getIdentifier() << std::endl;
-    std::cout << ".text" << std::endl;
-    std::cout << m_identifier->getIdentifier() << ":" << std::endl;
-    
     ctx->pushSymbols(m_symbols);
     ctx->pushParent(this);
-    
+
     m_identifier->codegen(ctx);
+    
+    m_beginTac.m_opcode = IrOpcode::FBEGIN;
+    m_beginTac.m_arg0 = m_identifier;
+    
+    IrPrintTac(m_beginTac);
+    
     for (auto it : m_argument_list)
     {
         it->codegen(ctx);
     }
+    
     if (m_block) m_block->codegen(ctx);
+
+    m_endTac.m_opcode = IrOpcode::FEND;
+    m_endTac.m_arg0 = m_identifier;
+ 
+    IrPrintTac(m_endTac);
     
     ctx->popParent();
     ctx->popSymbols();

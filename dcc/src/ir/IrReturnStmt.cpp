@@ -22,6 +22,8 @@
 // THE SOFTWARE.
 //
 #include "IrReturnStmt.h"
+#include "IrLiteral.h"
+#include "IrIdentifier.h"
 #include "IrTravCtx.h"
 
 namespace Decaf
@@ -59,8 +61,35 @@ bool IrReturnStatement::analyze(IrTraversalContext* ctx)
 
 bool IrReturnStatement::codegen(IrTraversalContext* ctx)
 {
-    std::cout << "ret" << std::endl;
+    bool valid = true;
+
+    ctx->pushParent(this);
     
-    return true;
+    m_tac.m_opcode = IrOpcode::RETURN;
+    m_tac.m_arg0 = nullptr;
+    m_tac.m_arg1 = nullptr;
+    m_tac.m_arg2 = nullptr;
+    
+    if (m_returnValue)
+    {
+        valid = m_returnValue->codegen(ctx);
+        
+        IrLiteral* literal = dynamic_cast<IrLiteral*>(m_returnValue);
+        if (literal)
+        {
+            m_tac.m_arg0 = m_returnValue;
+        }
+        else
+        {
+            m_tac.m_arg0 = m_returnValue->getResultIdentifier();
+        }
+    }
+    
+    IrPrintTac(m_tac);
+    
+    ctx->popParent();
+    
+    return valid;
 }
+
 } // namespace Decaf
