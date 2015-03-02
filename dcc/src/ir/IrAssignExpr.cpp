@@ -200,11 +200,11 @@ bool IrAssignExpression::codegen(IrTraversalContext* ctx)
             IrLiteral* literal = dynamic_cast<IrLiteral*>(m_lhs);
             if (literal)
             {
-                m_tac.m_arg0 = m_lhs;
+                m_tac.m_arg2 = m_lhs;
             }
             else
             {
-                m_tac.m_arg0 = m_lhs->getResultIdentifier();
+                m_tac.m_arg2 = m_lhs->getResultIdentifier();
             }
         }
         if (m_rhs != nullptr)
@@ -212,14 +212,13 @@ bool IrAssignExpression::codegen(IrTraversalContext* ctx)
             IrLiteral* literal = dynamic_cast<IrLiteral*>(m_rhs);
             if (literal)
             {
-                m_tac.m_arg1 = m_rhs;
+                m_tac.m_arg0 = m_rhs;
             }
             else
             {
-                m_tac.m_arg1 = m_rhs->getResultIdentifier();
+                m_tac.m_arg0 = m_rhs->getResultIdentifier();
             }
         }       
-        m_tac.m_arg2 = getResultIdentifier();
         
         IrPrintTac(m_tac);
     }

@@ -35,11 +35,19 @@ int IrIdentifier::s_tempLocationCounter = 0;
 IrIdentifier* IrIdentifier::CreateTemporary()
 {
     std::stringstream tempName;
-    tempName << "__tmp__" << s_tempLocationCounter++;
+    tempName << ".LC" << s_tempLocationCounter++;
     IrIdentifier* tempId = new IrIdentifier(0, 0, "temp", tempName.str());
     return tempId;
 }
-    
+
+IrIdentifier* IrIdentifier::CreateLabel()
+{
+    std::stringstream tempName;
+    tempName << ".L" << s_tempLocationCounter++;
+    IrIdentifier* tempId = new IrIdentifier(0, 0, "label", tempName.str());
+    return tempId;
+}
+
 void IrIdentifier::print(unsigned int depth) 
 {
     IRPRINT_INDENT(depth);
