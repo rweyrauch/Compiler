@@ -26,6 +26,7 @@
 #include <vector>
 #include "IrCommon.h"
 #include "IrBase.h"
+#include "IrTAC.h"
 
 namespace Decaf
 {
@@ -66,6 +67,12 @@ public:
     void error(const IrBase* node, const std::string& message) const;
     void highlightError(int line, int column, int length = 1) const;
     
+    void append(const IrTacStmt& stmt)
+    {
+        IrPrintTac(stmt);
+        m_statements.push_back(stmt);
+    }
+    
 protected:
     
     std::list<IrSymbolTable*> m_symbols;
@@ -73,6 +80,8 @@ protected:
     
     std::vector<std::string> const* m_source;
     std::string m_blank;
+    
+    std::vector<IrTacStmt> m_statements;
 };
 
 } // namespace Decaf

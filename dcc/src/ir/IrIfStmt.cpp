@@ -27,11 +27,22 @@
 #include "IrIfStmt.h"
 #include "IrExpression.h"
 #include "IrBlock.h"
+#include "IrBoolLiteral.h"
 #include "IrTravCtx.h"
 
 namespace Decaf
 {
 
+IrIfStatement::~IrIfStatement()
+{
+    delete m_condition;
+    delete m_trueBlock;
+    delete m_falseBlock;
+    
+    delete m_labelTrue;
+    delete m_labelEnd;
+}
+    
 void IrIfStatement::propagateTypes(IrTraversalContext* ctx)
 {
     ctx->pushParent(this);
@@ -104,17 +115,58 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
     if (!m_condition->codegen(ctx))
         valid = false;
     
-    if (m_trueBlock)
+    delete m_labelTrue;
+    m_labelTrue = IrIdentifier::CreateLabel();
+    
+    delete m_labelEnd;
+    m_labelEnd = IrIdentifier::CreateLabel();
+    
+    IrTacStmt tac;
+    tac.m_opcode = IrOpcode::IFZ;
+    IrBooleanLiteral* literal = dynamic_cast<IrBooleanLiteral*>(m_condition);
+    if (literal)
     {
-        if (!m_trueBlock->codegen(ctx))
-            valid = false;
+        tac.m_arg0 = m_condition;
     }
+    else
+    {
+        tac.m_arg0 = m_condition->getResultIdentifier();
+    }
+    tac.m_arg1 = m_labelTrue;
+    tac.m_arg2 = nullptr;
+    
+    ctx->append(tac);
+    
     if (m_falseBlock)
     {
         if (!m_falseBlock->codegen(ctx))
             valid = false;
+        
+        IrTacStmt jump;
+        jump.m_opcode = IrOpcode::JUMP;
+        jump.m_arg0 = m_labelEnd;
+        
+        ctx->append(jump);
     }
     
+    if (m_trueBlock)
+    {
+        IrTacStmt label;
+        label.m_opcode = IrOpcode::LABEL;
+        label.m_arg0 = m_labelTrue;
+        
+        ctx->append(label);
+        
+        if (!m_trueBlock->codegen(ctx))
+            valid = false;
+    }
+
+    IrTacStmt elabel;
+    elabel.m_opcode = IrOpcode::LABEL;
+    elabel.m_arg0 = m_labelEnd;
+    
+    ctx->append(elabel);
+
     ctx->popParent();
     
     return valid;

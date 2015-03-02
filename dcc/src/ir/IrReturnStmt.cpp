@@ -65,10 +65,8 @@ bool IrReturnStatement::codegen(IrTraversalContext* ctx)
 
     ctx->pushParent(this);
     
-    m_tac.m_opcode = IrOpcode::RETURN;
-    m_tac.m_arg0 = nullptr;
-    m_tac.m_arg1 = nullptr;
-    m_tac.m_arg2 = nullptr;
+    IrTacStmt tac;
+    tac.m_opcode = IrOpcode::RETURN;
     
     if (m_returnValue)
     {
@@ -77,15 +75,15 @@ bool IrReturnStatement::codegen(IrTraversalContext* ctx)
         IrLiteral* literal = dynamic_cast<IrLiteral*>(m_returnValue);
         if (literal)
         {
-            m_tac.m_arg0 = m_returnValue;
+            tac.m_arg0 = m_returnValue;
         }
         else
         {
-            m_tac.m_arg0 = m_returnValue->getResultIdentifier();
+            tac.m_arg0 = m_returnValue->getResultIdentifier();
         }
     }
     
-    IrPrintTac(m_tac);
+    ctx->append(tac);
     
     ctx->popParent();
     

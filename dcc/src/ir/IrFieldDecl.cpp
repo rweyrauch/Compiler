@@ -64,21 +64,5 @@ bool IrFieldDecl::analyze(IrTraversalContext* ctx)
     
     return valid;
 }
-    
-bool IrFieldDecl::codegen(IrTraversalContext* ctx)
-{
-    bool valid = false;
-    
-    SVariableSymbol symbol;
-    if (ctx->lookup(m_location, symbol))
-    {
-        // create a global .comm for this field
-        // .comm <ident> <size> <alignment>
-        //std::cout << ".comm " << symbol.m_name << "," << symbol.m_count * sizeof(double) << "," << sizeof(double) << std::endl;
-        valid = true;
-    }
-    
-    return valid;
-}
 
 } // namespace Decaf

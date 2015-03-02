@@ -44,7 +44,9 @@ public:
         m_initialValue(initialExpr),
         m_terminatingValue(endExpr),
         m_body(block),
-        m_symbols(nullptr)
+        m_symbols(nullptr),
+        m_labelTop(nullptr),
+        m_labelEnd(nullptr)
     {
         m_loopAutoLocation = new IrLocation(m_loopVariable->getLineNumber(), m_loopVariable->getColumnNumber(), filename, loopVar, IrType::Integer);
         
@@ -52,10 +54,7 @@ public:
         m_symbols->addVariable(m_loopAutoLocation);
     }
     
-    virtual ~IrForStatement()
-    {
-        delete m_symbols;
-    }
+    virtual ~IrForStatement();
     
     virtual void propagateTypes(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth);
@@ -70,6 +69,9 @@ protected:
     IrExpression* m_terminatingValue;
     IrBlock* m_body;
     IrSymbolTable* m_symbols;
+    
+    IrIdentifier* m_labelTop;
+    IrIdentifier* m_labelEnd;
     
 private:
     IrForStatement() = delete;

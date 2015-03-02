@@ -58,7 +58,6 @@ public:
 protected:    
     
     IrExpression* m_returnValue;
-    IrTacStmt m_tac;
     
 private:
     IrReturnStatement() = delete;

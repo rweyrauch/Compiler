@@ -27,12 +27,26 @@
 #include "IrForStmt.h"
 #include "IrIdentifier.h"
 #include "IrExpression.h"
+#include "IrIntLiteral.h"
 #include "IrBlock.h"
 #include "IrTravCtx.h"
 
 namespace Decaf
 {
 
+IrForStatement::~IrForStatement()
+{
+    delete m_loopVariable;
+    delete m_loopAutoLocation;
+    delete m_initialValue;
+    delete m_terminatingValue;
+    delete m_body;
+    delete m_symbols;
+    
+    delete m_labelTop;
+    delete m_labelEnd;    
+}
+    
 void IrForStatement::propagateTypes(IrTraversalContext* ctx)
 {
     ctx->pushSymbols(m_symbols);
@@ -106,12 +120,62 @@ bool IrForStatement::codegen(IrTraversalContext* ctx)
 {
     bool valid = true;
     
+    // Template:
+    // init_var = <evaluate initial value>
+    // loop_var = <evaluate terminating value>
+    // label_top:
+    // temp = loop_var - init_var;
+    // ifz temp <label_end>
+    // <body>
+    // decr loop_var
+    // jmp <label_top>
+    // label_end:
+    
+    delete m_labelTop;
+    m_labelTop = IrIdentifier::CreateLabel();
+    
+    delete m_labelEnd;
+    m_labelEnd = IrIdentifier::CreateLabel();
+    
     ctx->pushSymbols(m_symbols);
     ctx->pushParent(this);
     
     m_loopVariable->codegen(ctx);
     m_initialValue->codegen(ctx);
+    
+    /*
+    IrTacStmt initLoop;
+    initLoop.m_opcode = IrOpcode::MOV;
+    IrIntegerLiteral* literal = dynamic_cast<IrIntegerLiteral*>(m_initialValue);
+    if (literal)
+    {
+        initLoop.m_arg0 = m_initialValue;
+    }
+    else
+    {
+        initLoop.m_arg0 = m_initialValue->getResultIdentifier();
+    }
+    ctx->append(initLoop);
+    */
     m_terminatingValue->codegen(ctx);
+    
+    /*
+    IrTacStmt termLoop;
+    termLoop.m_opcode = IrOpcode::IFZ;
+    literal = dynamic_cast<IrIntegerLiteral*>(m_terminatingValue);
+    if (literal)
+    {
+        termLoop.m_arg0 = m_terminatingValue;
+    }
+    else
+    {
+        termLoop.m_arg0 = m_terminatingValue->getResultIdentifier();
+    }
+    termLoop.m_arg1 = m_labelEnd;
+    termLoop.m_arg2 = nullptr;
+    
+    ctx->append(termLoop);
+    */
     
     if (m_body) m_body->codegen(ctx);
     

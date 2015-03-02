@@ -196,17 +196,18 @@ bool IrBooleanExpression::codegen(IrTraversalContext* ctx)
         
         // TAC:
         // tempResult = lhs operator rhs
-        m_tac.m_opcode = opcodeFor(m_operator);
+        IrTacStmt tac;
+        tac.m_opcode = opcodeFor(m_operator);
         if (m_lhs != nullptr)
         {
             IrLiteral* literal = dynamic_cast<IrLiteral*>(m_lhs);
             if (literal)
             {
-                m_tac.m_arg0 = m_lhs;
+                tac.m_arg0 = m_lhs;
             }
             else
             {
-                m_tac.m_arg0 = m_lhs->getResultIdentifier();
+                tac.m_arg0 = m_lhs->getResultIdentifier();
             }
         }
         if (m_rhs != nullptr)
@@ -214,16 +215,16 @@ bool IrBooleanExpression::codegen(IrTraversalContext* ctx)
             IrLiteral* literal = dynamic_cast<IrLiteral*>(m_rhs);
             if (literal)
             {
-                m_tac.m_arg1 = m_rhs;
+                tac.m_arg1 = m_rhs;
             }
             else
             {
-                m_tac.m_arg1 = m_rhs->getResultIdentifier();
+                tac.m_arg1 = m_rhs->getResultIdentifier();
             }
         }       
-        m_tac.m_arg2 = getResultIdentifier();
+        tac.m_arg2 = getResultIdentifier();
         
-        IrPrintTac(m_tac);
+        ctx->append(tac);
     }
     ctx->popParent();
     

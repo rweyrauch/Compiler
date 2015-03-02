@@ -185,17 +185,18 @@ bool IrAssignExpression::codegen(IrTraversalContext* ctx)
         // MOV rhs lhs ||
         // ADD rhs lhs lhs ||
         // SUB rhs lhs lhs
-        m_tac.m_opcode = opcodeFor(m_operator);
+        IrTacStmt tac;
+        tac.m_opcode = opcodeFor(m_operator);
         if (m_rhs != nullptr)
         {
             IrLiteral* literal = dynamic_cast<IrLiteral*>(m_rhs);
             if (literal)
             {
-                m_tac.m_arg0 = m_rhs;
+                tac.m_arg0 = m_rhs;
             }
             else
             {
-                m_tac.m_arg0 = m_rhs->getResultIdentifier();
+                tac.m_arg0 = m_rhs->getResultIdentifier();
             }
         }       
         if (m_lhs != nullptr)
@@ -203,20 +204,19 @@ bool IrAssignExpression::codegen(IrTraversalContext* ctx)
             IrLiteral* literal = dynamic_cast<IrLiteral*>(m_lhs);
             if (literal)
             {
-                m_tac.m_arg2 = m_lhs;
+                tac.m_arg2 = m_lhs;
             }
             else
             {
-                m_tac.m_arg2 = m_lhs->getResultIdentifier();
+                tac.m_arg2 = m_lhs->getResultIdentifier();
             }
             
             if (m_operator != IrAssignmentOperator::Assign)
             {
-                m_tac.m_arg1 = m_tac.m_arg2;
+                tac.m_arg1 = tac.m_arg2;
             }
         }
-    
-        IrPrintTac(m_tac);      
+        ctx->append(tac);
     }
     ctx->popParent();
     

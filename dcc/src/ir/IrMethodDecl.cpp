@@ -136,10 +136,11 @@ bool IrMethodDecl::codegen(IrTraversalContext* ctx)
 
     m_identifier->codegen(ctx);
     
-    m_beginTac.m_opcode = IrOpcode::FBEGIN;
-    m_beginTac.m_arg0 = m_identifier;
+    IrTacStmt beginTac;
+    beginTac.m_opcode = IrOpcode::FBEGIN;
+    beginTac.m_arg0 = m_identifier;
     
-    IrPrintTac(m_beginTac);
+    ctx->append(beginTac);
     
     for (auto it : m_argument_list)
     {
@@ -148,10 +149,11 @@ bool IrMethodDecl::codegen(IrTraversalContext* ctx)
     
     if (m_block) m_block->codegen(ctx);
 
-    m_endTac.m_opcode = IrOpcode::FEND;
-    m_endTac.m_arg0 = m_identifier;
+    IrTacStmt endTac;
+    endTac.m_opcode = IrOpcode::FEND;
+    endTac.m_arg0 = m_identifier;
  
-    IrPrintTac(m_endTac);
+    ctx->append(endTac);
     
     ctx->popParent();
     ctx->popSymbols();

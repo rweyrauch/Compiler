@@ -79,9 +79,7 @@ protected:
     std::vector<IrVariableDecl*> m_argument_list;
     IrBlock* m_block;
     IrSymbolTable* m_symbols;
-    
-    IrTacStmt m_beginTac, m_endTac;
-
+ 
 private:
     IrMethodDecl() = delete;
     IrMethodDecl(const IrMethodDecl& rhs) = delete;

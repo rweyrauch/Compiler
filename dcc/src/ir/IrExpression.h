@@ -25,7 +25,6 @@
 #include <vector>
 #include "IrCommon.h"
 #include "IrBase.h"
-#include "IrTAC.h"
 
 namespace Decaf
 {
@@ -58,7 +57,6 @@ protected:
     bool m_isArray;
     
     IrIdentifier* m_result;
-    IrTacStmt m_tac;
     
 private:
     IrExpression() = delete;

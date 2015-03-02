@@ -30,6 +30,7 @@ namespace Decaf
 {
 class IrExpression;
 class IrBlock;
+class IrIdentifier;
 
 class IrIfStatement : public IrStatement
 {
@@ -38,11 +39,12 @@ public:
         IrStatement(lineNumber, columnNumber, filename),
         m_condition(condition),
         m_trueBlock(trueBlock),
-        m_falseBlock(falseBlock)
+        m_falseBlock(falseBlock),
+        m_labelTrue(nullptr),
+        m_labelEnd(nullptr)
     {}
     
-    virtual ~IrIfStatement()
-    {}
+    virtual ~IrIfStatement();
     
     virtual void propagateTypes(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth);
@@ -54,6 +56,9 @@ protected:
     IrExpression* m_condition;
     IrBlock* m_trueBlock;
     IrBlock* m_falseBlock;
+    
+    IrIdentifier* m_labelTrue;
+    IrIdentifier* m_labelEnd;
     
 private:
     IrIfStatement() = delete;
