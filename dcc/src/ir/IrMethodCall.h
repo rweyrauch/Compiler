@@ -38,14 +38,16 @@ public:
         IrExpression(lineNumber, columnNumber, filename, type),
         m_identifier(ident),
         m_externalFunction(0),
-        m_arguments()
+        m_arguments(),
+        m_externFuncId(nullptr)
     {}
 
     IrMethodCall(int lineNumber, int columnNumber, const std::string& filename, IrStringLiteral* ident, IrType type) :
         IrExpression(lineNumber, columnNumber, filename, type),
         m_identifier(0),
         m_externalFunction(ident),
-        m_arguments()
+        m_arguments(),
+        m_externFuncId(nullptr)
     {}
     
     virtual ~IrMethodCall()
@@ -71,6 +73,8 @@ protected:
     IrIdentifier* m_identifier;
     IrStringLiteral* m_externalFunction;
     std::vector<IrExpression*> m_arguments;
+    
+    IrIdentifier* m_externFuncId;
     
 private:
     IrMethodCall() = delete;

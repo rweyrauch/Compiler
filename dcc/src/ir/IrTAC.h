@@ -52,6 +52,7 @@ enum class IrOpcode : int
     IFZ,        // branch arg0 == 0 to arg1
     PUSH,       // push arg0 -> stack
     POP,        // pop stack -> arg0
+    STRING,     // string label -> arg0 value -> arg1
     
     NUM_OPCODES
 };

@@ -43,7 +43,7 @@ public:
     virtual void print(unsigned int depth);
     virtual bool codegen(IrTraversalContext* ctx);
     
-    const std::string& getValue() { return m_valueAsString; }
+    const std::string& getValue() const { return m_valueAsString; }
     
 private:
     IrStringLiteral() = delete;

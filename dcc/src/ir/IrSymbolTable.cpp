@@ -288,14 +288,14 @@ bool IrSymbolTable::getSymbol(IrMethodCall* method, SMethodSymbol& symbol) const
 
 size_t IrSymbolTable::getAllocationSize() const
 {
-	size_t totalSize = 0;
-	
+    size_t totalSize = 0;
+
     for (auto it = m_variables.cbegin(); it != m_variables.cend(); ++it)
-	{
-		totalSize += it->second.m_count * 8; // for now all types (int/boolean) are 8-bytes
-	}
-	
-	return totalSize;
+    {
+        totalSize += it->second.m_count * 8; // for now all types (int/boolean) are 8-bytes
+    }
+
+    return totalSize;
 }
 
 void IrSymbolTable::print(int depth)
@@ -317,5 +317,5 @@ void IrSymbolTable::print(int depth)
     IRPRINT_INDENT(depth);
     std::cout << "Allocated Size: " << getAllocationSize() << std::endl;
 }
- 
+
 } // namespace Decaf

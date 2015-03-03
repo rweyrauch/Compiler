@@ -27,6 +27,7 @@
 #include "IrSymbolTable.h"
 #include "IrIdentifier.h"
 #include "IrMethodCall.h"
+#include "IrStringLiteral.h"
 
 namespace Decaf
 {
@@ -84,6 +85,29 @@ bool IrTraversalContext::lookup(IrMethodCall* method, SMethodSymbol& symbol) con
     return found;
 }
    
+bool IrTraversalContext::addString(IrIdentifier* identifier, IrStringLiteral* value)
+{
+    bool ok = true;
+    if (!m_symbols.empty())
+    {   
+        auto it = m_strings.find(identifier->getIdentifier());
+        if (it == m_strings.end())
+        {
+            SStringSymbol symbol;
+            symbol.m_name = identifier;
+            symbol.m_value = value;
+            m_strings[identifier->getIdentifier()] = symbol;
+        }
+        else
+        {
+            // Error - duplicate
+            std::cerr << identifier->getFilename() << ":" << identifier->getLineNumber() << ":" << identifier->getColumnNumber() << ": error: string \'" << identifier->getIdentifier() << "\' already declared in scope." << std::endl;                
+            ok = false;
+        }
+    }
+    return ok;    
+}
+   
 const std::string& IrTraversalContext::sourceAt(int line_num) const
 {
     
@@ -113,6 +137,19 @@ void IrTraversalContext::highlightError(int line, int column, int length) const
         for (int i = 0; i < length; i++) std::cerr << "^";
         std::cerr << std::endl;
     }    
+}
+  
+void IrTraversalContext::genStrings()
+{
+    for (auto it = m_strings.cbegin(); it != m_strings.cend(); ++it)
+    {
+        IrTacStmt tac;
+        tac.m_opcode = IrOpcode::STRING;
+        tac.m_arg0 = it->second.m_name;
+        tac.m_arg1 = it->second.m_value;
+        
+        append(tac);
+    }
 }
   
 } // namespace Decaf

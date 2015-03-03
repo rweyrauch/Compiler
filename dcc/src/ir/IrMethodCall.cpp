@@ -105,11 +105,32 @@ bool IrMethodCall::codegen(IrTraversalContext* ctx)
 { 
     if (isExternal())
     {    
-        std::cout << "message:" << std::endl;
-        std::cout << ".asciz \"Hello world.\"" << std::endl;
-       
-        std::cout << "mov $message, %rdi" << std::endl;
-        std::cout << "call " << m_externalFunction->getValue() << std::endl;
+        m_externFuncId = IrIdentifier::CreateLabel();
+        ctx->addString(m_externFuncId, m_externalFunction);
+        
+        for (auto it : m_arguments)
+        {
+            it->codegen(ctx);
+            
+            IrTacStmt tac;
+            tac.m_opcode = IrOpcode::PUSH;
+            
+            IrLiteral* literal = dynamic_cast<IrLiteral*>(it);
+            if (literal)
+            {
+                tac.m_arg0 = it;
+            }
+            else
+            {
+                tac.m_arg0 = it->getResultIdentifier();
+            }
+            ctx->append(tac);
+        }
+        
+        IrTacStmt callStmt;
+        callStmt.m_opcode = IrOpcode::CALL;
+        callStmt.m_arg0 = m_externFuncId;
+        ctx->append(callStmt);
     }
     
     return true; 

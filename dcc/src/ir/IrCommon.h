@@ -27,7 +27,9 @@
 
 namespace Decaf
 {
-    
+class IrIdentifier;
+class IrStringLiteral;
+
 enum class IrType : int
 {
     Unknown = 0,
@@ -96,6 +98,12 @@ struct SMethodSymbol
     std::string m_name;
     IrType m_type;
     std::vector<SVariableSymbol> m_arguments;
+};
+
+struct SStringSymbol
+{
+    IrIdentifier* m_name;
+    IrStringLiteral* m_value;
 };
 
 } // namespace Decaf

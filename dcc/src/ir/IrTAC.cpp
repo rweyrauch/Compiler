@@ -26,6 +26,7 @@
 #include "IrIdentifier.h"
 #include "IrIntLiteral.h"
 #include "IrBoolLiteral.h"
+#include "IrStringLiteral.h"
 
 namespace Decaf
 {
@@ -53,7 +54,8 @@ const std::string gIrOpcodeStrings[(int)IrOpcode::NUM_OPCODES] =
     "JUMP",
     "IFZ",
     "PUSH",
-    "POP"
+    "POP",
+    "STRING"
 };
 static_assert(sizeof(gIrOpcodeStrings)/sizeof(std::string) == (size_t)IrOpcode::NUM_OPCODES, "Unexpected number of IrOpcode strings.");
 
@@ -69,6 +71,8 @@ void IrPrintTacArg(const IrBase* arg)
     const IrIdentifier* ident = dynamic_cast<const IrIdentifier*>(arg);
     const IrIntegerLiteral* iliteral = dynamic_cast<const IrIntegerLiteral*>(arg);
     const IrBooleanLiteral* bliteral = dynamic_cast<const IrBooleanLiteral*>(arg);
+    const IrStringLiteral* sliteral = dynamic_cast<const IrStringLiteral*>(arg);
+    
     if (ident != nullptr)
     {
         std::cout << ident->getIdentifier() << " ";
@@ -80,7 +84,11 @@ void IrPrintTacArg(const IrBase* arg)
     else if (bliteral != nullptr)
     {
         std::cout << (bliteral->getValue() ? "$1" : "$0") << " ";
-    }    
+    }
+    else if (sliteral != nullptr)
+    {
+        std::cout << sliteral->getValue() << " ";
+    }
 }
 
 void IrPrintTac(const IrTacStmt& stmt)

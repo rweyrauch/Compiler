@@ -24,6 +24,7 @@
 #pragma once
 #include <list>
 #include <vector>
+#include <map>
 #include "IrCommon.h"
 #include "IrBase.h"
 #include "IrTAC.h"
@@ -60,7 +61,8 @@ public:
     bool lookup(IrIdentifier* variable, SVariableSymbol& symbol) const;
     bool lookup(IrLocation* variable, SVariableSymbol& symbol) const;
     bool lookup(IrMethodCall* method, SMethodSymbol& symbol) const;
-   
+    bool addString(IrIdentifier* identifier, IrStringLiteral* value);
+    
     void setSource(std::vector<std::string> const* source) { m_source = source; }
     const std::string& sourceAt(int line_num) const;
     
@@ -73,6 +75,8 @@ public:
         m_statements.push_back(stmt);
     }
     
+    void genStrings();
+    
 protected:
     
     std::list<IrSymbolTable*> m_symbols;
@@ -82,6 +86,8 @@ protected:
     std::string m_blank;
     
     std::vector<IrTacStmt> m_statements;
+    
+    std::map<std::string, SStringSymbol> m_strings;  
 };
 
 } // namespace Decaf

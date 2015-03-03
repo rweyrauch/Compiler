@@ -67,7 +67,6 @@ protected:
     std::map<std::string, SVariableSymbol> m_variables;
     
     std::map<std::string, SMethodSymbol> m_methods;
-    
 };
     
 } // namespace Decaf

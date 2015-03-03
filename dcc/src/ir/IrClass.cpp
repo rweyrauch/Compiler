@@ -149,6 +149,9 @@ bool IrClass::codegen(IrTraversalContext* ctx)
     ctx->popParent();
     ctx->popSymbols();
     
+    // write string table
+    ctx->genStrings();
+    
     return true; 
 }
 
