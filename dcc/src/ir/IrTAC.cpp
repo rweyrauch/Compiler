@@ -75,7 +75,7 @@ void IrPrintTacArg(const IrBase* arg)
     }
     else if (iliteral != nullptr)
     {
-        std::cout << "$" << iliteral->getValueAsString() << " ";
+        std::cout << "$" << iliteral->getValue() << " ";
     }
     else if (bliteral != nullptr)
     {

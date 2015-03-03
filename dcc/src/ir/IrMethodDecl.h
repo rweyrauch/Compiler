@@ -32,6 +32,7 @@ namespace Decaf
 {
 class IrVariableDecl;
 class IrBlock;
+class IrIntegerLiteral;
 
 class IrMethodDecl : public IrBase
 {
@@ -42,16 +43,14 @@ public:
         m_returnType(returnType),
         m_argument_list(),
         m_block(nullptr),
-        m_symbols(nullptr)
+        m_symbols(nullptr),
+        m_stackSize(nullptr)
     {
         m_symbols = new IrSymbolTable();
     }
     
-    virtual ~IrMethodDecl()
-    {
-        delete m_symbols;
-    }
-    
+    virtual ~IrMethodDecl();
+     
     virtual void propagateTypes(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth);
     virtual bool analyze(IrTraversalContext* ctx);
@@ -80,6 +79,8 @@ protected:
     IrBlock* m_block;
     IrSymbolTable* m_symbols;
  
+	IrIntegerLiteral* m_stackSize;
+	
 private:
     IrMethodDecl() = delete;
     IrMethodDecl(const IrMethodDecl& rhs) = delete;

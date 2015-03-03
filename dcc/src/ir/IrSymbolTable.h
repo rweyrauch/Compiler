@@ -58,6 +58,8 @@ public:
     bool getSymbol(IrIdentifier* variable, SVariableSymbol& symbol) const;
     bool getSymbol(IrMethodCall* method, SMethodSymbol& symbol) const;
     
+    size_t getAllocationSize() const;
+    
     void print(int depth);
     
 protected:
