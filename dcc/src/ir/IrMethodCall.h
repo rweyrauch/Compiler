@@ -29,7 +29,6 @@
 namespace Decaf
 {
 class IrIdentifier;
-class IrStringLiteral;
 
 class IrMethodCall : public IrExpression
 {
@@ -37,21 +36,14 @@ public:
     IrMethodCall(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType type) :
         IrExpression(lineNumber, columnNumber, filename, type),
         m_identifier(ident),
-        m_externalFunction(0),
-        m_arguments(),
-        m_externFuncId(nullptr)
+        m_externFuncName(nullptr),
+        m_externalFunction(false),
+        m_arguments()
     {}
 
-    IrMethodCall(int lineNumber, int columnNumber, const std::string& filename, IrStringLiteral* ident, IrType type) :
-        IrExpression(lineNumber, columnNumber, filename, type),
-        m_identifier(0),
-        m_externalFunction(ident),
-        m_arguments(),
-        m_externFuncId(nullptr)
-    {}
+    IrMethodCall(int lineNumber, int columnNumber, const std::string& filename, IrStringLiteral* name, IrType type);
     
-    virtual ~IrMethodCall()
-    {}
+    virtual ~IrMethodCall();
     
     virtual void propagateTypes(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth);
@@ -63,7 +55,7 @@ public:
         m_arguments.push_back(arg);
     }
     
-    bool isExternal() const { return (m_externalFunction != nullptr); }
+    bool isExternal() const { return m_externalFunction; }
     const IrIdentifier* getIdentifier() const { return m_identifier; }
     size_t getNumArguments() const { return m_arguments.size(); }
     IrType getArgumentType(size_t which) const { return m_arguments.at(which)->getType(); }
@@ -71,10 +63,9 @@ public:
 protected:    
     
     IrIdentifier* m_identifier;
-    IrStringLiteral* m_externalFunction;
+    IrStringLiteral* m_externFuncName;
+    bool m_externalFunction;
     std::vector<IrExpression*> m_arguments;
-    
-    IrIdentifier* m_externFuncId;
     
 private:
     IrMethodCall() = delete;

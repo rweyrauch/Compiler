@@ -102,4 +102,90 @@ void IrPrintTac(const IrTacStmt& stmt)
     std::cout << std::endl;
 }
 
+void IrOutputArg(const IrBase* arg)
+{
+    IrPrintTacArg(arg);
+}
+
+void IrTacGenCode(const IrTacStmt& stmt)
+{    
+    switch(stmt.m_opcode)
+    {
+    case IrOpcode::MOV:        // arg0 -> arg2
+        break;
+        
+    case IrOpcode::ADD:        // arg0 + arg1 -> arg2
+        break;
+        
+    case IrOpcode::SUB:        // arg0 - arg1 -> arg2
+        break;
+        
+    case IrOpcode::MUL:        // arg0 * arg1 -> arg2
+        break;
+        
+    case IrOpcode::DIV:        // arg0 / arg1 -> arg2
+        break;
+        
+    case IrOpcode::MOD:        // arg0 % arg1 -> arg2
+        break;
+        
+    case IrOpcode::LOAD:       // *[arg0 + arg1] -> arg2
+        break;
+        
+    case IrOpcode::STORE:      // arg0 -> *[arg1 + arg2]
+        break;
+        
+    case IrOpcode::CALL:       // call arg0
+        std::cout << "call ";
+        IrOutputArg(stmt.m_arg0);
+        std::cout << std::endl;
+        break;
+        
+    case IrOpcode::FBEGIN:     // begin function
+        break;
+        
+    case IrOpcode::FEND:       // end function
+        break;
+        
+    case IrOpcode::RETURN:     // return |arg0|
+        break;
+        
+    case IrOpcode::EQUAL:      // arg0 == arg1 -> arg2 (0 or 1)
+        break;
+        
+    case IrOpcode::LESS:       // arg0 < arg1 -> arg2 (0 or 1)
+        break;
+        
+    case IrOpcode::AND:        // arg0 && arg1 -> arg2 (0 or 1)
+        break;
+        
+    case IrOpcode::OR:         // arg0 || arg1 -> arg2 (0 or 1)
+        break;
+        
+    case IrOpcode::LABEL:      // arg0:
+        IrOutputArg(stmt.m_arg0);
+        std::cout << ":" << std::endl;
+        break;
+        
+    case IrOpcode::JUMP:       // jump arg0
+        break;
+        
+    case IrOpcode::IFZ:        // branch arg0 == 0 to arg1
+        break;
+        
+    case IrOpcode::PUSH:       // push arg0 -> stack
+        break;
+        
+    case IrOpcode::POP:        // pop stack -> arg0
+        break;
+        
+    case IrOpcode::STRING:     // string label -> arg0 value -> arg1
+        break;
+        
+    default:
+        break;
+    }
+    
+}
+
 } // namespace Decaf

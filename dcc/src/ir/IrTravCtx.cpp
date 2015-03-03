@@ -139,6 +139,14 @@ void IrTraversalContext::highlightError(int line, int column, int length) const
     }    
 }
   
+void IrTraversalContext::codegen()
+{
+    for (auto it : m_statements)
+    {
+        IrTacGenCode(it);
+    }
+}
+  
 void IrTraversalContext::genStrings()
 {
     for (auto it = m_strings.cbegin(); it != m_strings.cend(); ++it)

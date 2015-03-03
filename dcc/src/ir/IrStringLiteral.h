@@ -28,12 +28,14 @@
 namespace Decaf
 {
 class IrTraversalContext;
+class IrIdentifier;
 
 class IrStringLiteral : public IrLiteral
 {
 public:
     IrStringLiteral(int lineNumber, int columnNumber, const std::string& filename, const std::string& value) :
-        IrLiteral(lineNumber, columnNumber, filename, IrType::String, value)
+        IrLiteral(lineNumber, columnNumber, filename, IrType::String, value),
+        m_label(nullptr)
     {
     }
     
@@ -44,6 +46,10 @@ public:
     virtual bool codegen(IrTraversalContext* ctx);
     
     const std::string& getValue() const { return m_valueAsString; }
+    IrIdentifier* getIdentifier() const { return m_label; }
+    
+protected:
+    IrIdentifier* m_label;
     
 private:
     IrStringLiteral() = delete;

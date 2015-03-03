@@ -74,4 +74,6 @@ struct IrTacStmt
 
 void IrPrintTac(const IrTacStmt& stmt);
 
+void IrTacGenCode(const IrTacStmt& stmt);
+
 } // namespace Decaf

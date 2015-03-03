@@ -24,6 +24,8 @@
 #include <iostream>
 #include "IrCommon.h"
 #include "IrStringLiteral.h"
+#include "IrIdentifier.h"
+#include "IrTravCtx.h"
 
 namespace Decaf
 {
@@ -36,7 +38,10 @@ void IrStringLiteral::print(unsigned int depth)
     
 bool IrStringLiteral::codegen(IrTraversalContext* ctx)
 {
-    std::cout << ".asciz " << getValue() << std::endl;
+    delete m_label;
+    m_label = IrIdentifier::CreateLabel();
+    ctx->addString(m_label, this);
+    
     return true;
 }
 

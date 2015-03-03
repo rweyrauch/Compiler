@@ -32,12 +32,33 @@
 namespace Decaf
 {
 
+IrMethodCall::IrMethodCall(int lineNumber, int columnNumber, const std::string& filename, IrStringLiteral* name, IrType type) :
+    IrExpression(lineNumber, columnNumber, filename, type),
+    m_identifier(nullptr),
+    m_externFuncName(name),
+    m_externalFunction(true),
+    m_arguments()
+{
+    // strip quotes from literal
+    std::string funcName = name->getValue().substr(1, name->getValue().size()-2);   
+    m_identifier = new IrIdentifier(lineNumber, columnNumber, filename, funcName);
+}
+ 
+IrMethodCall::~IrMethodCall()
+{
+    delete m_identifier;
+    delete m_externFuncName;
+    for (auto it : m_arguments)
+    {
+        delete it;
+    }
+}
+  
 void IrMethodCall::propagateTypes(IrTraversalContext* ctx)
 {
     ctx->pushParent(this);
 
-    if (m_identifier) m_identifier->propagateTypes(ctx);
-    else if (m_externalFunction) m_externalFunction->propagateTypes(ctx);
+    m_identifier->propagateTypes(ctx);
     for (auto it : m_arguments)
     {
         it->propagateTypes(ctx);
@@ -59,10 +80,9 @@ void IrMethodCall::print(unsigned int depth)
     std::cout << "Method Call(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
     
     IRPRINT_INDENT(depth+1);
-    std::cout << "Type = " << IrTypeToString(m_type) << std::endl;
+    std::cout << "Type = " << IrTypeToString(m_type) << " External = " << (isExternal() ? "true" : "false") << std::endl;
     
-    if (m_identifier) m_identifier->print(depth+1);
-    else if (m_externalFunction) m_externalFunction->print(depth+1);
+    m_identifier->print(depth+1);
     
     IRPRINT_INDENT(depth+1);
     std::cout << "Arguments: " << std::endl;
@@ -93,7 +113,6 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
     }
     else
     {
-        // 
     }
     
     ctx->popParent();
@@ -104,10 +123,7 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
 bool IrMethodCall::codegen(IrTraversalContext* ctx) 
 { 
     if (isExternal())
-    {    
-        m_externFuncId = IrIdentifier::CreateLabel();
-        ctx->addString(m_externFuncId, m_externalFunction);
-        
+    {            
         for (auto it : m_arguments)
         {
             it->codegen(ctx);
@@ -115,8 +131,13 @@ bool IrMethodCall::codegen(IrTraversalContext* ctx)
             IrTacStmt tac;
             tac.m_opcode = IrOpcode::PUSH;
             
+            IrStringLiteral* sliteral = dynamic_cast<IrStringLiteral*>(it);
             IrLiteral* literal = dynamic_cast<IrLiteral*>(it);
-            if (literal)
+            if (sliteral)
+            {
+                tac.m_arg0 = sliteral->getIdentifier();
+            }
+            else if (literal)
             {
                 tac.m_arg0 = it;
             }
@@ -129,7 +150,7 @@ bool IrMethodCall::codegen(IrTraversalContext* ctx)
         
         IrTacStmt callStmt;
         callStmt.m_opcode = IrOpcode::CALL;
-        callStmt.m_arg0 = m_externFuncId;
+        callStmt.m_arg0 = m_identifier;
         ctx->append(callStmt);
     }
     

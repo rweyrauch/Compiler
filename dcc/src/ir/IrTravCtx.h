@@ -74,6 +74,7 @@ public:
         IrPrintTac(stmt);
         m_statements.push_back(stmt);
     }
+    void codegen();
     
     void genStrings();
     
