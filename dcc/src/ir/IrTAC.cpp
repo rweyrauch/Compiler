@@ -75,19 +75,19 @@ void IrPrintTacArg(const IrBase* arg)
     
     if (ident != nullptr)
     {
-        std::cout << ident->getIdentifier() << " ";
+        std::cout << ident->getIdentifier();
     }
     else if (iliteral != nullptr)
     {
-        std::cout << "$" << iliteral->getValue() << " ";
+        std::cout << "$" << iliteral->getValue();
     }
     else if (bliteral != nullptr)
     {
-        std::cout << (bliteral->getValue() ? "$1" : "$0") << " ";
+        std::cout << (bliteral->getValue() ? "$1" : "$0");
     }
     else if (sliteral != nullptr)
     {
-        std::cout << sliteral->getValue() << " ";
+        std::cout << sliteral->getValue();
     }
 }
 
@@ -95,9 +95,9 @@ void IrPrintTac(const IrTacStmt& stmt)
 {
     std::cout << IrOpcodeToString(stmt.m_opcode) << " ";
     
-    IrPrintTacArg(stmt.m_arg0);
-    IrPrintTacArg(stmt.m_arg1);
-    IrPrintTacArg(stmt.m_arg2);
+    IrPrintTacArg(stmt.m_arg0); std::cout << " ";
+    IrPrintTacArg(stmt.m_arg1); std::cout << " ";
+    IrPrintTacArg(stmt.m_arg2); std::cout << " ";
     
     std::cout << std::endl;
 }
@@ -142,12 +142,20 @@ void IrTacGenCode(const IrTacStmt& stmt)
         break;
         
     case IrOpcode::FBEGIN:     // begin function
+        std::cout << ".global ";
+        IrOutputArg(stmt.m_arg0);
+        std::cout << std::endl;
+        IrOutputArg(stmt.m_arg0);
+        std::cout << ":" << std::endl; 
+        //std::cout << "enter " << std::endl;
         break;
         
     case IrOpcode::FEND:       // end function
+        std::cout << "leave" << std::endl;
         break;
         
     case IrOpcode::RETURN:     // return |arg0|
+        std::cout << "ret" << std::endl;
         break;
         
     case IrOpcode::EQUAL:      // arg0 == arg1 -> arg2 (0 or 1)
@@ -174,12 +182,21 @@ void IrTacGenCode(const IrTacStmt& stmt)
         break;
         
     case IrOpcode::PUSH:       // push arg0 -> stack
+        std::cout << "movq ";
+        std::cout << "$";
+        IrOutputArg(stmt.m_arg0);
+        std::cout << ", %rdi" << std::endl;
         break;
         
     case IrOpcode::POP:        // pop stack -> arg0
         break;
         
     case IrOpcode::STRING:     // string label -> arg0 value -> arg1
+        IrOutputArg(stmt.m_arg0);
+        std::cout << ":" << std::endl;
+        std::cout << ".string ";
+        IrOutputArg(stmt.m_arg1);
+        std::cout << std::endl;
         break;
         
     default:

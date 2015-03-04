@@ -149,11 +149,11 @@ bool IrClass::codegen(IrTraversalContext* ctx)
     ctx->popParent();
     ctx->popSymbols();
     
-    // convert TAC into x86_64 assembly
-    ctx->codegen();
-    
     // write string table
     ctx->genStrings();
+    
+    // convert TAC into x86_64 assembly
+    ctx->codegen();
     
     return true; 
 }

@@ -141,6 +141,7 @@ void IrTraversalContext::highlightError(int line, int column, int length) const
   
 void IrTraversalContext::codegen()
 {
+    std::cout << ".text" << std::endl;
     for (auto it : m_statements)
     {
         IrTacGenCode(it);

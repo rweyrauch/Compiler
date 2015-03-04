@@ -71,7 +71,7 @@ public:
     
     void append(const IrTacStmt& stmt)
     {
-        IrPrintTac(stmt);
+        //IrPrintTac(stmt);
         m_statements.push_back(stmt);
     }
     void codegen();
