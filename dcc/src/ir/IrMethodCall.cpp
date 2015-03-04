@@ -123,13 +123,14 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
 bool IrMethodCall::codegen(IrTraversalContext* ctx) 
 { 
     if (isExternal())
-    {            
+    {        
+		int argCount = 0;    
         for (auto it : m_arguments)
         {
             it->codegen(ctx);
             
             IrTacStmt tac;
-            tac.m_opcode = IrOpcode::PUSH;
+            tac.m_opcode = IrOpcode::PARAM;
             
             IrStringLiteral* sliteral = dynamic_cast<IrStringLiteral*>(it);
             IrLiteral* literal = dynamic_cast<IrLiteral*>(it);
@@ -145,6 +146,7 @@ bool IrMethodCall::codegen(IrTraversalContext* ctx)
             {
                 tac.m_arg0 = it->getResultIdentifier();
             }
+            tac.m_info = argCount++;
             ctx->append(tac);
         }
         

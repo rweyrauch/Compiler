@@ -50,8 +50,7 @@ enum class IrOpcode : int
     LABEL,      // arg0:
     JUMP,       // jump arg0
     IFZ,        // branch arg0 == 0 to arg1
-    PUSH,       // push arg0 -> stack
-    POP,        // pop stack -> arg0
+    PARAM,      // function call param, arg0 => ident info => argument number
     STRING,     // string label -> arg0 value -> arg1
     
     NUM_OPCODES
@@ -65,15 +64,18 @@ struct IrTacStmt
         m_opcode(IrOpcode::NOOP),
         m_arg0(nullptr),
         m_arg1(nullptr),
-        m_arg2(nullptr) 
+        m_arg2(nullptr),
+        m_info(0)
     {}
         
     IrOpcode m_opcode;
     IrBase* m_arg0, *m_arg1, *m_arg2;
+    int m_info;
 };
 
 void IrPrintTac(const IrTacStmt& stmt);
 
+void IrTacInitCall();
 void IrTacGenCode(const IrTacStmt& stmt);
 
 } // namespace Decaf

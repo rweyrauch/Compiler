@@ -53,8 +53,7 @@ const std::string gIrOpcodeStrings[(int)IrOpcode::NUM_OPCODES] =
     "LABEL",
     "JUMP",
     "IFZ",
-    "PUSH",
-    "POP",
+    "PARAM",
     "STRING"
 };
 static_assert(sizeof(gIrOpcodeStrings)/sizeof(std::string) == (size_t)IrOpcode::NUM_OPCODES, "Unexpected number of IrOpcode strings.");
@@ -99,13 +98,24 @@ void IrPrintTac(const IrTacStmt& stmt)
     IrPrintTacArg(stmt.m_arg1); std::cout << " ";
     IrPrintTacArg(stmt.m_arg2); std::cout << " ";
     
-    std::cout << std::endl;
+    std::cout << stmt.m_info << std::endl;
 }
 
 void IrOutputArg(const IrBase* arg)
 {
     IrPrintTacArg(arg);
 }
+
+const int NUM_ARG_REGS = 6;
+const std::string gArgumentRegisters[NUM_ARG_REGS] =
+{
+	"%rdi",
+	"%rsi",
+	"%rdx",
+	"%rcx",
+	"%r8",
+	"%r9"
+};
 
 void IrTacGenCode(const IrTacStmt& stmt)
 {    
@@ -147,7 +157,7 @@ void IrTacGenCode(const IrTacStmt& stmt)
         std::cout << std::endl;
         IrOutputArg(stmt.m_arg0);
         std::cout << ":" << std::endl; 
-        //std::cout << "enter " << std::endl;
+        std::cout << "enter $" << stmt.m_info << ", $0" << std::endl;
         break;
         
     case IrOpcode::FEND:       // end function
@@ -181,14 +191,18 @@ void IrTacGenCode(const IrTacStmt& stmt)
     case IrOpcode::IFZ:        // branch arg0 == 0 to arg1
         break;
         
-    case IrOpcode::PUSH:       // push arg0 -> stack
+    case IrOpcode::PARAM:       // push arg0 -> stack
         std::cout << "movq ";
         std::cout << "$";
         IrOutputArg(stmt.m_arg0);
-        std::cout << ", %rdi" << std::endl;
-        break;
-        
-    case IrOpcode::POP:        // pop stack -> arg0
+        if (stmt.m_info < NUM_ARG_REGS)
+        {
+			std::cout << ", " << gArgumentRegisters[stmt.m_info] << std::endl;
+		}
+		else
+		{
+			std::cout << "*** OUT OF REGISTERS ****" << std::endl;
+		}
         break;
         
     case IrOpcode::STRING:     // string label -> arg0 value -> arg1

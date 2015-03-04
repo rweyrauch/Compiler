@@ -43,8 +43,7 @@ public:
         m_returnType(returnType),
         m_argument_list(),
         m_block(nullptr),
-        m_symbols(nullptr),
-        m_stackSize(nullptr)
+        m_symbols(nullptr)
     {
         m_symbols = new IrSymbolTable();
     }
@@ -78,9 +77,7 @@ protected:
     std::vector<IrVariableDecl*> m_argument_list;
     IrBlock* m_block;
     IrSymbolTable* m_symbols;
- 
-	IrIntegerLiteral* m_stackSize;
-	
+ 	
 private:
     IrMethodDecl() = delete;
     IrMethodDecl(const IrMethodDecl& rhs) = delete;

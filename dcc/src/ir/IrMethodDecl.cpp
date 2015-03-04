@@ -43,7 +43,6 @@ IrMethodDecl::~IrMethodDecl()
 		delete it;
 	}
 	delete m_block;
-	delete m_stackSize;
 }
  
 void IrMethodDecl::propagateTypes(IrTraversalContext* ctx)
@@ -152,14 +151,11 @@ bool IrMethodDecl::codegen(IrTraversalContext* ctx)
     // determine the stack storage requirements for the argument and body
     size_t stackSize = m_symbols->getAllocationSize();
     if (m_block) stackSize += m_block->getSymbols()->getAllocationSize();
-    delete m_stackSize;
-    m_stackSize = new IrIntegerLiteral(0, 0, "stack", "0");
-    m_stackSize->setValue((int)stackSize);
     
     IrTacStmt beginTac;
     beginTac.m_opcode = IrOpcode::FBEGIN;
     beginTac.m_arg0 = m_identifier;
-    beginTac.m_arg1 = m_stackSize;
+    beginTac.m_info = (int)stackSize;
     
     ctx->append(beginTac);
     
