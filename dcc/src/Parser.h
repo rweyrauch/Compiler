@@ -49,7 +49,13 @@ class Parser: public ParserBase
         {
             if (d_root)
             {
-                return d_root->codegen(d_ctx);
+                d_root->codegen(d_ctx);
+                    
+                // write string table
+                d_ctx->genStrings();
+    
+                // convert TAC into x86_64 assembly
+                d_ctx->codegen(d_scanner.outStream());
             }
             return false;
         }

@@ -28,6 +28,8 @@ class Scanner : public ScannerBase
         
         void setSLoc(ParserBase::LTYPE__ *location) { m_loc = location; }
         
+        std::ostream   &outStream() { return out(); }
+        
     protected:
     
         int m_current_column;

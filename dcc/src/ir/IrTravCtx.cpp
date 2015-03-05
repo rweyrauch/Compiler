@@ -143,12 +143,12 @@ void IrTraversalContext::highlightError(int line, int column, int length) const
     }    
 }
   
-void IrTraversalContext::codegen()
+void IrTraversalContext::codegen(std::ostream& stream)
 {
-    std::cout << ".text" << std::endl;
+    stream << ".text" << std::endl;
     for (auto it : m_statements)
     {
-        IrTacGenCode(it);
+        IrTacGenCode(it, stream);
     }
 }
   

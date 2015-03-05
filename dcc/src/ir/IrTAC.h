@@ -23,6 +23,7 @@
 //
 #pragma once
 #include <string>
+#include <iostream>
 
 namespace Decaf
 {
@@ -75,7 +76,6 @@ struct IrTacStmt
 
 void IrPrintTac(const IrTacStmt& stmt);
 
-void IrTacInitCall();
-void IrTacGenCode(const IrTacStmt& stmt);
+void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream = std::cout);
 
 } // namespace Decaf

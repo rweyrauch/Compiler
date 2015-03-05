@@ -25,6 +25,7 @@
 #include <list>
 #include <vector>
 #include <map>
+#include <iostream>
 #include "IrCommon.h"
 #include "IrBase.h"
 #include "IrTAC.h"
@@ -74,7 +75,7 @@ public:
         //IrPrintTac(stmt);
         m_statements.push_back(stmt);
     }
-    void codegen();
+    void codegen(std::ostream& stream);
     
     void genStrings();
     

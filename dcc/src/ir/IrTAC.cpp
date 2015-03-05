@@ -102,7 +102,7 @@ void IrPrintTac(const IrTacStmt& stmt)
     std::cout << stmt.m_info << std::endl;
 }
 
-void IrOutputArg(const IrBase* arg)
+void IrOutputArg(const IrBase* arg, std::ostream& stream)
 {
    if (arg == nullptr) return;
     
@@ -113,21 +113,21 @@ void IrOutputArg(const IrBase* arg)
     if (ident != nullptr)
     {
 		if (ident->isLabel())
-			std::cout << "$" << ident->getIdentifier();
+			stream << "$" << ident->getIdentifier();
 		else
-			std::cout << "-" << ident->getAddress()+8 << "(%rbp)";
+			stream << "-" << ident->getAddress()+8 << "(%rbp)";
     }
     else if (iliteral != nullptr)
     {
-        std::cout << "$" << iliteral->getValue();
+        stream << "$" << iliteral->getValue();
     }
     else if (bliteral != nullptr)
     {
-        std::cout << (bliteral->getValue() ? "$1" : "$0");
+        stream << (bliteral->getValue() ? "$1" : "$0");
     }
 }
 
-void IrOutputLabel(const IrBase* arg)
+void IrOutputLabel(const IrBase* arg, std::ostream& stream)
 {
     if (arg == nullptr) return;
     
@@ -136,35 +136,35 @@ void IrOutputLabel(const IrBase* arg)
     
     if (ident != nullptr)
     {
-        std::cout << ident->getIdentifier();
+        stream << ident->getIdentifier();
     }
     else if (sliteral != nullptr)
     {
-        std::cout << sliteral->getValue();
+        stream << sliteral->getValue();
     }
 }
 
 const int NUM_ARG_REGS = 6;
 const std::string gArgumentRegisters[NUM_ARG_REGS] =
 {
-	"%rdi",
-	"%rsi",
-	"%rdx",
-	"%rcx",
-	"%r8",
-	"%r9"
+    "%rdi",
+    "%rsi",
+    "%rdx",
+    "%rcx",
+    "%r8",
+    "%r9"
 };
 
-void IrTacGenCode(const IrTacStmt& stmt)
+void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
 {    
     switch(stmt.m_opcode)
     {
     case IrOpcode::MOV:        // arg0 -> arg2
-		std::cout << "movq ";
-		IrOutputArg(stmt.m_arg0);
-		std::cout << ", ";
-		IrOutputArg(stmt.m_arg2);
-		std::cout << std::endl;
+        stream << "movq ";
+        IrOutputArg(stmt.m_arg0, stream);
+        stream << ", ";
+        IrOutputArg(stmt.m_arg2, stream);
+        stream << std::endl;
         break;
         
     case IrOpcode::ADD:        // arg0 + arg1 -> arg2
@@ -189,26 +189,26 @@ void IrTacGenCode(const IrTacStmt& stmt)
         break;
         
     case IrOpcode::CALL:       // call arg0
-        std::cout << "call ";
-        IrOutputLabel(stmt.m_arg0);
-        std::cout << std::endl;
+        stream << "call ";
+        IrOutputLabel(stmt.m_arg0, stream);
+        stream << std::endl;
         break;
         
     case IrOpcode::FBEGIN:     // begin function
-        std::cout << ".global ";
-        IrOutputLabel(stmt.m_arg0);
-        std::cout << std::endl;
-        IrOutputLabel(stmt.m_arg0);
-        std::cout << ":" << std::endl; 
-        std::cout << "enter $" << stmt.m_info << ", $0" << std::endl;
+        stream << ".global ";
+        IrOutputLabel(stmt.m_arg0, stream);
+        stream << std::endl;
+        IrOutputLabel(stmt.m_arg0, stream);
+        stream << ":" << std::endl; 
+        stream << "enter $" << stmt.m_info << ", $0" << std::endl;
         break;
         
     case IrOpcode::FEND:       // end function
-        std::cout << "leave" << std::endl;
+        stream << "leave" << std::endl;
         break;
         
     case IrOpcode::RETURN:     // return |arg0|
-        std::cout << "ret" << std::endl;
+        stream << "ret" << std::endl;
         break;
         
     case IrOpcode::EQUAL:      // arg0 == arg1 -> arg2 (0 or 1)
@@ -224,8 +224,8 @@ void IrTacGenCode(const IrTacStmt& stmt)
         break;
         
     case IrOpcode::LABEL:      // arg0:
-        IrOutputLabel(stmt.m_arg0);
-        std::cout << ":" << std::endl;
+        IrOutputLabel(stmt.m_arg0, stream);
+        stream << ":" << std::endl;
         break;
         
     case IrOpcode::JUMP:       // jump arg0
@@ -235,24 +235,24 @@ void IrTacGenCode(const IrTacStmt& stmt)
         break;
         
     case IrOpcode::PARAM:       // push arg0 -> stack
-        std::cout << "movq ";
-        IrOutputArg(stmt.m_arg0);
+        stream << "movq ";
+        IrOutputArg(stmt.m_arg0, stream);
         if (stmt.m_info < NUM_ARG_REGS)
         {
-			std::cout << ", " << gArgumentRegisters[stmt.m_info] << std::endl;
-		}
-		else
-		{
-			std::cout << "*** OUT OF REGISTERS ****" << std::endl;
-		}
+            stream << ", " << gArgumentRegisters[stmt.m_info] << std::endl;
+        }
+        else
+        {
+            stream << "*** OUT OF REGISTERS ****" << std::endl;
+        }
         break;
         
     case IrOpcode::STRING:     // string label -> arg0 value -> arg1
-        IrOutputLabel(stmt.m_arg0);
-        std::cout << ":" << std::endl;
-        std::cout << ".string ";
-        IrOutputLabel(stmt.m_arg1);
-        std::cout << std::endl;
+        IrOutputLabel(stmt.m_arg0, stream);
+        stream << ":" << std::endl;
+        stream << ".string ";
+        IrOutputLabel(stmt.m_arg1, stream);
+        stream << std::endl;
         break;
         
     default:
