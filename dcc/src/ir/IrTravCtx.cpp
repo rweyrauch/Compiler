@@ -45,7 +45,11 @@ bool IrTraversalContext::addTempVariable(IrIdentifier* variable, IrType type)
 {
     if (!m_symbols.empty())
     {
-        return m_symbols.front()->addVariable(variable, type);
+        if (m_symbols.front()->addVariable(variable, type))
+        {
+			variable->codegen(this);
+			return true;
+		}
     }
     return false;
 }

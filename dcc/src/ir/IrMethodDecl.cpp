@@ -151,7 +151,10 @@ bool IrMethodDecl::codegen(IrTraversalContext* ctx)
     // determine the stack storage requirements for the argument and body
     size_t stackSize = m_symbols->getAllocationSize();
     if (m_block) stackSize += m_block->getSymbols()->getAllocationSize();
-    
+    // round stack size to multiple of 16 (assuming already a multiple of 8)
+    if (stackSize % 16 != 0)
+		stackSize += 8;
+		
     IrTacStmt beginTac;
     beginTac.m_opcode = IrOpcode::FBEGIN;
     beginTac.m_arg0 = m_identifier;
@@ -165,13 +168,7 @@ bool IrMethodDecl::codegen(IrTraversalContext* ctx)
     }
     
     if (m_block) m_block->codegen(ctx);
-
-    IrTacStmt endTac;
-    endTac.m_opcode = IrOpcode::FEND;
-    endTac.m_arg0 = m_identifier;
- 
-    ctx->append(endTac);
-    
+   
     ctx->popParent();
     ctx->popSymbols();
     

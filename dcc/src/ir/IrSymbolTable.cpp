@@ -39,6 +39,7 @@ bool IrSymbolTable::addVariable(IrFieldDecl* variable)
         SVariableSymbol symbol;
         symbol.m_name = variable->getName();
         symbol.m_type = variable->getType();
+        symbol.m_addr = m_variableStackSize;
         symbol.m_count = 1;
         
         if (variable->getLocation()->getIndex() != nullptr)
@@ -64,7 +65,9 @@ bool IrSymbolTable::addVariable(IrFieldDecl* variable)
                 return false;
             }
         }
+        
         m_variables[symbol.m_name] = symbol;
+        m_variableStackSize += symbol.m_count * 8;
         
         return true;
     }
@@ -90,7 +93,9 @@ bool IrSymbolTable::addVariable(IrVariableDecl* variables)
                 symbol.m_name = variable->getIdentifier();
                 symbol.m_type = variables->getType();
                 symbol.m_count = 1;
+				symbol.m_addr = m_variableStackSize;
                 m_variables[symbol.m_name] = symbol;
+                m_variableStackSize += symbol.m_count * 8;
             }
             else
             {
@@ -111,6 +116,7 @@ bool IrSymbolTable::addVariable(IrLocation* variable)
         SVariableSymbol symbol;
         symbol.m_name = variable->getIdentifier()->getIdentifier();
         symbol.m_type = variable->getType();
+        symbol.m_addr = m_variableStackSize;
         symbol.m_count = 1;
         
         if (variable->getIndex() != nullptr)
@@ -137,6 +143,7 @@ bool IrSymbolTable::addVariable(IrLocation* variable)
             }
         }
         m_variables[symbol.m_name] = symbol;
+        m_variableStackSize += symbol.m_count * 8;
         
         return true;
     }
@@ -156,7 +163,9 @@ bool IrSymbolTable::addVariable(IrIdentifier* variable, IrType type)
         symbol.m_name = variable->getIdentifier();
         symbol.m_type = type;
         symbol.m_count = 1;
+        symbol.m_addr = m_variableStackSize;
         m_variables[symbol.m_name] = symbol;
+        m_variableStackSize += symbol.m_count * 8;
         
         return true;
     }
@@ -308,14 +317,15 @@ void IrSymbolTable::print(int depth)
     std::cout << "Symbol Table Size = " << table_size << std::endl;
     
     IRPRINT_INDENT(depth);
-    std::cout << "Name\t\tType\t\tCount" << std::endl;
+    std::cout << "Name\t\tType\t\tCount\t\tAddress" << std::endl;
     for (auto it = m_variables.cbegin(); it != m_variables.cend(); ++it)
     {
         IRPRINT_INDENT(depth);
-        std::cout << it->first << "\t\t" << IrTypeToString(it->second.m_type) << "\t\t" << it->second.m_count << std::endl;
+        std::cout << it->first << "\t\t" << IrTypeToString(it->second.m_type) << "\t\t" << it->second.m_count
+                  << "\t\t" << it->second.m_addr << std::endl;
     }
     IRPRINT_INDENT(depth);
-    std::cout << "Allocated Size: " << getAllocationSize() << std::endl;
+    std::cout << "Allocated Size: " << getAllocationSize() << " " << m_variableStackSize << std::endl;
 }
 
 } // namespace Decaf

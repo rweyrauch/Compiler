@@ -44,7 +44,7 @@ IrIdentifier* IrIdentifier::CreateLabel()
 {
     std::stringstream tempName;
     tempName << ".L" << s_tempLocationCounter++;
-    IrIdentifier* tempId = new IrIdentifier(0, 0, "label", tempName.str());
+    IrIdentifier* tempId = new IrIdentifier(0, 0, "label", tempName.str(), true);
     return tempId;
 }
 
@@ -52,6 +52,19 @@ void IrIdentifier::print(unsigned int depth)
 {
     IRPRINT_INDENT(depth);
     std::cout << "Identifier(" << getLineNumber() << "," << getColumnNumber() << ") = \"" << m_identifier << "\"" << std::endl;
+}
+
+bool IrIdentifier::codegen(IrTraversalContext* ctx)
+{
+	bool ok = false;
+	SVariableSymbol symbol;
+	
+	if (ctx->lookup(this, symbol))
+	{
+		m_addr = symbol.m_addr;
+	}
+	
+	return ok;
 }
 
 } // namespace Decaf

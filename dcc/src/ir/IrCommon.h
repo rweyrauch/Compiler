@@ -91,6 +91,7 @@ struct SVariableSymbol
     std::string m_name;
     IrType m_type;
     size_t m_count; // >1 for arrays
+    size_t m_addr;  // offset from base of stack in bytes
 };
   
 struct SMethodSymbol

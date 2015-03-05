@@ -155,6 +155,8 @@ bool IrLocation::codegen(IrTraversalContext* ctx)
     {
         m_result = m_index->getResultIdentifier();
     }
+    m_result->codegen(ctx);
+    
     ctx->popParent();
     
     return valid;

@@ -75,14 +75,15 @@ void IrPrintTacArg(const IrBase* arg)
     if (ident != nullptr)
     {
         std::cout << ident->getIdentifier();
+        //std::cout << " -" << ident->getAddress()+8 << "(%rbp)";
     }
     else if (iliteral != nullptr)
     {
-        std::cout << "$" << iliteral->getValue();
+        std::cout << iliteral->getValue();
     }
     else if (bliteral != nullptr)
     {
-        std::cout << (bliteral->getValue() ? "$1" : "$0");
+        std::cout << (bliteral->getValue() ? "1" : "0");
     }
     else if (sliteral != nullptr)
     {
@@ -103,7 +104,44 @@ void IrPrintTac(const IrTacStmt& stmt)
 
 void IrOutputArg(const IrBase* arg)
 {
-    IrPrintTacArg(arg);
+   if (arg == nullptr) return;
+    
+    const IrIdentifier* ident = dynamic_cast<const IrIdentifier*>(arg);
+    const IrIntegerLiteral* iliteral = dynamic_cast<const IrIntegerLiteral*>(arg);
+    const IrBooleanLiteral* bliteral = dynamic_cast<const IrBooleanLiteral*>(arg);
+    
+    if (ident != nullptr)
+    {
+		if (ident->isLabel())
+			std::cout << "$" << ident->getIdentifier();
+		else
+			std::cout << "-" << ident->getAddress()+8 << "(%rbp)";
+    }
+    else if (iliteral != nullptr)
+    {
+        std::cout << "$" << iliteral->getValue();
+    }
+    else if (bliteral != nullptr)
+    {
+        std::cout << (bliteral->getValue() ? "$1" : "$0");
+    }
+}
+
+void IrOutputLabel(const IrBase* arg)
+{
+    if (arg == nullptr) return;
+    
+    const IrIdentifier* ident = dynamic_cast<const IrIdentifier*>(arg);
+    const IrStringLiteral* sliteral = dynamic_cast<const IrStringLiteral*>(arg);
+    
+    if (ident != nullptr)
+    {
+        std::cout << ident->getIdentifier();
+    }
+    else if (sliteral != nullptr)
+    {
+        std::cout << sliteral->getValue();
+    }
 }
 
 const int NUM_ARG_REGS = 6;
@@ -122,6 +160,11 @@ void IrTacGenCode(const IrTacStmt& stmt)
     switch(stmt.m_opcode)
     {
     case IrOpcode::MOV:        // arg0 -> arg2
+		std::cout << "movq ";
+		IrOutputArg(stmt.m_arg0);
+		std::cout << ", ";
+		IrOutputArg(stmt.m_arg2);
+		std::cout << std::endl;
         break;
         
     case IrOpcode::ADD:        // arg0 + arg1 -> arg2
@@ -147,15 +190,15 @@ void IrTacGenCode(const IrTacStmt& stmt)
         
     case IrOpcode::CALL:       // call arg0
         std::cout << "call ";
-        IrOutputArg(stmt.m_arg0);
+        IrOutputLabel(stmt.m_arg0);
         std::cout << std::endl;
         break;
         
     case IrOpcode::FBEGIN:     // begin function
         std::cout << ".global ";
-        IrOutputArg(stmt.m_arg0);
+        IrOutputLabel(stmt.m_arg0);
         std::cout << std::endl;
-        IrOutputArg(stmt.m_arg0);
+        IrOutputLabel(stmt.m_arg0);
         std::cout << ":" << std::endl; 
         std::cout << "enter $" << stmt.m_info << ", $0" << std::endl;
         break;
@@ -181,7 +224,7 @@ void IrTacGenCode(const IrTacStmt& stmt)
         break;
         
     case IrOpcode::LABEL:      // arg0:
-        IrOutputArg(stmt.m_arg0);
+        IrOutputLabel(stmt.m_arg0);
         std::cout << ":" << std::endl;
         break;
         
@@ -193,7 +236,6 @@ void IrTacGenCode(const IrTacStmt& stmt)
         
     case IrOpcode::PARAM:       // push arg0 -> stack
         std::cout << "movq ";
-        std::cout << "$";
         IrOutputArg(stmt.m_arg0);
         if (stmt.m_info < NUM_ARG_REGS)
         {
@@ -206,10 +248,10 @@ void IrTacGenCode(const IrTacStmt& stmt)
         break;
         
     case IrOpcode::STRING:     // string label -> arg0 value -> arg1
-        IrOutputArg(stmt.m_arg0);
+        IrOutputLabel(stmt.m_arg0);
         std::cout << ":" << std::endl;
         std::cout << ".string ";
-        IrOutputArg(stmt.m_arg1);
+        IrOutputLabel(stmt.m_arg1);
         std::cout << std::endl;
         break;
         

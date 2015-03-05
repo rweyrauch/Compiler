@@ -28,6 +28,7 @@
 
 namespace Decaf
 {
+class IrTraversalContext;
 
 class IrIdentifier : public IrBase
 {
@@ -36,21 +37,28 @@ public:
     static IrIdentifier* CreateTemporary();
     static IrIdentifier* CreateLabel();
     
-    IrIdentifier(int lineNumber, int columnNumber, const std::string& filename, const std::string& ident) :
+    IrIdentifier(int lineNumber, int columnNumber, const std::string& filename, const std::string& ident, bool isLabel = false) :
         IrBase(lineNumber, columnNumber, filename),
-        m_identifier(ident)
+        m_identifier(ident),
+        m_addr(0),
+        m_isLabel(isLabel)
     {}
     
     virtual ~IrIdentifier()
     {}
     
     virtual void print(unsigned int depth);
+    virtual bool codegen(IrTraversalContext* ctx);
     
     const std::string& getIdentifier() const { return m_identifier; }
+    size_t getAddress() const { return m_addr; }
+    bool isLabel() const { return m_isLabel; }
     
 protected:
     
     std::string m_identifier;
+    size_t m_addr;
+    bool m_isLabel;
     
     static int s_tempLocationCounter;
     

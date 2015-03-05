@@ -38,7 +38,9 @@ class IrSymbolTable
 {
 public:
     IrSymbolTable() :
-        m_variables()
+		m_variableStackSize(0),
+        m_variables(),
+        m_methods()
     {}
     
     ~IrSymbolTable() 
@@ -64,6 +66,7 @@ public:
     
 protected:
         
+    size_t m_variableStackSize;    
     std::map<std::string, SVariableSymbol> m_variables;
     
     std::map<std::string, SMethodSymbol> m_methods;
