@@ -168,18 +168,73 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         break;
         
     case IrOpcode::ADD:        // arg0 + arg1 -> arg2
+		stream << "movq ";
+        IrOutputArg(stmt.m_arg0, stream);
+		stream << ", %r10" << std::endl;
+		
+		stream << "addq ";
+		IrOutputArg(stmt.m_arg1, stream);
+		stream << ", %r10" << std::endl;
+		
+		stream << "movq %r10, ";
+		IrOutputArg(stmt.m_arg2, stream);
+		stream << std::endl;
         break;
         
     case IrOpcode::SUB:        // arg0 - arg1 -> arg2
+		stream << "movq ";
+        IrOutputArg(stmt.m_arg0, stream);
+		stream << ", %r10" << std::endl;
+		
+		stream << "subq ";
+		IrOutputArg(stmt.m_arg1, stream);
+		stream << ", %r10" << std::endl;
+		
+		stream << "movq %r10, ";
+		IrOutputArg(stmt.m_arg2, stream);
+		stream << std::endl;
         break;
         
     case IrOpcode::MUL:        // arg0 * arg1 -> arg2
+		stream << "movq ";					// arg -> %rax
+        IrOutputArg(stmt.m_arg0, stream);
+		stream << ", %rax" << std::endl;
+		
+		stream << "imulq ";					// mul %rax, arg1 => %rax
+		IrOutputArg(stmt.m_arg1, stream);
+		stream << std::endl;
+		
+		stream << "movq %rax, ";			// result in %rax
+		IrOutputArg(stmt.m_arg2, stream);
+		stream << std::endl;
         break;
         
     case IrOpcode::DIV:        // arg0 / arg1 -> arg2
+		stream << "movq ";					// dividend in %rax
+        IrOutputArg(stmt.m_arg0, stream);
+		stream << ", %rax" << std::endl;
+		
+		stream << "idivq ";
+		IrOutputArg(stmt.m_arg1, stream);
+		stream << std::endl;
+		
+		stream << "movq %rax, ";			// result in %rax
+		IrOutputArg(stmt.m_arg2, stream);
+		stream << std::endl;
         break;
         
     case IrOpcode::MOD:        // arg0 % arg1 -> arg2
+		stream << "movq ";					// dividend in %rax
+        IrOutputArg(stmt.m_arg0, stream);
+		stream << ", %rax" << std::endl;
+		
+		stream << "idivq ";
+		IrOutputArg(stmt.m_arg1, stream);
+		stream << std::endl;
+		
+		stream << "movq %rdx, ";			// remainder in %rdx
+		IrOutputArg(stmt.m_arg2, stream);
+		stream << std::endl;
         break;
         
     case IrOpcode::LOAD:       // *[arg0 + arg1] -> arg2
