@@ -31,6 +31,55 @@
 namespace Decaf
 {
 
+enum class IrRegName : int
+{
+    rTemp,
+    rRet,
+    rOutput,
+    
+    rParam1,
+    rParam2,
+    rParam3,
+    rParam4,
+    rParam5,
+    rParam6,
+    
+    NUM
+};
+
+const std::string g_registerNames[(int)IrRegName::NUM] =
+{
+    // temp registers
+    "%r10",
+    "%rax",
+    "%rdx",
+
+    // parameter registers
+    "%rdi",
+    "%rsi",
+    "%rdx",
+    "%rcx",
+    "%r8",
+    "%r9"    
+};
+
+class IrRegister : public IrBase
+{
+public:
+    IrRegister(IrRegName which) :
+        IrBase(0, 0, __FILE__),
+        m_which(which) {}
+    virtual ~IrRegister() {}
+    
+    virtual void print(unsigned int depth) {} 
+    
+    IrRegName name() const { return m_which; }
+    
+protected:
+    IrRegName m_which;
+};
+
+    
 const std::string gIrOpcodeStrings[(int)IrOpcode::NUM_OPCODES] =
 {
     "NOOP",
@@ -74,16 +123,15 @@ void IrPrintTacArg(const IrBase* arg)
     
     if (ident != nullptr)
     {
-        std::cout << ident->getIdentifier();
-        //std::cout << " -" << ident->getAddress()+8 << "(%rbp)";
+        std::cout << "$" << ident->getIdentifier();
     }
     else if (iliteral != nullptr)
     {
-        std::cout << iliteral->getValue();
+        std::cout << "$" << iliteral->getValue();
     }
     else if (bliteral != nullptr)
     {
-        std::cout << (bliteral->getValue() ? "1" : "0");
+        std::cout << (bliteral->getValue() ? "$1" : "$0");
     }
     else if (sliteral != nullptr)
     {
@@ -91,31 +139,62 @@ void IrPrintTacArg(const IrBase* arg)
     }
 }
 
+void IrPrintTacLabel(const IrBase* label)
+{
+    if (label == nullptr) return;
+    
+    const IrIdentifier* ident = dynamic_cast<const IrIdentifier*>(label);
+    
+    if (ident != nullptr)
+    {
+        std::cout << ident->getIdentifier();
+    }
+}
+
 void IrPrintTac(const IrTacStmt& stmt)
 {
     std::cout << IrOpcodeToString(stmt.m_opcode) << " ";
     
-    IrPrintTacArg(stmt.m_arg0); std::cout << " ";
-    IrPrintTacArg(stmt.m_arg1); std::cout << " ";
-    IrPrintTacArg(stmt.m_arg2); std::cout << " ";
+    if (stmt.m_opcode != IrOpcode::LABEL)
+    {
+        if (stmt.m_arg0)
+        {
+            IrPrintTacArg(stmt.m_arg0);
+        }
+        if (stmt.m_arg1)
+        {
+            std::cout << ", ";
+            IrPrintTacArg(stmt.m_arg1);
+        }
+        if (stmt.m_arg2)
+        {
+            std::cout << ", ";
+            IrPrintTacArg(stmt.m_arg2);
+        }
+    }
+    else
+    {
+        IrPrintTacLabel(stmt.m_arg0); std::cout << " ";
+    }
     
-    std::cout << stmt.m_info << std::endl;
+    std::cout << "\t// " << stmt.m_info << std::endl;
 }
 
 void IrOutputArg(const IrBase* arg, std::ostream& stream)
 {
-   if (arg == nullptr) return;
+if (arg == nullptr) return;
     
     const IrIdentifier* ident = dynamic_cast<const IrIdentifier*>(arg);
     const IrIntegerLiteral* iliteral = dynamic_cast<const IrIntegerLiteral*>(arg);
     const IrBooleanLiteral* bliteral = dynamic_cast<const IrBooleanLiteral*>(arg);
-    
+    const IrRegister* reg = dynamic_cast<const IrRegister*>(arg);
+
     if (ident != nullptr)
     {
-		if (ident->isLabel())
-			stream << "$" << ident->getIdentifier();
-		else
-			stream << "-" << ident->getAddress()+8 << "(%rbp)";
+        if (ident->isLabel())
+            stream << "$" << ident->getIdentifier();
+        else
+            stream << "-" << ident->getAddress()+8 << "(%rbp)";
     }
     else if (iliteral != nullptr)
     {
@@ -124,6 +203,10 @@ void IrOutputArg(const IrBase* arg, std::ostream& stream)
     else if (bliteral != nullptr)
     {
         stream << (bliteral->getValue() ? "$1" : "$0");
+    }
+    else if (reg != nullptr)
+    {
+        stream << g_registerNames[(int)reg->name()];
     }
 }
 
@@ -144,97 +227,100 @@ void IrOutputLabel(const IrBase* arg, std::ostream& stream)
     }
 }
 
+const IrRegister g_tempReg(IrRegName::rTemp);
+const IrRegister g_retReg(IrRegName::rRet);
+const IrRegister g_outReg(IrRegName::rOutput);
+
 const int NUM_ARG_REGS = 6;
-const std::string gArgumentRegisters[NUM_ARG_REGS] =
+const IrRegister* g_paramRegisters[NUM_ARG_REGS] =
 {
-    "%rdi",
-    "%rsi",
-    "%rdx",
-    "%rcx",
-    "%r8",
-    "%r9"
+    new IrRegister(IrRegName::rParam1),
+    new IrRegister(IrRegName::rParam2),
+    new IrRegister(IrRegName::rParam3),
+    new IrRegister(IrRegName::rParam4),
+    new IrRegister(IrRegName::rParam5),
+    new IrRegister(IrRegName::rParam6)
 };
+
+bool IrIsRegister(const IrBase* value)
+{
+    const IrRegister* reg = dynamic_cast<const IrRegister*>(value);
+    return (reg != nullptr);
+}
+bool IrIsMemory(const IrBase* value)
+{
+    const IrIdentifier* reg = dynamic_cast<const IrIdentifier*>(value);
+    return (reg != nullptr);
+}
+
+void IrGenMov(const IrBase* src, const IrBase* dst, std::ostream& stream)
+{
+    if (IrIsMemory(src) && IrIsMemory(dst))
+    {
+        stream << "movq ";
+        IrOutputArg(src, stream);
+        stream << ", ";
+        IrOutputArg(&g_tempReg, stream);
+        stream << std::endl;
+        
+        stream << "movq ";
+        IrOutputArg(&g_tempReg, stream);
+        stream << ", ";
+        IrOutputArg(dst, stream);
+        stream << std::endl;      
+    }
+    else
+    {
+        stream << "movq ";
+        IrOutputArg(src, stream);
+        stream << ", ";
+        IrOutputArg(dst, stream);
+        stream << std::endl;
+    }
+}
 
 void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
 {    
     switch(stmt.m_opcode)
     {
     case IrOpcode::MOV:        // arg0 -> arg2
-        stream << "movq ";
-        IrOutputArg(stmt.m_arg0, stream);
-        stream << ", ";
-        IrOutputArg(stmt.m_arg2, stream);
-        stream << std::endl;
+        IrGenMov(stmt.m_arg0, stmt.m_arg2, stream);
         break;
         
     case IrOpcode::ADD:        // arg0 + arg1 -> arg2
-		stream << "movq ";
-        IrOutputArg(stmt.m_arg0, stream);
-		stream << ", %r10" << std::endl;
-		
-		stream << "addq ";
-		IrOutputArg(stmt.m_arg1, stream);
-		stream << ", %r10" << std::endl;
-		
-		stream << "movq %r10, ";
-		IrOutputArg(stmt.m_arg2, stream);
-		stream << std::endl;
-        break;
-        
     case IrOpcode::SUB:        // arg0 - arg1 -> arg2
-		stream << "movq ";
-        IrOutputArg(stmt.m_arg0, stream);
-		stream << ", %r10" << std::endl;
-		
-		stream << "subq ";
-		IrOutputArg(stmt.m_arg1, stream);
-		stream << ", %r10" << std::endl;
-		
-		stream << "movq %r10, ";
-		IrOutputArg(stmt.m_arg2, stream);
-		stream << std::endl;
+        IrGenMov(stmt.m_arg0, &g_tempReg, stream);
+        
+        stream << (stmt.m_opcode == IrOpcode::ADD ? "addq " : "subq ");
+        IrOutputArg(stmt.m_arg1, stream);
+        stream << ", ";
+        IrOutputArg(&g_tempReg, stream);
+        stream << std::endl;
+        
+        IrGenMov(&g_tempReg, stmt.m_arg2, stream);
         break;
         
     case IrOpcode::MUL:        // arg0 * arg1 -> arg2
-		stream << "movq ";					// arg -> %rax
-        IrOutputArg(stmt.m_arg0, stream);
-		stream << ", %rax" << std::endl;
-		
-		stream << "imulq ";					// mul %rax, arg1 => %rax
-		IrOutputArg(stmt.m_arg1, stream);
-		stream << std::endl;
-		
-		stream << "movq %rax, ";			// result in %rax
-		IrOutputArg(stmt.m_arg2, stream);
-		stream << std::endl;
-        break;
-        
     case IrOpcode::DIV:        // arg0 / arg1 -> arg2
-		stream << "movq ";					// dividend in %rax
-        IrOutputArg(stmt.m_arg0, stream);
-		stream << ", %rax" << std::endl;
-		
-		stream << "idivq ";
-		IrOutputArg(stmt.m_arg1, stream);
-		stream << std::endl;
-		
-		stream << "movq %rax, ";			// result in %rax
-		IrOutputArg(stmt.m_arg2, stream);
-		stream << std::endl;
-        break;
-        
     case IrOpcode::MOD:        // arg0 % arg1 -> arg2
-		stream << "movq ";					// dividend in %rax
-        IrOutputArg(stmt.m_arg0, stream);
-		stream << ", %rax" << std::endl;
-		
-		stream << "idivq ";
-		IrOutputArg(stmt.m_arg1, stream);
-		stream << std::endl;
-		
-		stream << "movq %rdx, ";			// remainder in %rdx
-		IrOutputArg(stmt.m_arg2, stream);
-		stream << std::endl;
+        
+        // zero the temp output reg
+        stream << "xorq ";
+        IrOutputArg(&g_outReg, stream);
+        stream << ", ";
+        IrOutputArg(&g_outReg, stream);
+        stream << std::endl;
+        
+        IrGenMov(stmt.m_arg0, &g_retReg, stream); // arg0 => %rax
+        
+        stream << (stmt.m_opcode == IrOpcode::MUL ? "imulq " : "idivq ");
+        IrOutputArg(stmt.m_arg1, stream);
+        stream << std::endl;
+        
+        if (stmt.m_opcode == IrOpcode::MOD)
+            IrGenMov(&g_outReg, stmt.m_arg2, stream); // %rdx => arg2            
+        else
+            IrGenMov(&g_retReg, stmt.m_arg2, stream); // %rax => arg2
         break;
         
     case IrOpcode::LOAD:       // *[arg0 + arg1] -> arg2
@@ -290,11 +376,9 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         break;
         
     case IrOpcode::PARAM:       // push arg0 -> stack
-        stream << "movq ";
-        IrOutputArg(stmt.m_arg0, stream);
         if (stmt.m_info < NUM_ARG_REGS)
         {
-            stream << ", " << gArgumentRegisters[stmt.m_info] << std::endl;
+            IrGenMov(stmt.m_arg0, g_paramRegisters[stmt.m_info], stream);
         }
         else
         {
