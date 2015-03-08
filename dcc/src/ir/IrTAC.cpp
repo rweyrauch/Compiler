@@ -35,7 +35,9 @@ enum class IrRegName : int
 {
     rTemp,
     rRet,
+    rRetWord,
     rOutput,
+    rOutputWord,
     
     rParam1,
     rParam2,
@@ -52,8 +54,10 @@ const std::string g_registerNames[(int)IrRegName::NUM] =
     // temp registers
     "%r10",
     "%rax",
+    "%al",
     "%rdx",
-
+    "%dl",
+    
     // parameter registers
     "%rdi",
     "%rsi",
@@ -234,7 +238,9 @@ void IrOutputLabel(const IrBase* arg, std::ostream& stream)
 
 const IrRegister g_tempReg(IrRegName::rTemp);
 const IrRegister g_retReg(IrRegName::rRet);
+const IrRegister g_retRegWord(IrRegName::rRetWord);
 const IrRegister g_outReg(IrRegName::rOutput);
+const IrRegister g_outRegWord(IrRegName::rOutputWord);
 
 const int NUM_ARG_REGS = 6;
 const IrRegister* g_paramRegisters[NUM_ARG_REGS] =
@@ -285,7 +291,14 @@ void IrGenMov(const IrBase* src, const IrBase* dst, std::ostream& stream)
 }
 
 void IrGenComparison(const IrTacStmt& stmt, std::ostream& stream)
-{
+{    
+    // zero the temp output reg
+    stream << "xorq ";
+    IrOutputArg(&g_retReg, stream);
+    stream << ", ";
+    IrOutputArg(&g_retReg, stream);
+    stream << std::endl;
+    
     // make sure the second arg is not an immediate nor a memory access
     IrGenMov(stmt.m_arg1, &g_tempReg, stream);
     
@@ -294,7 +307,7 @@ void IrGenComparison(const IrTacStmt& stmt, std::ostream& stream)
     stream << ", ";
     IrOutputArg(&g_tempReg, stream);
     stream << std::endl;  
-    
+     
     switch (stmt.m_opcode)
     {
     case IrOpcode::EQUAL:      // arg0 == arg1 -> arg2 (0 or 1)
@@ -324,9 +337,16 @@ void IrGenComparison(const IrTacStmt& stmt, std::ostream& stream)
     default:
         break;
     }
-    IrOutputArg(stmt.m_arg2, stream);
+    IrOutputArg(&g_retRegWord, stream);    
     stream << std::endl;  
-        
+    
+    stream << "movzbq ";
+    IrOutputArg(&g_retRegWord, stream);
+    stream << ", ";
+    IrOutputArg(&g_retReg, stream);
+    stream << std::endl;
+    
+    IrGenMov(&g_retReg, stmt.m_arg2, stream);      
 }
 
 void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
@@ -450,7 +470,11 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         break;
         
     case IrOpcode::IFZ:        // branch arg0 == 0 to arg1
-        stream << "jz ";
+        stream << "cmp $0, ";       
+        IrOutputArg(stmt.m_arg0, stream);
+        stream << std::endl;
+        
+        stream << "jz ";        // jump if cmp == 0
         IrOutputLabel(stmt.m_arg1, stream);
         stream << std::endl;
         break;
