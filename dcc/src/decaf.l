@@ -4,10 +4,17 @@ xdigit [a-fA-F0-9]
 
 
 %x string
+%x comment
 
 %%
 
 "//"[^\n]*						;	// comment
+"/*"                            { track_column(); begin(StartCondition__::comment); }
+
+<comment>{
+    "*/"                        { track_column(); begin(StartCondition__::INITIAL); }
+    .|\n                        { track_column(); }; // c-style comment - skip
+}
 
 "callout"                       { track_column(); return (Parser::CALLOUT); }
 "return"				        { track_column(); return (Parser::RETURN); }
