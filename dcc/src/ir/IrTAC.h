@@ -40,9 +40,8 @@ enum class IrOpcode : int
     MOD,        // arg0 % arg1 -> arg2
     LOAD,       // *[arg0 + arg1] -> arg2
     STORE,      // arg0 -> *[arg1 + arg2]
-    CALL,       // call arg0
+    CALL,       // call arg0 arg1
     FBEGIN,     // begin function
-    FEND,       // end function
     RETURN,     // return |arg0|
     EQUAL,      // arg0 == arg1 -> arg2 (0 or 1)
     NOTEQUAL,   // arg0 != arg1 -> arg2 (0 or 1)

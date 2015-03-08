@@ -22,7 +22,9 @@
 // THE SOFTWARE.
 //
 #include <iostream>
+#include <vector>
 #include "IrTAC.h"
+#include "IrBase.h"
 #include "IrIdentifier.h"
 #include "IrIntLiteral.h"
 #include "IrBoolLiteral.h"
@@ -97,7 +99,6 @@ const std::string gIrOpcodeStrings[(int)IrOpcode::NUM_OPCODES] =
     "STORE",
     "CALL",
     "FBEGIN",
-    "FEND",
     "RETURN",
     "EQUAL",
     "NOTEQUAL",
@@ -349,6 +350,8 @@ void IrGenComparison(const IrTacStmt& stmt, std::ostream& stream)
     IrGenMov(&g_retReg, stmt.m_arg2, stream);      
 }
 
+static std::vector<const IrBase*> g_extraParams;
+
 void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
 {    
     switch(stmt.m_opcode)
@@ -401,10 +404,27 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
     case IrOpcode::STORE:      // arg0 -> *[arg1 + arg2]
         break;
         
-    case IrOpcode::CALL:       // call arg0
+    case IrOpcode::CALL:       // call arg0 arg1
+    
+		// Pop extra parameters off the param stack
+		if (!g_extraParams.empty())
+		{
+			for (auto it = g_extraParams.begin(); it != g_extraParams.end(); ++it)
+			{
+				stream << "push ";
+				IrOutputLabel(*it, stream);
+				stream << std::endl;
+			}
+			g_extraParams.clear();
+		}
         stream << "call ";
         IrOutputLabel(stmt.m_arg0, stream);
         stream << std::endl;
+        
+        if (stmt.m_arg1 != nullptr)
+        {
+			IrGenMov(&g_retReg, stmt.m_arg1, stream);
+		}
         break;
         
     case IrOpcode::FBEGIN:     // begin function
@@ -416,11 +436,12 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         stream << "enter $" << stmt.m_info << ", $0" << std::endl;
         break;
         
-    case IrOpcode::FEND:       // end function
-        stream << "leave" << std::endl;
-        break;
-        
     case IrOpcode::RETURN:     // return |arg0|
+		if (stmt.m_arg0 != nullptr)
+		{
+			IrGenMov(stmt.m_arg0, &g_retReg, stream);
+		}
+        stream << "leave" << std::endl;
         stream << "ret" << std::endl;
         break;
         
@@ -486,7 +507,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         }
         else
         {
-            stream << "*** OUT OF REGISTERS ****" << std::endl;
+            g_extraParams.push_back(stmt.m_arg0);
         }
         break;
         

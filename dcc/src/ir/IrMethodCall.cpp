@@ -110,6 +110,14 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
             ctx->error(this, msg.str());
             valid = false;
         }
+        else
+        {
+			if (symbol.m_type == IrType::Integer || symbol.m_type == IrType::Boolean)
+			{
+				m_result = IrIdentifier::CreateTemporary();
+				ctx->addTempVariable(m_result, symbol.m_type);
+			}
+		}
     }
     else
     {
@@ -122,7 +130,7 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
 
 bool IrMethodCall::codegen(IrTraversalContext* ctx) 
 { 
-    if (isExternal())
+    //if (isExternal())
     {        
 		int argCount = 0;    
         for (auto it : m_arguments)
@@ -153,6 +161,7 @@ bool IrMethodCall::codegen(IrTraversalContext* ctx)
         IrTacStmt callStmt;
         callStmt.m_opcode = IrOpcode::CALL;
         callStmt.m_arg0 = m_identifier;
+        callStmt.m_arg1 = m_result;
         ctx->append(callStmt);
     }
     

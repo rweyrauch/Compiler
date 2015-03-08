@@ -82,12 +82,6 @@ bool IrReturnStatement::codegen(IrTraversalContext* ctx)
             tac.m_arg0 = m_returnValue->getResultIdentifier();
         }
     }
-
-    IrTacStmt endTac;
-    endTac.m_opcode = IrOpcode::FEND;
-
-    ctx->append(endTac); 
-       
     ctx->append(tac);
     
     ctx->popParent();

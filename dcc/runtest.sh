@@ -4,7 +4,7 @@ clear
 
 echo "Running IR semantic tests."
 
-DCC=`pwd`/dcc
+DCC=`pwd`/src/build/dcc
 echo $DCC
 
 TESTFILES=testdata/semantic/*.dcf
