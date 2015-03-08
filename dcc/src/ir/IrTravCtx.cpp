@@ -148,6 +148,7 @@ void IrTraversalContext::codegen(std::ostream& stream)
     stream << ".text" << std::endl;
     for (auto it : m_statements)
     {
+        IrPrintTac(it);
         IrTacGenCode(it, stream);
     }
 }

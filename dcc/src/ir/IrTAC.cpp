@@ -96,9 +96,14 @@ const std::string gIrOpcodeStrings[(int)IrOpcode::NUM_OPCODES] =
     "FEND",
     "RETURN",
     "EQUAL",
+    "NOTEQUAL",
     "LESS",
+    "LESSEQUAL",
+    "GREATER",
+    "GREATEREQUAL",
     "AND",
     "OR",
+    "NOT",
     "LABEL",
     "JUMP",
     "IFZ",
@@ -279,6 +284,51 @@ void IrGenMov(const IrBase* src, const IrBase* dst, std::ostream& stream)
     }
 }
 
+void IrGenComparison(const IrTacStmt& stmt, std::ostream& stream)
+{
+    // make sure the second arg is not an immediate nor a memory access
+    IrGenMov(stmt.m_arg1, &g_tempReg, stream);
+    
+    stream << "cmp ";
+    IrOutputArg(stmt.m_arg0, stream);
+    stream << ", ";
+    IrOutputArg(&g_tempReg, stream);
+    stream << std::endl;  
+    
+    switch (stmt.m_opcode)
+    {
+    case IrOpcode::EQUAL:      // arg0 == arg1 -> arg2 (0 or 1)
+        stream << "sete ";
+        break;
+        
+    case IrOpcode::LESS:       // arg0 < arg1 -> arg2 (0 or 1)
+        stream << "setnge ";
+        break;
+        
+    case IrOpcode::NOTEQUAL:   // arg0 != arg1 -> arg2 (0 or 1)
+        stream << "setne ";
+        break;
+        
+    case IrOpcode::LESSEQUAL:  // arg0 <= arg1 -> arg2 (0 or 1)
+        stream << "setng ";
+        break;
+        
+    case IrOpcode::GREATER:    // arg0 > arg1 -> arg2 (0 or 1)
+        stream << "setg ";
+        break;
+        
+    case IrOpcode::GREATEREQUAL: // arg0 >= arg1 -> arg2 (0 or 1)
+        stream << "setge ";
+        break;
+        
+    default:
+        break;
+    }
+    IrOutputArg(stmt.m_arg2, stream);
+    stream << std::endl;  
+        
+}
+
 void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
 {    
     switch(stmt.m_opcode)
@@ -302,8 +352,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         
     case IrOpcode::MUL:        // arg0 * arg1 -> arg2
     case IrOpcode::DIV:        // arg0 / arg1 -> arg2
-    case IrOpcode::MOD:        // arg0 % arg1 -> arg2
-        
+    case IrOpcode::MOD:        // arg0 % arg1 -> arg2     
         // zero the temp output reg
         stream << "xorq ";
         IrOutputArg(&g_outReg, stream);
@@ -313,8 +362,11 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         
         IrGenMov(stmt.m_arg0, &g_retReg, stream); // arg0 => %rax
         
+        // make sure the second arg is not an immediate nor a memory access
+        IrGenMov(stmt.m_arg1, &g_tempReg, stream);
+        
         stream << (stmt.m_opcode == IrOpcode::MUL ? "imulq " : "idivq ");
-        IrOutputArg(stmt.m_arg1, stream);
+        IrOutputArg(&g_tempReg, stream);
         stream << std::endl;
         
         if (stmt.m_opcode == IrOpcode::MOD)
@@ -353,15 +405,37 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         break;
         
     case IrOpcode::EQUAL:      // arg0 == arg1 -> arg2 (0 or 1)
-        break;
-        
     case IrOpcode::LESS:       // arg0 < arg1 -> arg2 (0 or 1)
+    case IrOpcode::NOTEQUAL:   // arg0 != arg1 -> arg2 (0 or 1)
+    case IrOpcode::LESSEQUAL:  // arg0 <= arg1 -> arg2 (0 or 1)
+    case IrOpcode::GREATER:    // arg0 > arg1 -> arg2 (0 or 1)
+    case IrOpcode::GREATEREQUAL: // arg0 >= arg1 -> arg2 (0 or 1)
+        IrGenComparison(stmt, stream);
         break;
         
     case IrOpcode::AND:        // arg0 && arg1 -> arg2 (0 or 1)
+    case IrOpcode::OR:         // arg0 || arg1 -> arg2 (0 or 1)
+        // make sure the second arg is not an immediate nor a memory access
+        IrGenMov(stmt.m_arg1, &g_tempReg, stream);
+     
+        stream << (stmt.m_opcode == IrOpcode::AND ? "andq " : "orq ");
+        IrOutputArg(stmt.m_arg0, stream);
+        stream << ", ";
+        IrOutputArg(&g_tempReg, stream);
+        stream << std::endl;
+    
+        IrGenMov(&g_tempReg, stmt.m_arg2, stream);        
         break;
         
-    case IrOpcode::OR:         // arg0 || arg1 -> arg2 (0 or 1)
+    case IrOpcode::NOT:        // !arg0 -> arg2 (0 or 1)
+        // make sure the arg is not an immediate 
+        IrGenMov(stmt.m_arg0, &g_tempReg, stream);
+            
+        stream << "notq ";
+        IrOutputArg(&g_tempReg, stream);
+        stream << std::endl;
+        
+        IrGenMov(&g_tempReg, stmt.m_arg2, stream);        
         break;
         
     case IrOpcode::LABEL:      // arg0:
@@ -370,9 +444,15 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         break;
         
     case IrOpcode::JUMP:       // jump arg0
+        stream << "jmp ";
+        IrOutputLabel(stmt.m_arg0, stream);
+        stream << std::endl;
         break;
         
     case IrOpcode::IFZ:        // branch arg0 == 0 to arg1
+        stream << "jz ";
+        IrOutputLabel(stmt.m_arg1, stream);
+        stream << std::endl;
         break;
         
     case IrOpcode::PARAM:       // push arg0 -> stack

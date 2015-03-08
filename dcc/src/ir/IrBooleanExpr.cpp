@@ -33,14 +33,14 @@ namespace Decaf
 static const IrOpcode g_booleanOpcodes[(int)IrBooleanOperator::NUM_IR_BOOLEAN_OPERATORS] =
 {
     IrOpcode::EQUAL,
-    IrOpcode::EQUAL, // NotEqual,
-    IrOpcode::LESS,  // Less,
-    IrOpcode::LESS,  // LessEqual,
-    IrOpcode::LESS,  // Greater,
-    IrOpcode::LESS,  // GreaterEqual,
+    IrOpcode::NOTEQUAL,
+    IrOpcode::LESS, 
+    IrOpcode::LESSEQUAL,
+    IrOpcode::GREATER,
+    IrOpcode::GREATEREQUAL,
     IrOpcode::AND,
     IrOpcode::OR,
-    IrOpcode::EQUAL, // Not,
+    IrOpcode::NOT,
 };
 
 static IrOpcode opcodeFor(IrBooleanOperator boolop)

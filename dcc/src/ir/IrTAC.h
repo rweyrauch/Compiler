@@ -45,9 +45,14 @@ enum class IrOpcode : int
     FEND,       // end function
     RETURN,     // return |arg0|
     EQUAL,      // arg0 == arg1 -> arg2 (0 or 1)
+    NOTEQUAL,   // arg0 != arg1 -> arg2 (0 or 1)
     LESS,       // arg0 < arg1 -> arg2 (0 or 1)
+    LESSEQUAL,  // arg0 <= arg1 -> arg2 (0 or 1)
+    GREATER,    // arg0 > arg1 -> arg2 (0 or 1)
+    GREATEREQUAL, // arg0 >= arg1 -> arg2 (0 or 1)
     AND,        // arg0 && arg1 -> arg2 (0 or 1)
     OR,         // arg0 || arg1 -> arg2 (0 or 1)
+    NOT,        // !arg0 -> arg2 (0 or 1)
     LABEL,      // arg0:
     JUMP,       // jump arg0
     IFZ,        // branch arg0 == 0 to arg1

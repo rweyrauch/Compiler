@@ -4,10 +4,25 @@ clear
 
 echo "Running IR semantic tests."
 
-pushd testdata/semantic
-for input in *.dcf
+DCC=`pwd`/dcc
+echo $DCC
+
+TESTFILES=testdata/semantic/*.dcf
+
+for input in ${TESTFILES}
 do
-    ../../dcc --target parse > ../../out/$input.out $input
+    dcfinput=${input##*/}
+    ${DCC} -o out/$dcfinput.s $input 2> out/$dcfinput.log
 done
 popd
 
+echo "Running dcc codegen tests."
+
+TESTFILES=testdata/codegen/*.dcf
+for input in ${TESTFILES}
+do
+    dcfinput=${input##*/}
+    echo $dcfinput
+    ${DCC} -o out/$dcfinput.s $input
+    gcc out/$dcfinput.s -o out/$dcfinput.out 2> out/$dcfinput.log
+done
