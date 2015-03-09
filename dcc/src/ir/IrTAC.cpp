@@ -412,7 +412,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
 			for (auto it = g_extraParams.begin(); it != g_extraParams.end(); ++it)
 			{
 				stream << "push ";
-				IrOutputLabel(*it, stream);
+				IrOutputArg(*it, stream);
 				stream << std::endl;
 			}
 			g_extraParams.clear();
