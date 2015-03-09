@@ -27,20 +27,20 @@ class Parser: public ParserBase
     std::string d_blank;
     
     public:
-        Parser(std::istream &in, std::ostream &out) :
+        Parser(std::istream &in, std::ostream &out, bool ia64) :
             d_scanner(in, out),
             d_root(0) 
         {
             d_scanner.setSLoc(&d_loc__);
-            d_ctx = new IrTraversalContext();
+            d_ctx = new IrTraversalContext(ia64);
         }
-        Parser(std::string const &infile, std::string const &outfile) :
+        Parser(std::string const &infile, std::string const &outfile, bool ia64) :
             d_scanner(infile, outfile),
             d_root(0) 
         {
             preloadSource(infile);            
             d_scanner.setSLoc(&d_loc__);            
-            d_ctx = new IrTraversalContext();
+            d_ctx = new IrTraversalContext(ia64);
             d_ctx->setSource(&d_source);
         }
         virtual ~Parser() {}

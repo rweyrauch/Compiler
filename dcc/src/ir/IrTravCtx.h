@@ -40,7 +40,8 @@ class IrIdentifier;
 class IrTraversalContext
 {
 public:
-    IrTraversalContext() :
+    IrTraversalContext(bool ia64 = true) :
+		m_ia64(ia64),
         m_symbols(),
         m_parents(),
         m_source(nullptr),
@@ -48,6 +49,8 @@ public:
     {}
     
     ~IrTraversalContext() {}
+    
+    bool ia64() const { return m_ia64; }
     
     void pushSymbols(IrSymbolTable* symbols) { m_symbols.push_front(symbols); }
     void popSymbols() { m_symbols.pop_front(); }
@@ -80,6 +83,8 @@ public:
     void genStrings();
     
 protected:
+    
+    const bool m_ia64; // true to gen ia64 (x86_64), false to gen ia32 
     
     std::list<IrSymbolTable*> m_symbols;
     std::vector<IrBase*> m_parents;

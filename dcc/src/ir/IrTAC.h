@@ -80,6 +80,8 @@ struct IrTacStmt
 
 void IrPrintTac(const IrTacStmt& stmt);
 
+void IrGenIA32();
+
 void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream = std::cout);
 
 } // namespace Decaf

@@ -7,12 +7,14 @@
 char* g_target = 0;
 char* g_outputFilename = 0;
 int g_debug = 0;
+int g_ia32 = false;
 
 poptOption appOptions[] =
 {
     { "target", 't', POPT_ARG_STRING, &g_target, 0, "scan or parse", NULL },
     { "output", 'o', POPT_ARG_STRING, &g_outputFilename, 0, "output filename", NULL },
     { "debug", 'd', POPT_ARG_NONE, &g_debug, 0, "debugging output", NULL },
+    { "m32", '3', POPT_ARG_NONE, &g_ia32, 0, "generate 32-bit code", NULL },
     POPT_AUTOHELP
     POPT_TABLEEND
 };
@@ -71,11 +73,11 @@ int main(int argc, char **argv)
         Parser* parser = 0;
         if (poptPeekArg(cmd))
         {
-            parser = new Parser(poptGetArg(cmd), g_outputFilename ? g_outputFilename : "decaf.out");
+            parser = new Parser(poptGetArg(cmd), g_outputFilename ? g_outputFilename : "decaf.out", !g_ia32);
         }
         else
         {
-            parser = new Parser(std::cin, std::cout);
+            parser = new Parser(std::cin, std::cout, !g_ia32);
         }
         
         parser->parse();        

@@ -69,6 +69,24 @@ const std::string g_registerNames[(int)IrRegName::NUM] =
     "%r9"    
 };
 
+const std::string g_registerNames_ia32[(int)IrRegName::NUM] =
+{
+    // temp registers
+    "%ebx",
+    "%eax",
+    "%al",
+    "%edx",
+    "%dl",
+    
+    // parameter registers
+    "---",
+    "---",
+    "---",
+    "---",
+    "---",
+    "---"    
+};
+
 class IrRegister : public IrBase
 {
 public:
@@ -190,6 +208,8 @@ void IrPrintTac(const IrTacStmt& stmt)
     std::cout << "\t// " << stmt.m_info << std::endl;
 }
 
+static bool g_ia64 = true;
+
 void IrOutputArg(const IrBase* arg, std::ostream& stream)
 {
 if (arg == nullptr) return;
@@ -204,7 +224,8 @@ if (arg == nullptr) return;
         if (ident->isLabel())
             stream << "$" << ident->getIdentifier();
         else
-            stream << "-" << ident->getAddress()+8 << "(%rbp)";
+
+            stream << "-" << ident->getAddress()+8 << (g_ia64 ? "(%rbp)" : "(%ebp)");
     }
     else if (iliteral != nullptr)
     {
@@ -216,7 +237,10 @@ if (arg == nullptr) return;
     }
     else if (reg != nullptr)
     {
-        stream << g_registerNames[(int)reg->name()];
+		if (g_ia64)
+			stream << g_registerNames[(int)reg->name()];
+		else
+			stream << g_registerNames_ia32[(int)reg->name()];
     }
 }
 
@@ -269,13 +293,13 @@ void IrGenMov(const IrBase* src, const IrBase* dst, std::ostream& stream)
 {
     if (IrIsMemory(src) && IrIsMemory(dst))
     {
-        stream << "movq ";
+        stream << (g_ia64 ? "movq " : "movl ");
         IrOutputArg(src, stream);
         stream << ", ";
         IrOutputArg(&g_tempReg, stream);
         stream << std::endl;
         
-        stream << "movq ";
+        stream << (g_ia64 ? "movq " : "movl ");
         IrOutputArg(&g_tempReg, stream);
         stream << ", ";
         IrOutputArg(dst, stream);
@@ -283,7 +307,7 @@ void IrGenMov(const IrBase* src, const IrBase* dst, std::ostream& stream)
     }
     else
     {
-        stream << "movq ";
+        stream << (g_ia64 ? "movq " : "movl ");
         IrOutputArg(src, stream);
         stream << ", ";
         IrOutputArg(dst, stream);
@@ -294,7 +318,7 @@ void IrGenMov(const IrBase* src, const IrBase* dst, std::ostream& stream)
 void IrGenComparison(const IrTacStmt& stmt, std::ostream& stream)
 {    
     // zero the temp output reg
-    stream << "xorq ";
+    stream << "xor ";
     IrOutputArg(&g_retReg, stream);
     stream << ", ";
     IrOutputArg(&g_retReg, stream);
@@ -341,7 +365,7 @@ void IrGenComparison(const IrTacStmt& stmt, std::ostream& stream)
     IrOutputArg(&g_retRegWord, stream);    
     stream << std::endl;  
     
-    stream << "movzbq ";
+    stream << "movzb ";
     IrOutputArg(&g_retRegWord, stream);
     stream << ", ";
     IrOutputArg(&g_retReg, stream);
@@ -351,6 +375,11 @@ void IrGenComparison(const IrTacStmt& stmt, std::ostream& stream)
 }
 
 static std::vector<const IrBase*> g_extraParams;
+
+void IrGenIA32()
+{
+	g_ia64 = false;
+}
 
 void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
 {    
@@ -364,7 +393,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
     case IrOpcode::SUB:        // arg0 - arg1 -> arg2
         IrGenMov(stmt.m_arg0, &g_tempReg, stream);
         
-        stream << (stmt.m_opcode == IrOpcode::ADD ? "addq " : "subq ");
+        stream << (stmt.m_opcode == IrOpcode::ADD ? "add " : "sub ");
         IrOutputArg(stmt.m_arg1, stream);
         stream << ", ";
         IrOutputArg(&g_tempReg, stream);
@@ -377,7 +406,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
     case IrOpcode::DIV:        // arg0 / arg1 -> arg2
     case IrOpcode::MOD:        // arg0 % arg1 -> arg2     
         // zero the temp output reg
-        stream << "xorq ";
+        stream << "xor ";
         IrOutputArg(&g_outReg, stream);
         stream << ", ";
         IrOutputArg(&g_outReg, stream);
@@ -388,7 +417,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         // make sure the second arg is not an immediate nor a memory access
         IrGenMov(stmt.m_arg1, &g_tempReg, stream);
         
-        stream << (stmt.m_opcode == IrOpcode::MUL ? "imulq " : "idivq ");
+        stream << (stmt.m_opcode == IrOpcode::MUL ? "imul " : "idiv ");
         IrOutputArg(&g_tempReg, stream);
         stream << std::endl;
         
@@ -459,7 +488,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         // make sure the second arg is not an immediate nor a memory access
         IrGenMov(stmt.m_arg1, &g_tempReg, stream);
      
-        stream << (stmt.m_opcode == IrOpcode::AND ? "andq " : "orq ");
+        stream << (stmt.m_opcode == IrOpcode::AND ? "and " : "or ");
         IrOutputArg(stmt.m_arg0, stream);
         stream << ", ";
         IrOutputArg(&g_tempReg, stream);
@@ -472,7 +501,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         // make sure the arg is not an immediate 
         IrGenMov(stmt.m_arg0, &g_tempReg, stream);
             
-        stream << "notq ";
+        stream << "not ";
         IrOutputArg(&g_tempReg, stream);
         stream << std::endl;
         
@@ -501,7 +530,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         break;
         
     case IrOpcode::PARAM:       // push arg0 -> stack
-        if (stmt.m_info < NUM_ARG_REGS)
+        if (g_ia64 && stmt.m_info < NUM_ARG_REGS)
         {
             IrGenMov(stmt.m_arg0, g_paramRegisters[stmt.m_info], stream);
         }
