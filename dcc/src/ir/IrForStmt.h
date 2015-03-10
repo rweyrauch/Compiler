@@ -43,6 +43,7 @@ public:
         m_loopAutoLocation(nullptr),
         m_initialValue(initialExpr),
         m_terminatingValue(endExpr),
+        m_terminatingExpr(nullptr),
         m_body(block),
         m_symbols(nullptr),
         m_labelTop(nullptr),
@@ -67,6 +68,7 @@ protected:
     IrLocation* m_loopAutoLocation;
     IrExpression* m_initialValue;
     IrExpression* m_terminatingValue;
+    IrExpression* m_terminatingExpr;
     IrBlock* m_body;
     IrSymbolTable* m_symbols;
     

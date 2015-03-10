@@ -27,6 +27,7 @@
 #include "IrForStmt.h"
 #include "IrIdentifier.h"
 #include "IrExpression.h"
+#include "IrBooleanExpr.h"
 #include "IrIntLiteral.h"
 #include "IrBlock.h"
 #include "IrTravCtx.h"
@@ -40,6 +41,7 @@ IrForStatement::~IrForStatement()
     delete m_loopAutoLocation;
     delete m_initialValue;
     delete m_terminatingValue;
+    delete m_terminatingExpr;
     delete m_body;
     delete m_symbols;
     
@@ -137,47 +139,42 @@ bool IrForStatement::codegen(IrTraversalContext* ctx)
     delete m_labelEnd;
     m_labelEnd = IrIdentifier::CreateLabel();
     
+    delete m_terminatingExpr;
+    m_terminatingExpr = new IrBooleanExpression(0, 0, __FILE__, m_loopAutoLocation, IrBooleanOperator::GreaterEqual, m_terminatingValue);
+    
     ctx->pushSymbols(m_symbols);
     ctx->pushParent(this);
     
     m_loopVariable->codegen(ctx);
     m_initialValue->codegen(ctx);
-    
-    /*
-    IrTacStmt initLoop;
-    initLoop.m_opcode = IrOpcode::MOV;
-    IrIntegerLiteral* literal = dynamic_cast<IrIntegerLiteral*>(m_initialValue);
-    if (literal)
-    {
-        initLoop.m_arg0 = m_initialValue;
-    }
-    else
-    {
-        initLoop.m_arg0 = m_initialValue->getResultIdentifier();
-    }
-    ctx->append(initLoop);
-    */
+        
+    IrTacStmt label;  
+    label.m_opcode = IrOpcode::LABEL;
+    label.m_arg0 = m_labelTop;
+    ctx->append(label);
+     
     m_terminatingValue->codegen(ctx);
     
-    /*
+    m_terminatingExpr->codegen(ctx);
+       
     IrTacStmt termLoop;
     termLoop.m_opcode = IrOpcode::IFZ;
-    literal = dynamic_cast<IrIntegerLiteral*>(m_terminatingValue);
-    if (literal)
-    {
-        termLoop.m_arg0 = m_terminatingValue;
-    }
-    else
-    {
-        termLoop.m_arg0 = m_terminatingValue->getResultIdentifier();
-    }
+    termLoop.m_arg0 = m_terminatingExpr;
     termLoop.m_arg1 = m_labelEnd;
-    termLoop.m_arg2 = nullptr;
     
     ctx->append(termLoop);
-    */
     
     if (m_body) m_body->codegen(ctx);
+    
+	IrTacStmt jump;
+	jump.m_opcode = IrOpcode::JUMP;
+	jump.m_arg0 = m_labelEnd;
+	
+	ctx->append(jump);
+    
+    label.m_opcode = IrOpcode::LABEL;
+    label.m_arg0 = m_labelEnd;
+    ctx->append(label);
     
     ctx->popParent();
     ctx->popSymbols();
