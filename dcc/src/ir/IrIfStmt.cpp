@@ -39,7 +39,7 @@ IrIfStatement::~IrIfStatement()
     delete m_trueBlock;
     delete m_falseBlock;
     
-    delete m_labelTrue;
+    delete m_labelFalse;
     delete m_labelEnd;
 }
     
@@ -103,11 +103,11 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
     
     // Template:
     // <evaluate condition>
-    // jump<oper> <label_true>
-    // <false_body>
-    // jmp <label_end>
-    // label_true:
+    // jump<oper> <label_false>
     // <true_body>
+    // jmp <label_end>
+    // label_false:
+    // <false_body>
     // label_end:
     
     ctx->pushParent(this);
@@ -115,8 +115,8 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
     if (!m_condition->codegen(ctx))
         valid = false;
     
-    delete m_labelTrue;
-    m_labelTrue = IrIdentifier::CreateLabel();
+    delete m_labelFalse;
+    m_labelFalse = IrIdentifier::CreateLabel();
     
     delete m_labelEnd;
     m_labelEnd = IrIdentifier::CreateLabel();
@@ -132,14 +132,14 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
     {
         tac.m_arg0 = m_condition->getResultIdentifier();
     }
-    tac.m_arg1 = m_labelTrue;
+    tac.m_arg1 = m_labelFalse;
     tac.m_arg2 = nullptr;
     
     ctx->append(tac);
     
-    if (m_falseBlock)
+    if (m_trueBlock)
     {
-        if (!m_falseBlock->codegen(ctx))
+        if (!m_trueBlock->codegen(ctx))
             valid = false;
         
         IrTacStmt jump;
@@ -148,19 +148,18 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
         
         ctx->append(jump);
     }
+            
+    IrTacStmt label;
+    label.m_opcode = IrOpcode::LABEL;
+    label.m_arg0 = m_labelFalse;
+    ctx->append(label);
     
-    if (m_trueBlock)
-    {
-        IrTacStmt label;
-        label.m_opcode = IrOpcode::LABEL;
-        label.m_arg0 = m_labelTrue;
-        
-        ctx->append(label);
-        
-        if (!m_trueBlock->codegen(ctx))
+    if (m_falseBlock)
+    {              
+        if (!m_falseBlock->codegen(ctx))
             valid = false;
     }
-
+    
     IrTacStmt elabel;
     elabel.m_opcode = IrOpcode::LABEL;
     elabel.m_arg0 = m_labelEnd;

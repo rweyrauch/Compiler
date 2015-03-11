@@ -40,7 +40,7 @@ public:
         m_condition(condition),
         m_trueBlock(trueBlock),
         m_falseBlock(falseBlock),
-        m_labelTrue(nullptr),
+        m_labelFalse(nullptr),
         m_labelEnd(nullptr)
     {}
     
@@ -57,7 +57,7 @@ protected:
     IrBlock* m_trueBlock;
     IrBlock* m_falseBlock;
     
-    IrIdentifier* m_labelTrue;
+    IrIdentifier* m_labelFalse;
     IrIdentifier* m_labelEnd;
     
 private:

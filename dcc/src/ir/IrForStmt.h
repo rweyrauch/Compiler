@@ -26,7 +26,7 @@
 #include "IrCommon.h"
 #include "IrStatement.h"
 #include "IrSymbolTable.h"
-#include "IrLocation.h"
+#include "IrVarDecl.h"
 
 namespace Decaf
 {
@@ -37,23 +37,7 @@ class IrBlock;
 class IrForStatement : public IrStatement
 {
 public:
-    IrForStatement(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* loopVar, IrExpression* initialExpr, IrExpression* endExpr, IrBlock* block = nullptr) :
-        IrStatement(lineNumber, columnNumber, filename),
-        m_loopVariable(loopVar),
-        m_loopAutoLocation(nullptr),
-        m_initialValue(initialExpr),
-        m_terminatingValue(endExpr),
-        m_terminatingExpr(nullptr),
-        m_body(block),
-        m_symbols(nullptr),
-        m_labelTop(nullptr),
-        m_labelEnd(nullptr)
-    {
-        m_loopAutoLocation = new IrLocation(m_loopVariable->getLineNumber(), m_loopVariable->getColumnNumber(), filename, loopVar, IrType::Integer);
-        
-        m_symbols = new IrSymbolTable();
-        m_symbols->addVariable(m_loopAutoLocation);
-    }
+    IrForStatement(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* loopVar, IrExpression* initialExpr, IrExpression* endExpr, IrBlock* block = nullptr);
     
     virtual ~IrForStatement();
     
@@ -65,14 +49,15 @@ public:
 protected:    
     
     IrIdentifier* m_loopVariable;
-    IrLocation* m_loopAutoLocation;
+    IrVariableDecl* m_loopAuto;
+    IrExpression* m_loopVarExpr;
     IrExpression* m_initialValue;
     IrExpression* m_terminatingValue;
     IrExpression* m_terminatingExpr;
     IrBlock* m_body;
     IrSymbolTable* m_symbols;
     
-    IrIdentifier* m_labelTop;
+    IrIdentifier* m_labelCont;
     IrIdentifier* m_labelEnd;
     
 private:

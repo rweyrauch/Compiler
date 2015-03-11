@@ -28,6 +28,8 @@
 #include "IrIdentifier.h"
 #include "IrExpression.h"
 #include "IrBooleanExpr.h"
+#include "IrBinaryExpr.h"
+#include "IrIdentifier.h"
 #include "IrIntLiteral.h"
 #include "IrBlock.h"
 #include "IrTravCtx.h"
@@ -35,17 +37,47 @@
 namespace Decaf
 {
 
+IrForStatement::IrForStatement(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* loopVar, IrExpression* initialExpr, IrExpression* endExpr, IrBlock* block) :
+    IrStatement(lineNumber, columnNumber, filename),
+    m_loopVariable(loopVar),
+    m_loopAuto(nullptr),
+    m_loopVarExpr(nullptr),
+    m_initialValue(initialExpr),
+    m_terminatingValue(endExpr),
+    m_terminatingExpr(nullptr),
+    m_body(block),
+    m_symbols(nullptr),
+    m_labelCont(nullptr),
+    m_labelEnd(nullptr)
+{
+    m_loopAuto = new IrVariableDecl(m_loopVariable->getLineNumber(), m_loopVariable->getColumnNumber(), filename, m_loopVariable, IrType::Integer);
+    
+    m_loopVarExpr = new IrBinaryExpression(m_loopVariable->getLineNumber(), m_loopVariable->getColumnNumber(), filename, nullptr, IrBinaryOperator::Add, nullptr);
+    
+    delete m_labelCont;
+    m_labelCont = IrIdentifier::CreateLabel();
+    
+    delete m_labelEnd;
+    m_labelEnd = IrIdentifier::CreateLabel();
+    
+    delete m_terminatingExpr;
+    m_terminatingExpr = new IrBooleanExpression(0, 0, __FILE__, m_loopAuto->getVariable(0), IrBooleanOperator::GreaterEqual, m_terminatingValue);
+    
+    m_symbols = new IrSymbolTable();
+    m_symbols->addVariable(m_loopAuto);
+}
+     
 IrForStatement::~IrForStatement()
 {
     delete m_loopVariable;
-    delete m_loopAutoLocation;
+    delete m_loopAuto;
     delete m_initialValue;
     delete m_terminatingValue;
     delete m_terminatingExpr;
     delete m_body;
     delete m_symbols;
     
-    delete m_labelTop;
+    delete m_labelCont;
     delete m_labelEnd;    
 }
     
@@ -54,6 +86,7 @@ void IrForStatement::propagateTypes(IrTraversalContext* ctx)
     ctx->pushSymbols(m_symbols);
     ctx->pushParent(this);
     
+    m_loopAuto->propagateTypes(ctx);
     m_loopVariable->propagateTypes(ctx);
     m_initialValue->propagateTypes(ctx);
     m_terminatingValue->propagateTypes(ctx);
@@ -69,6 +102,7 @@ void IrForStatement::print(unsigned int depth)
     IRPRINT_INDENT(depth);
     std::cout << "For(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
     
+    m_loopAuto->print(depth+1);
     m_loopVariable->print(depth+1);
     m_initialValue->print(depth+1);
     m_terminatingValue->print(depth+1);
@@ -83,6 +117,8 @@ bool IrForStatement::analyze(IrTraversalContext* ctx)
     ctx->pushSymbols(m_symbols);
     ctx->pushParent(this);
     
+    if (!m_loopAuto->analyze(ctx))
+        valid = false;
     if (!m_loopVariable->analyze(ctx))
         valid = false;
     if (!m_initialValue->analyze(ctx))
@@ -125,32 +161,24 @@ bool IrForStatement::codegen(IrTraversalContext* ctx)
     // Template:
     // init_var = <evaluate initial value>
     // loop_var = <evaluate terminating value>
-    // label_top:
-    // temp = loop_var - init_var;
+    // label_cont:
+    // temp = <evaluate termination expression>
     // ifz temp <label_end>
     // <body>
-    // decr loop_var
-    // jmp <label_top>
+    // incr loop_var
+    // jmp <label_cont>
     // label_end:
-    
-    delete m_labelTop;
-    m_labelTop = IrIdentifier::CreateLabel();
-    
-    delete m_labelEnd;
-    m_labelEnd = IrIdentifier::CreateLabel();
-    
-    delete m_terminatingExpr;
-    m_terminatingExpr = new IrBooleanExpression(0, 0, __FILE__, m_loopAutoLocation, IrBooleanOperator::GreaterEqual, m_terminatingValue);
     
     ctx->pushSymbols(m_symbols);
     ctx->pushParent(this);
     
     m_loopVariable->codegen(ctx);
+    m_loopAuto->codegen(ctx);
     m_initialValue->codegen(ctx);
         
     IrTacStmt label;  
     label.m_opcode = IrOpcode::LABEL;
-    label.m_arg0 = m_labelTop;
+    label.m_arg0 = m_labelCont;
     ctx->append(label);
      
     m_terminatingValue->codegen(ctx);

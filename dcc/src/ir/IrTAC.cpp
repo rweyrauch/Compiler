@@ -338,25 +338,25 @@ void IrGenComparison(const IrTacStmt& stmt, std::ostream& stream)
     case IrOpcode::EQUAL:      // arg0 == arg1 -> arg2 (0 or 1)
         stream << "sete ";
         break;
-        
-    case IrOpcode::LESS:       // arg0 < arg1 -> arg2 (0 or 1)
-        stream << "setnge ";
-        break;
-        
+                
     case IrOpcode::NOTEQUAL:   // arg0 != arg1 -> arg2 (0 or 1)
         stream << "setne ";
         break;
         
-    case IrOpcode::LESSEQUAL:  // arg0 <= arg1 -> arg2 (0 or 1)
-        stream << "setng ";
+    case IrOpcode::LESS:       // arg0 < arg1 -> arg2 (0 or 1)
+        stream << "setge ";
         break;
         
-    case IrOpcode::GREATER:    // arg0 > arg1 -> arg2 (0 or 1)
+    case IrOpcode::LESSEQUAL:  // arg0 <= arg1 -> arg2 (0 or 1)
         stream << "setg ";
         break;
         
+    case IrOpcode::GREATER:    // arg0 > arg1 -> arg2 (0 or 1)
+        stream << "setnge ";
+        break;
+        
     case IrOpcode::GREATEREQUAL: // arg0 >= arg1 -> arg2 (0 or 1)
-        stream << "setge ";
+        stream << "setng ";
         break;
         
     default:
@@ -524,7 +524,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         IrOutputArg(stmt.m_arg0, stream);
         stream << std::endl;
         
-        stream << "jz ";        // jump if cmp == 0
+        stream << "je ";        // jump if cmp == 0
         IrOutputLabel(stmt.m_arg1, stream);
         stream << std::endl;
         break;
