@@ -29,7 +29,7 @@
 
 %token RETURN CALLOUT
 %token BOOLTYPE INTTYPE CLASS VOID
-%token IF ELSE FOR CONTINUE BREAK
+%token IF ELSE FOR CONTINUE BREAK GOTO
 
 %token IDENTIFIER INTEGER BOOLEAN CHARACTER STRING
 %token EQUAL PLUSEQUAL MINUSEQUAL
@@ -303,6 +303,10 @@ statement
     | expr SEMI 
     { 
         $$ = new Decaf::IrExpressionStatement(@1.first_line, @1.first_column, d_scanner.filename(), $1); 
+    }
+    | GOTO ident SEMI
+    {
+        $$ = new Decaf::IrGotoStatement(@1.first_line, @1.first_column, $2);
     }
     | block 
     { 

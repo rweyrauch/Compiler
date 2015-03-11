@@ -26,7 +26,7 @@
 #include "IrCommon.h"
 #include "IrStatement.h"
 #include "IrSymbolTable.h"
-#include "IrVarDecl.h"
+#include "IrLocation.h"
 
 namespace Decaf
 {
@@ -48,11 +48,11 @@ public:
         
 protected:    
     
-    IrIdentifier* m_loopVariable;
-    IrVariableDecl* m_loopAuto;
+    IrLocation* m_loopAuto;
     IrExpression* m_loopVarExpr;
     IrExpression* m_initialValue;
     IrExpression* m_terminatingValue;
+    IrExpression* m_incrementExpr;
     IrExpression* m_terminatingExpr;
     IrBlock* m_body;
     IrSymbolTable* m_symbols;

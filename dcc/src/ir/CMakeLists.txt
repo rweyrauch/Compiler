@@ -15,6 +15,7 @@ add_library(
     IrExprStmt.cpp
     IrFieldDecl.cpp
     IrForStmt.cpp
+    IrGotoStmt.cpp
     IrIdentifier.cpp
     IrIfStmt.cpp
     IrLocation.cpp

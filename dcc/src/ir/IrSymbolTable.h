@@ -38,7 +38,7 @@ class IrSymbolTable
 {
 public:
     IrSymbolTable() :
-		m_variableStackSize(0),
+        m_variableStackSize(0),
         m_variables(),
         m_methods()
     {}

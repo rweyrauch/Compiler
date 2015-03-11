@@ -22,36 +22,33 @@
 // THE SOFTWARE.
 //
 #pragma once
-
-#include "IrCommon.h"
-#include "IrBase.h"
-
-#include "IrAssignExpr.h"
-#include "IrBinaryExpr.h"
-#include "IrBlock.h"
-#include "IrBooleanExpr.h"
-#include "IrBoolLiteral.h"
-#include "IrBreakStmt.h"
-#include "IrCharLiteral.h"
-#include "IrClass.h"
-#include "IrContinueStmt.h"
-#include "IrExpression.h"
-#include "IrExprStmt.h"
-#include "IrFieldDecl.h"
-#include "IrForStmt.h"
-#include "IrGotoStmt.h"
-#include "IrIdentifier.h"
-#include "IrIfStmt.h"
-#include "IrIntLiteral.h"
-#include "IrLiteral.h"
-#include "IrLocation.h"
-#include "IrMethodCall.h"
-#include "IrMethodDecl.h"
-#include "IrReturnStmt.h"
 #include "IrStatement.h"
-#include "IrStringLiteral.h"
-#include "IrSymbolTable.h"
-#include "IrTravCtx.h"
-#include "IrVarDecl.h"
 
+namespace Decaf
+{
+class IrIdentifier;
 
+class IrGotoStatement : public IrStatement
+{
+public:
+    IrGotoStatement(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* label) :
+        IrStatement(lineNumber, columnNumber, filename),
+        m_label(label)
+    {}
+    
+    virtual ~IrGotoStatement()
+    {}
+    
+    virtual void propagateTypes(IrTraversalContext* ctx); 
+    virtual void print(unsigned int depth);
+    virtual bool analyze(IrTraversalContext* ctx);
+        
+protected:    
+    IrIdentifier* m_label;
+    
+private:
+    IrGotoStatement() = delete;
+    IrGotoStatement(const IrGotoStatement& rhs) = delete;
+};
+
+} // namespace Decaf
