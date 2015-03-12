@@ -18,6 +18,7 @@ add_library(
     IrGotoStmt.cpp
     IrIdentifier.cpp
     IrIfStmt.cpp
+    IrLabelStmt.cpp
     IrLocation.cpp
     IrMethodCall.cpp
     IrMethodDecl.cpp

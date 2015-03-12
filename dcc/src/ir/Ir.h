@@ -43,6 +43,7 @@
 #include "IrIdentifier.h"
 #include "IrIfStmt.h"
 #include "IrIntLiteral.h"
+#include "IrLabelStmt.h"
 #include "IrLiteral.h"
 #include "IrLocation.h"
 #include "IrMethodCall.h"

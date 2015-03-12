@@ -21,47 +21,35 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#include <iostream>
-#include "IrCommon.h"
-#include "IrGotoStmt.h"
-#include "IrTravCtx.h"
-#include "IrForStmt.h"
+#pragma once
+#include "IrStatement.h"
 
 namespace Decaf
 {
-    
-void IrGotoStatement::propagateTypes(IrTraversalContext* ctx)
-{
-    // nothing to do
-}
-    
-void IrGotoStatement::print(unsigned int depth)
-{
-    IRPRINT_INDENT(depth);
-    std::cout << "Goto(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
-}
-        
-bool IrGotoStatement::analyze(IrTraversalContext* ctx)
-{
-    bool valid = true;
-    return valid;
-}
+class IrIdentifier;
 
-bool IrGotoStatement::codegen(IrTraversalContext* ctx)
+class IrLabelStatement : public IrStatement
 {
-	bool valid = true;
-	
-    ctx->pushParent(this);
+public:
+    IrLabelStatement(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* label) :
+        IrStatement(lineNumber, columnNumber, filename),
+        m_label(label)
+    {}
     
-    IrTacStmt tac;
-    tac.m_opcode = IrOpcode::JUMP;
-    tac.m_arg0 = m_label;
-
-    ctx->append(tac);
+    virtual ~IrLabelStatement()
+    {}
     
-    ctx->popParent();
-    		
-	return valid;
-}
+    virtual void propagateTypes(IrTraversalContext* ctx); 
+    virtual void print(unsigned int depth);
+    virtual bool analyze(IrTraversalContext* ctx);
+    virtual bool codegen(IrTraversalContext* ctx);
+    
+protected:    
+    IrIdentifier* m_label;
+    
+private:
+    IrLabelStatement() = delete;
+    IrLabelStatement(const IrLabelStatement& rhs) = delete;
+};
 
 } // namespace Decaf

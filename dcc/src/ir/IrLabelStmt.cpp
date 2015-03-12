@@ -23,44 +23,44 @@
 //
 #include <iostream>
 #include "IrCommon.h"
-#include "IrGotoStmt.h"
+#include "IrLabelStmt.h"
 #include "IrTravCtx.h"
 #include "IrForStmt.h"
 
 namespace Decaf
 {
     
-void IrGotoStatement::propagateTypes(IrTraversalContext* ctx)
+void IrLabelStatement::propagateTypes(IrTraversalContext* ctx)
 {
     // nothing to do
 }
     
-void IrGotoStatement::print(unsigned int depth)
+void IrLabelStatement::print(unsigned int depth)
 {
     IRPRINT_INDENT(depth);
-    std::cout << "Goto(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
+    std::cout << "Label(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
 }
         
-bool IrGotoStatement::analyze(IrTraversalContext* ctx)
+bool IrLabelStatement::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
     return valid;
 }
 
-bool IrGotoStatement::codegen(IrTraversalContext* ctx)
+bool IrLabelStatement::codegen(IrTraversalContext* ctx)
 {
 	bool valid = true;
 	
     ctx->pushParent(this);
     
     IrTacStmt tac;
-    tac.m_opcode = IrOpcode::JUMP;
+    tac.m_opcode = IrOpcode::LABEL;
     tac.m_arg0 = m_label;
 
     ctx->append(tac);
     
     ctx->popParent();
-    		
+    	
 	return valid;
 }
 

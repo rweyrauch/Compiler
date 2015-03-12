@@ -90,6 +90,7 @@ false|true				        { track_column(); return (Parser::BOOLEAN); }
 "%"							    { track_column(); return (Parser::MOD); }
 
 ";"								{ track_column(); return (Parser::SEMI); }
+":"								{ track_column(); return (Parser::COLON); }
 
 [ \t\v\f\n]					    { track_column(); } // white space
 

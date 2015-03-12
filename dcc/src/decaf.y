@@ -33,7 +33,7 @@
 
 %token IDENTIFIER INTEGER BOOLEAN CHARACTER STRING
 %token EQUAL PLUSEQUAL MINUSEQUAL
-%token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA SEMI BANG
+%token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA SEMI BANG COLON
 %token MOD LOR LAND
 
 %token PLUS MINUS CEQ CNE CLT CLE CGT CGE 
@@ -306,8 +306,12 @@ statement
     }
     | GOTO ident SEMI
     {
-        $$ = new Decaf::IrGotoStatement(@1.first_line, @1.first_column, $2);
+        $$ = new Decaf::IrGotoStatement(@1.first_line, @1.first_column, d_scanner.filename(), $2);
     }
+    | ident COLON
+	{
+		$$ = new Decaf::IrLabelStatement(@1.first_line, @1.first_column, d_scanner.filename(), $1);
+	}
     | block 
     { 
         $$ = new Decaf::IrBlock(@1.first_line, @1.first_column, d_scanner.filename()); 
