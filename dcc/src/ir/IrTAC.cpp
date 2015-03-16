@@ -438,7 +438,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
 		// Pop extra parameters off the param stack
 		if (!g_extraParams.empty())
 		{
-			for (auto it = g_extraParams.begin(); it != g_extraParams.end(); ++it)
+			for (auto it = g_extraParams.rbegin(); it != g_extraParams.rend(); ++it)
 			{
 				stream << "push ";
 				IrOutputArg(*it, stream);

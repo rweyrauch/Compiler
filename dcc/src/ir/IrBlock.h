@@ -69,7 +69,9 @@ public:
     {
         return m_symbols;
     }
-  
+
+	size_t getAllocationSize() const;
+
 protected:    
     
     std::vector<IrVariableDecl*> m_variables;

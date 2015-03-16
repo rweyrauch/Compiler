@@ -93,6 +93,8 @@ void IrForStatement::print(unsigned int depth)
     IRPRINT_INDENT(depth);
     std::cout << "For(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
     
+    m_symbols->print(depth+1);
+       
     m_loopAuto->print(depth+1);
     m_initialValue->print(depth+1);
     m_terminatingValue->print(depth+1);
@@ -189,6 +191,11 @@ bool IrForStatement::codegen(IrTraversalContext* ctx)
     ctx->popSymbols();
     
     return valid;
+}
+
+size_t IrForStatement::getAllocationSize() const
+{
+	return m_symbols->getAllocationSize();
 }
 
 } // namespace Decaf
