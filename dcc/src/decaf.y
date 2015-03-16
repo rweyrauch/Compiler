@@ -314,7 +314,7 @@ statement
 	}
     | block 
     { 
-        $$ = new Decaf::IrBlock(@1.first_line, @1.first_column, d_scanner.filename()); 
+        $$ = $1; 
     }
     ;
     
