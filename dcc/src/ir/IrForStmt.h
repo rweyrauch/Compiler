@@ -33,11 +33,14 @@ namespace Decaf
 class IrIdentifier;
 class IrExpression;
 class IrBlock;
+class IrIntegerLiteral;
+class IrGotoStatement;
 
 class IrForStatement : public IrStatement
 {
 public:
-    IrForStatement(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* loopVar, IrExpression* initialExpr, IrExpression* endExpr, IrBlock* block = nullptr);
+    IrForStatement(int lineNumber, int columnNumber, const std::string& filename, 
+		IrIdentifier* loopVar, IrExpression* initialExpr, IrExpression* endExpr, IrBlock* block = nullptr);
     
     virtual ~IrForStatement();
     
@@ -49,16 +52,18 @@ public:
 protected:    
     
     IrLocation* m_loopAuto;
-    IrExpression* m_loopVarExpr;
     IrExpression* m_initialValue;
     IrExpression* m_terminatingValue;
-    IrExpression* m_incrementExpr;
-    IrExpression* m_terminatingExpr;
     IrBlock* m_body;
     IrSymbolTable* m_symbols;
     
-    IrIdentifier* m_labelCont;
+    IrIdentifier* m_labelTop;
     IrIdentifier* m_labelEnd;
+    IrExpression* m_initLoopAuto;
+    IrExpression* m_terminatingExpr;
+    IrExpression* m_incrementLoop;
+    IrIntegerLiteral* m_loopIncrement;
+    IrGotoStatement* m_loopGoto;
     
 private:
     IrForStatement() = delete;
