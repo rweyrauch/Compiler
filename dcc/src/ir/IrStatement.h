@@ -40,6 +40,7 @@ public:
     virtual void print(unsigned int depth) = 0;
     
     virtual size_t getAllocationSize() const { return 0; }
+    virtual void setSymbolStartAddress(size_t addr) { }
     
 protected:
     

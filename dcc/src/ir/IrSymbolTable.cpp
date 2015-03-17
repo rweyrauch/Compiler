@@ -271,6 +271,7 @@ bool IrSymbolTable::getSymbol(IrIdentifier* variable, SVariableSymbol& symbol) c
     if (it != m_variables.end())
     {
         symbol = it->second;
+        symbol.m_addr += m_startAddr;
         
         valid = true;
     }
@@ -322,7 +323,7 @@ void IrSymbolTable::print(int depth)
     {
         IRPRINT_INDENT(depth);
         std::cout << it->first << "\t\t" << IrTypeToString(it->second.m_type) << "\t\t" << it->second.m_count
-                  << "\t\t" << it->second.m_addr << std::endl;
+                  << "\t\t" << it->second.m_addr + m_startAddr << std::endl;
     }
     IRPRINT_INDENT(depth);
     std::cout << "Allocated Size: " << getAllocationSize() << " " << m_variableStackSize << std::endl;

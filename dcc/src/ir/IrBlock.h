@@ -71,6 +71,7 @@ public:
     }
 
     virtual size_t getAllocationSize() const;
+    virtual void setSymbolStartAddress(size_t addr);
 
 protected:    
     

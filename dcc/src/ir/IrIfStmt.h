@@ -52,6 +52,7 @@ public:
     virtual bool codegen(IrTraversalContext* ctx);
     
     virtual size_t getAllocationSize() const;
+    virtual void setSymbolStartAddress(size_t addr);
     
 protected:    
     

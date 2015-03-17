@@ -150,4 +150,15 @@ size_t IrBlock::getAllocationSize() const
     return allocSize;
 }
     
+void IrBlock::setSymbolStartAddress(size_t addr)
+{
+	m_symbols->setStartAddress(addr);
+	
+    // recurse sub-blocks
+    for (auto it : m_statements)
+    {
+        it->setSymbolStartAddress(m_symbols->getAllocationSize() + addr);
+    }
+}
+    
 } // namespace Decaf

@@ -185,4 +185,18 @@ size_t IrIfStatement::getAllocationSize() const
     return allocSize;
 }
 
+void IrIfStatement::setSymbolStartAddress(size_t addr)
+{
+	if (m_trueBlock != nullptr)
+    {
+        m_trueBlock->setSymbolStartAddress(addr);
+        addr += m_trueBlock->getAllocationSize();
+    }
+	if (m_falseBlock != nullptr)
+    {
+        m_falseBlock->setSymbolStartAddress(addr);
+        //addr += m_falseBlock->getAllocationSize();
+    }
+}
+ 
 } // namespace Decaf

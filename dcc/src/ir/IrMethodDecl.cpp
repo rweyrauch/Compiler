@@ -133,8 +133,10 @@ bool IrMethodDecl::analyze(IrTraversalContext* ctx)
                 m_block->addStatement(new IrReturnStatement(m_block->getLineNumber(), m_block->getColumnNumber(), m_block->getFilename()));
             }
         }
+		// patch up child symbol addresses
+		m_block->setSymbolStartAddress(m_symbols->getAllocationSize());
     }
-    
+       
     ctx->popParent();
     ctx->popSymbols();
     
@@ -155,7 +157,7 @@ bool IrMethodDecl::codegen(IrTraversalContext* ctx)
     // round stack size to multiple of 16 (assuming already a multiple of 8)
     if (stackSize % 16 != 0)
         stackSize += 8;
-
+		
     IrTacStmt beginTac;
     beginTac.m_opcode = IrOpcode::FBEGIN;
     beginTac.m_arg0 = m_identifier;

@@ -217,4 +217,15 @@ size_t IrForStatement::getAllocationSize() const
     return allocSize;
 }
 
+void IrForStatement::setSymbolStartAddress(size_t addr)
+{
+	m_symbols->setStartAddress(addr);
+	addr += m_symbols->getAllocationSize();
+	
+	if (m_body != nullptr)
+    {
+        m_body->setSymbolStartAddress(addr);
+    }
+}
+ 
 } // namespace Decaf
