@@ -171,4 +171,18 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
     return valid;
 }
 
+size_t IrIfStatement::getAllocationSize() const
+{
+    size_t allocSize = 0;
+    if (m_trueBlock != nullptr)
+    {
+        allocSize += m_trueBlock->getAllocationSize();
+    }
+    if (m_falseBlock != nullptr)
+    {
+        allocSize += m_falseBlock->getAllocationSize();
+    }
+    return allocSize;
+}
+
 } // namespace Decaf

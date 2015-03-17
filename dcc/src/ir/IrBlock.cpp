@@ -141,23 +141,14 @@ void IrBlock::addVariableDecl(const std::vector<IrVariableDecl*>& variables)
  
 size_t IrBlock::getAllocationSize() const
 {
-	size_t allocSize = m_symbols->getAllocationSize();
-	
-	// recurse sub-blocks
-	for (auto it = m_statements.cbegin(); it != m_statements.end(); ++it)
-	{
-		IrBlock const* subblock = dynamic_cast<IrBlock const*>(*it);
-		IrForStatement const* forblock = dynamic_cast<IrForStatement const*>(*it);
-		if (subblock != nullptr)
-		{
-			allocSize += subblock->getAllocationSize();
-		}
-		if (forblock != nullptr)
-		{
-			allocSize += forblock->getAllocationSize();
-		}
-	}
-	return allocSize;
+    size_t allocSize = m_symbols->getAllocationSize();
+
+    // recurse sub-blocks
+    for (auto it : m_statements)
+    {
+        allocSize += (it)->getAllocationSize();
+    }
+    return allocSize;
 }
-	    
+    
 } // namespace Decaf

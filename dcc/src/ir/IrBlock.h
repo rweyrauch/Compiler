@@ -70,7 +70,7 @@ public:
         return m_symbols;
     }
 
-	size_t getAllocationSize() const;
+    virtual size_t getAllocationSize() const;
 
 protected:    
     

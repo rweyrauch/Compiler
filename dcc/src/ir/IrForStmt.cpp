@@ -47,19 +47,19 @@ IrForStatement::IrForStatement(int lineNumber, int columnNumber, const std::stri
     m_body(block),
     m_symbols(nullptr)
 {
-	m_loopAuto = new IrLocation(lineNumber, columnNumber, filename, loopVar, IrType::Integer);
-	
-	m_initLoopAuto = new IrAssignExpression(lineNumber, columnNumber, filename, m_loopAuto, IrAssignmentOperator::Assign, m_initialValue);
-	m_labelTop = IrIdentifier::CreateLabel();
-	m_labelEnd = IrIdentifier::CreateLabel();
-	
-	m_terminatingExpr = new IrBooleanExpression(lineNumber, columnNumber, filename, m_loopAuto, IrBooleanOperator::LessEqual, m_terminatingValue);
-	
-	m_loopIncrement = new IrIntegerLiteral(lineNumber, columnNumber, filename, "1");
-	m_incrementLoop = new IrAssignExpression(lineNumber, columnNumber, filename, m_loopAuto, IrAssignmentOperator::IncrementAssign, m_loopIncrement);
+    m_loopAuto = new IrLocation(lineNumber, columnNumber, filename, loopVar, IrType::Integer);
 
-	m_loopGoto = new IrGotoStatement(lineNumber, columnNumber, filename, m_labelTop);
-	
+    m_initLoopAuto = new IrAssignExpression(lineNumber, columnNumber, filename, m_loopAuto, IrAssignmentOperator::Assign, m_initialValue);
+    m_labelTop = IrIdentifier::CreateLabel();
+    m_labelEnd = IrIdentifier::CreateLabel();
+    
+    m_terminatingExpr = new IrBooleanExpression(lineNumber, columnNumber, filename, m_loopAuto, IrBooleanOperator::LessEqual, m_terminatingValue);
+
+    m_loopIncrement = new IrIntegerLiteral(lineNumber, columnNumber, filename, "1");
+    m_incrementLoop = new IrAssignExpression(lineNumber, columnNumber, filename, m_loopAuto, IrAssignmentOperator::IncrementAssign, m_loopIncrement);
+
+    m_loopGoto = new IrGotoStatement(lineNumber, columnNumber, filename, m_labelTop);
+
     m_symbols = new IrSymbolTable();
     m_symbols->addVariable(m_loopAuto);
 }
@@ -83,6 +83,13 @@ void IrForStatement::propagateTypes(IrTraversalContext* ctx)
     m_terminatingValue->propagateTypes(ctx);
     
     if (m_body) m_body->propagateTypes(ctx);
+    
+    m_labelTop->propagateTypes(ctx);
+    m_labelEnd->propagateTypes(ctx);
+    m_initLoopAuto->propagateTypes(ctx);
+    m_terminatingExpr->propagateTypes(ctx);
+    m_loopIncrement->propagateTypes(ctx);
+    m_loopGoto->propagateTypes(ctx);
     
     ctx->popParent();
     ctx->popSymbols();
@@ -138,6 +145,13 @@ bool IrForStatement::analyze(IrTraversalContext* ctx)
         valid = false;
     }
 
+    m_labelTop->analyze(ctx);
+    m_labelEnd->analyze(ctx);
+    m_initLoopAuto->analyze(ctx);
+    m_terminatingExpr->analyze(ctx);
+    m_loopIncrement->analyze(ctx);
+    m_loopGoto->analyze(ctx);
+        
     ctx->popParent();
     ctx->popSymbols();
     
@@ -195,7 +209,12 @@ bool IrForStatement::codegen(IrTraversalContext* ctx)
 
 size_t IrForStatement::getAllocationSize() const
 {
-	return m_symbols->getAllocationSize();
+    size_t allocSize = m_symbols->getAllocationSize();
+    if (m_body != nullptr)
+    {
+        allocSize += m_body->getAllocationSize();
+    }
+    return allocSize;
 }
 
 } // namespace Decaf

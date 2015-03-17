@@ -164,6 +164,18 @@ bool IrBooleanExpression::analyze(IrTraversalContext* ctx)
             }
         }
     }
+    
+    if (valid)
+    {
+        // allocate a temporary variable for the result of this expression
+        m_result = IrIdentifier::CreateTemporary();
+        if (!ctx->addTempVariable(m_result, m_type))
+        {
+            ctx->error(m_result, "Internal compiler error.  Failed to add temporary variable to symbol table.");
+            valid = false;
+        }
+    }
+    
     ctx->popParent();
     
     return valid;
@@ -185,15 +197,7 @@ bool IrBooleanExpression::codegen(IrTraversalContext* ctx)
     }
     
     if (valid)
-    {
-        // allocate a temporary variable for the result of this expression
-        m_result = IrIdentifier::CreateTemporary();
-        if (!ctx->addTempVariable(m_result, m_type))
-        {
-            ctx->error(m_result, "Internal compiler error.  Failed to add temporary variable to symbol table.");
-            valid = false;
-        }
-        
+    {        
         // TAC:
         // tempResult = lhs operator rhs
         IrTacStmt tac;

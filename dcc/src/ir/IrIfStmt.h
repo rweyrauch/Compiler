@@ -51,6 +51,8 @@ public:
     virtual bool analyze(IrTraversalContext* ctx);
     virtual bool codegen(IrTraversalContext* ctx);
     
+    virtual size_t getAllocationSize() const;
+    
 protected:    
     
     IrExpression* m_condition;

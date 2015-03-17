@@ -92,6 +92,7 @@ bool IrBinaryExpression::analyze(IrTraversalContext* ctx)
     ctx->pushParent(this);
 
     bool valid = true;
+    
     if (m_lhs) 
     {
         if (!m_lhs->analyze(ctx))
@@ -130,6 +131,17 @@ bool IrBinaryExpression::analyze(IrTraversalContext* ctx)
             valid = false;            
         }
     }
+
+    if (valid)
+    {
+        // allocate a temporary variable for the result of this expression
+        m_result = IrIdentifier::CreateTemporary();
+        if (!ctx->addTempVariable(m_result, m_type))
+        {
+            ctx->error(m_result, "Internal compiler error.  Failed to add temporary variable to symbol table.");
+            valid = false;
+        }
+    }   
     
     ctx->popParent();
     
@@ -153,14 +165,6 @@ bool IrBinaryExpression::codegen(IrTraversalContext* ctx)
     
     if (valid)
     {
-        // allocate a temporary variable for the result of this expression
-        m_result = IrIdentifier::CreateTemporary();
-        if (!ctx->addTempVariable(m_result, m_type))
-        {
-            ctx->error(m_result, "Internal compiler error.  Failed to add temporary variable to symbol table.");
-            valid = false;
-        }
-        
         // TAC:
         // tempResult = lhs operator rhs
         IrTacStmt tac;

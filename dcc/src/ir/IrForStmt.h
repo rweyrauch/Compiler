@@ -40,7 +40,7 @@ class IrForStatement : public IrStatement
 {
 public:
     IrForStatement(int lineNumber, int columnNumber, const std::string& filename, 
-		IrIdentifier* loopVar, IrExpression* initialExpr, IrExpression* endExpr, IrBlock* block = nullptr);
+        IrIdentifier* loopVar, IrExpression* initialExpr, IrExpression* endExpr, IrBlock* block = nullptr);
     
     virtual ~IrForStatement();
     
@@ -49,7 +49,7 @@ public:
     virtual bool analyze(IrTraversalContext* ctx);
     virtual bool codegen(IrTraversalContext* ctx);
        
-    size_t getAllocationSize() const;
+    virtual size_t getAllocationSize() const;
         
 protected:    
     
