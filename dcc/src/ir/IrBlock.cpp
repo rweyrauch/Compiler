@@ -28,7 +28,6 @@
 #include "IrStatement.h"
 #include "IrSymbolTable.h"
 #include "IrTravCtx.h"
-#include "IrForStmt.h"
 
 namespace Decaf
 {
@@ -146,7 +145,7 @@ size_t IrBlock::getAllocationSize() const
     // recurse sub-blocks
     for (auto it : m_statements)
     {
-        allocSize += (it)->getAllocationSize();
+        allocSize += it->getAllocationSize();
     }
     return allocSize;
 }

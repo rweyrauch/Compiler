@@ -82,11 +82,10 @@ int main(int argc, char **argv)
         
         parser->parse();        
         parser->semanticChecks();
-        parser->codegen();
-           
         if (g_debug)
             parser->dumpAST();
-        
+        parser->codegen();
+         
         delete parser;
     }
     return 0;
