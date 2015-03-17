@@ -89,6 +89,7 @@ void IrForStatement::propagateTypes(IrTraversalContext* ctx)
     m_initLoopAuto->propagateTypes(ctx);
     m_terminatingExpr->propagateTypes(ctx);
     m_loopIncrement->propagateTypes(ctx);
+    m_incrementLoop->propagateTypes(ctx);
     m_loopGoto->propagateTypes(ctx);
     
     ctx->popParent();
@@ -150,6 +151,7 @@ bool IrForStatement::analyze(IrTraversalContext* ctx)
     m_initLoopAuto->analyze(ctx);
     m_terminatingExpr->analyze(ctx);
     m_loopIncrement->analyze(ctx);
+    m_incrementLoop->analyze(ctx);
     m_loopGoto->analyze(ctx);
         
     ctx->popParent();
