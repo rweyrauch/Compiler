@@ -26,6 +26,7 @@
 #include "IrGotoStmt.h"
 #include "IrTravCtx.h"
 #include "IrForStmt.h"
+#include "IrIdentifier.h"
 
 namespace Decaf
 {

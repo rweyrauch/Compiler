@@ -41,44 +41,49 @@ namespace Decaf
 
 IrForStatement::IrForStatement(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* loopVar, IrExpression* initialExpr, IrExpression* endExpr, IrBlock* block) :
     IrStatement(lineNumber, columnNumber, filename),
-    m_loopAuto(nullptr),
+    m_loopVar(nullptr),
     m_initialValue(initialExpr),
     m_terminatingValue(endExpr),
-    m_body(block),
-    m_symbols(nullptr)
+    m_body(block)
 {
-    m_loopAuto = new IrLocation(lineNumber, columnNumber, filename, loopVar, IrType::Integer);
+    m_loopVar = new IrLocation(lineNumber, columnNumber, filename, loopVar, IrType::Integer);
 
-    m_initLoopAuto = new IrAssignExpression(lineNumber, columnNumber, filename, m_loopAuto, IrAssignmentOperator::Assign, m_initialValue);
+    m_initLoopAuto = new IrAssignExpression(lineNumber, columnNumber, filename, m_loopVar, IrAssignmentOperator::Assign, m_initialValue);
     m_labelTop = IrIdentifier::CreateLabel();
     m_labelEnd = IrIdentifier::CreateLabel();
     
-    m_terminatingExpr = new IrBooleanExpression(lineNumber, columnNumber, filename, m_loopAuto, IrBooleanOperator::LessEqual, m_terminatingValue);
+    m_terminatingExpr = new IrBooleanExpression(lineNumber, columnNumber, filename, m_loopVar, IrBooleanOperator::LessEqual, m_terminatingValue);
 
     m_loopIncrement = new IrIntegerLiteral(lineNumber, columnNumber, filename, "1");
-    m_incrementLoop = new IrAssignExpression(lineNumber, columnNumber, filename, m_loopAuto, IrAssignmentOperator::IncrementAssign, m_loopIncrement);
+    m_incrementLoop = new IrAssignExpression(lineNumber, columnNumber, filename, m_loopVar, IrAssignmentOperator::IncrementAssign, m_loopIncrement);
 
     m_loopGoto = new IrGotoStatement(lineNumber, columnNumber, filename, m_labelTop);
-
-    m_symbols = new IrSymbolTable();
-    m_symbols->addVariable(m_loopAuto);
 }
     
 IrForStatement::~IrForStatement()
 {
-    delete m_loopAuto;
+    delete m_loopVar;
     delete m_initialValue;
     delete m_terminatingValue;
     delete m_body;
-    delete m_symbols;
+    
+    delete m_initLoopAuto;
+    delete m_labelTop;
+    delete m_labelEnd;
+    
+    delete m_terminatingExpr;
+
+    delete m_loopIncrement;
+    delete m_incrementLoop;
+
+    delete m_loopGoto;
 }
     
 void IrForStatement::propagateTypes(IrTraversalContext* ctx)
 {
-    ctx->pushSymbols(m_symbols);
     ctx->pushParent(this);
     
-    m_loopAuto->propagateTypes(ctx);    
+    m_loopVar->propagateTypes(ctx);    
     m_initialValue->propagateTypes(ctx);
     m_terminatingValue->propagateTypes(ctx);
     
@@ -93,17 +98,14 @@ void IrForStatement::propagateTypes(IrTraversalContext* ctx)
     m_loopGoto->propagateTypes(ctx);
     
     ctx->popParent();
-    ctx->popSymbols();
 }
     
 void IrForStatement::print(unsigned int depth) 
 {
     IRPRINT_INDENT(depth);
     std::cout << "For(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
-    
-    m_symbols->print(depth+1);
-       
-    m_loopAuto->print(depth+1);
+           
+    m_loopVar->print(depth+1);
     m_initialValue->print(depth+1);
     m_terminatingValue->print(depth+1);
     
@@ -114,10 +116,9 @@ bool IrForStatement::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
     
-    ctx->pushSymbols(m_symbols);
     ctx->pushParent(this);
     
-    if (!m_loopAuto->analyze(ctx))
+    if (!m_loopVar->analyze(ctx))
         valid = false;
     if (!m_initialValue->analyze(ctx))
         valid = false;
@@ -155,7 +156,6 @@ bool IrForStatement::analyze(IrTraversalContext* ctx)
     m_loopGoto->analyze(ctx);
         
     ctx->popParent();
-    ctx->popSymbols();
     
     return valid;
 }
@@ -173,7 +173,6 @@ bool IrForStatement::codegen(IrTraversalContext* ctx)
     //     goto LABEL_CONT;
     // }
     
-    ctx->pushSymbols(m_symbols);
     ctx->pushParent(this);
     
     m_initLoopAuto->codegen(ctx);
@@ -204,14 +203,13 @@ bool IrForStatement::codegen(IrTraversalContext* ctx)
     ctx->append(label);
      
     ctx->popParent();
-    ctx->popSymbols();
     
     return valid;
 }
 
 size_t IrForStatement::getAllocationSize() const
 {
-    size_t allocSize = m_symbols->getAllocationSize();
+    size_t allocSize = 0;
     if (m_body != nullptr)
     {
         allocSize += m_body->getAllocationSize();
@@ -221,10 +219,7 @@ size_t IrForStatement::getAllocationSize() const
 
 void IrForStatement::setSymbolStartAddress(size_t addr)
 {
-	m_symbols->setStartAddress(addr);
-	addr += m_symbols->getAllocationSize();
-	
-	if (m_body != nullptr)
+    if (m_body != nullptr)
     {
         m_body->setSymbolStartAddress(addr);
     }

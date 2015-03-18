@@ -25,8 +25,6 @@
 #include <iostream>
 #include "IrCommon.h"
 #include "IrStatement.h"
-#include "IrSymbolTable.h"
-#include "IrLocation.h"
 
 namespace Decaf
 {
@@ -35,6 +33,7 @@ class IrExpression;
 class IrBlock;
 class IrIntegerLiteral;
 class IrGotoStatement;
+class IrLocation;
 
 class IrForStatement : public IrStatement
 {
@@ -54,11 +53,10 @@ public:
         
 protected:    
     
-    IrLocation* m_loopAuto;
+    IrLocation* m_loopVar;
     IrExpression* m_initialValue;
     IrExpression* m_terminatingValue;
     IrBlock* m_body;
-    IrSymbolTable* m_symbols;
     
     IrIdentifier* m_labelTop;
     IrIdentifier* m_labelEnd;
