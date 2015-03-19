@@ -131,7 +131,8 @@ const std::string gIrOpcodeStrings[(int)IrOpcode::NUM_OPCODES] =
     "JUMP",
     "IFZ",
     "PARAM",
-    "STRING"
+    "STRING",
+    "GLOBAL"
 };
 static_assert(sizeof(gIrOpcodeStrings)/sizeof(std::string) == (size_t)IrOpcode::NUM_OPCODES, "Unexpected number of IrOpcode strings.");
 
@@ -223,8 +224,9 @@ if (arg == nullptr) return;
     {
         if (ident->isLabel())
             stream << "$" << ident->getIdentifier();
+        else if (ident->isGlobal())
+            stream << ident->getIdentifier();
         else
-
             stream << "-" << ident->getAddress()+8 << (g_ia64 ? "(%rbp)" : "(%ebp)");
     }
     else if (iliteral != nullptr)
@@ -237,10 +239,10 @@ if (arg == nullptr) return;
     }
     else if (reg != nullptr)
     {
-		if (g_ia64)
-			stream << g_registerNames[(int)reg->name()];
-		else
-			stream << g_registerNames_ia32[(int)reg->name()];
+        if (g_ia64)
+            stream << g_registerNames[(int)reg->name()];
+        else
+            stream << g_registerNames_ia32[(int)reg->name()];
     }
 }
 
@@ -332,7 +334,7 @@ void IrGenComparison(const IrTacStmt& stmt, std::ostream& stream)
     stream << ", ";
     IrOutputArg(&g_tempReg, stream);
     stream << std::endl;  
-     
+    
     switch (stmt.m_opcode)
     {
     case IrOpcode::EQUAL:      // arg0 == arg1 -> arg2 (0 or 1)
@@ -378,7 +380,7 @@ static std::vector<const IrBase*> g_extraParams;
 
 void IrGenIA32()
 {
-	g_ia64 = false;
+    g_ia64 = false;
 }
 
 void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
@@ -435,25 +437,25 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         
     case IrOpcode::CALL:       // call arg0 arg1
     
-		// Pop extra parameters off the param stack
-		if (!g_extraParams.empty())
-		{
-			for (auto it = g_extraParams.rbegin(); it != g_extraParams.rend(); ++it)
-			{
-				stream << "push ";
-				IrOutputArg(*it, stream);
-				stream << std::endl;
-			}
-			g_extraParams.clear();
-		}
+        // Pop extra parameters off the param stack
+        if (!g_extraParams.empty())
+        {
+            for (auto it = g_extraParams.rbegin(); it != g_extraParams.rend(); ++it)
+            {
+                stream << "push ";
+                IrOutputArg(*it, stream);
+                stream << std::endl;
+            }
+            g_extraParams.clear();
+        }
         stream << "call ";
         IrOutputLabel(stmt.m_arg0, stream);
         stream << std::endl;
         
         if (stmt.m_arg1 != nullptr)
         {
-			IrGenMov(&g_retReg, stmt.m_arg1, stream);
-		}
+            IrGenMov(&g_retReg, stmt.m_arg1, stream);
+        }
         break;
         
     case IrOpcode::FBEGIN:     // begin function
@@ -466,10 +468,10 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         break;
         
     case IrOpcode::RETURN:     // return |arg0|
-		if (stmt.m_arg0 != nullptr)
-		{
-			IrGenMov(stmt.m_arg0, &g_retReg, stream);
-		}
+        if (stmt.m_arg0 != nullptr)
+        {
+            IrGenMov(stmt.m_arg0, &g_retReg, stream);
+        }
         stream << "leave" << std::endl;
         stream << "ret" << std::endl;
         break;
@@ -487,7 +489,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
     case IrOpcode::OR:         // arg0 || arg1 -> arg2 (0 or 1)
         // make sure the second arg is not an immediate nor a memory access
         IrGenMov(stmt.m_arg1, &g_tempReg, stream);
-     
+    
         stream << (stmt.m_opcode == IrOpcode::AND ? "and " : "or ");
         IrOutputArg(stmt.m_arg0, stream);
         stream << ", ";
@@ -546,6 +548,12 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         stream << ".string ";
         IrOutputLabel(stmt.m_arg1, stream);
         stream << std::endl;
+        break;
+        
+    case IrOpcode::GLOBAL:
+        stream << ".comm ";
+        IrOutputLabel(stmt.m_arg0, stream);
+        stream << "," << stmt.m_info << ",8" << std::endl;
         break;
         
     default:

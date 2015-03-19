@@ -56,15 +56,17 @@ void IrIdentifier::print(unsigned int depth)
 
 bool IrIdentifier::codegen(IrTraversalContext* ctx)
 {
-	bool ok = false;
-	SVariableSymbol symbol;
-	
-	if (ctx->lookup(this, symbol))
-	{
-		m_addr = symbol.m_addr;
-	}
-	
-	return ok;
+    bool ok = false;
+    SVariableSymbol symbol;
+    
+    if (ctx->lookup(this, symbol))
+    {
+        m_addr = symbol.m_addr;
+        m_isGlobal = symbol.m_global;
+        ok = true;
+    }
+    
+    return ok;
 }
 
 } // namespace Decaf

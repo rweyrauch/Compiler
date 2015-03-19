@@ -41,7 +41,8 @@ public:
         IrBase(lineNumber, columnNumber, filename),
         m_identifier(ident),
         m_addr(0),
-        m_isLabel(isLabel)
+        m_isLabel(isLabel),
+        m_isGlobal(false)
     {}
     
     virtual ~IrIdentifier()
@@ -53,12 +54,14 @@ public:
     const std::string& getIdentifier() const { return m_identifier; }
     size_t getAddress() const { return m_addr; }
     bool isLabel() const { return m_isLabel; }
+    bool isGlobal() const { return m_isGlobal; }
     
 protected:
     
     std::string m_identifier;
     size_t m_addr;
     bool m_isLabel;
+    bool m_isGlobal;
     
     static int s_tempLocationCounter;
     

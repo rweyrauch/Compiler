@@ -57,6 +57,7 @@ enum class IrOpcode : int
     IFZ,        // branch arg0 == 0 to arg1
     PARAM,      // function call param, arg0 => ident info => argument number
     STRING,     // string label -> arg0 value -> arg1
+    GLOBAL,     // global arg0
     
     NUM_OPCODES
 };
