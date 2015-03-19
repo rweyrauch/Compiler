@@ -47,7 +47,8 @@ public:
     virtual void propagateTypes(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth);
     virtual bool analyze(IrTraversalContext* ctx);
-    
+    virtual bool codegen(IrTraversalContext* ctx);
+   
     IrLocation* getLocation() const { return m_location; }
     const std::string& getName() const { return m_location->getIdentifier()->getIdentifier(); }
     IrType getType() const { return m_type; }

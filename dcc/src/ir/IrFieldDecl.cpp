@@ -65,4 +65,20 @@ bool IrFieldDecl::analyze(IrTraversalContext* ctx)
     return valid;
 }
 
+bool IrFieldDecl::codegen(IrTraversalContext* ctx)
+{
+    bool valid = true;
+    
+    ctx->pushParent(this);
+    
+    if (!m_location->codegen(ctx))
+        valid = false;
+    
+    ctx->popParent();
+    
+    return valid;
+}
+
+
+
 } // namespace Decaf
