@@ -165,9 +165,18 @@ bool IrMethodDecl::codegen(IrTraversalContext* ctx)
     
     ctx->append(beginTac);
     
+    int argNum = 0;
     for (auto it : m_argument_list)
     {
         it->codegen(ctx);
+        		
+		IrTacStmt paramTac;
+		paramTac.m_opcode = IrOpcode::GETPARAM;
+		paramTac.m_arg0 = it->getVariable(0);
+		paramTac.m_info = argNum;
+		argNum++;
+		
+        ctx->append(paramTac);
     }
     
     if (m_block) m_block->codegen(ctx);

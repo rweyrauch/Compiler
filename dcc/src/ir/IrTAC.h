@@ -56,6 +56,7 @@ enum class IrOpcode : int
     JUMP,       // jump arg0
     IFZ,        // branch arg0 == 0 to arg1
     PARAM,      // function call param, arg0 => ident info => argument number
+    GETPARAM,	// get value from param, arg0 => ident info => argument number
     STRING,     // string label -> arg0 value -> arg1
     GLOBAL,     // global arg0
     

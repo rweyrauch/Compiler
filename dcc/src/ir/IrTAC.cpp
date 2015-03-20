@@ -131,6 +131,7 @@ const std::string gIrOpcodeStrings[(int)IrOpcode::NUM_OPCODES] =
     "JUMP",
     "IFZ",
     "PARAM",
+    "GETPARAM",
     "STRING",
     "GLOBAL"
 };
@@ -541,7 +542,20 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
             g_extraParams.push_back(stmt.m_arg0);
         }
         break;
-        
+    
+    case IrOpcode::GETPARAM:	// stack -> arg0
+		if (g_ia64 && stmt.m_info < NUM_ARG_REGS)
+		{
+			IrGenMov(g_paramRegisters[stmt.m_info], stmt.m_arg0, stream);
+		}
+		else
+		{
+			IrGenMov(g_paramRegisters[0], stmt.m_arg0, stream);
+			
+			stream << "# Params on stack not implemented" << std::endl;
+		}
+		break;
+		
     case IrOpcode::STRING:     // string label -> arg0 value -> arg1
         IrOutputLabel(stmt.m_arg0, stream);
         stream << ":" << std::endl;
