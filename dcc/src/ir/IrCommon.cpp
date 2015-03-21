@@ -71,6 +71,13 @@ const std::string gIrAssignmentOperatorStrings[(int)IrAssignmentOperator::NUM_IR
 };
 static_assert(sizeof(gIrAssignmentOperatorStrings)/sizeof(std::string) == (size_t)IrAssignmentOperator::NUM_IR_ASSIGNMENT_OPERATORS, "Unexpected number of IrAssignmentOperator strings.");
 
+const std::string gIrMemLocationStrings[(int)IrMemLocation::NUM_MEM_LOCATIONS] =
+{
+    std::string("Local"),
+    std::string("Global")
+};
+static_assert(sizeof(gIrMemLocationStrings)/sizeof(std::string) == (size_t)IrMemLocation::NUM_MEM_LOCATIONS, "Unexpected number or IrMemLocation strings.");
+
 const std::string& IrTypeToString(IrType type)
 {
     return gIrTypeStrings[(int)type];
@@ -89,6 +96,11 @@ const std::string& IrBooleanOperatorToString(IrBooleanOperator op)
 const std::string& IrAssignmentOperatorToString(IrAssignmentOperator op)
 {
     return gIrAssignmentOperatorStrings[(int)op];
+}
+
+const std::string& IrMemLocationToString(IrMemLocation loc)
+{
+    return gIrMemLocationStrings[(int)loc];
 }
 
 } // namespace Decaf

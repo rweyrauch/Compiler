@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include <cstddef>
 #include <string>
 #include <vector>
 
@@ -78,21 +79,29 @@ enum class IrAssignmentOperator : int
     NUM_IR_ASSIGNMENT_OPERATORS
 };
 
+enum class IrMemLocation : int
+{
+    Local,
+    Global,
+    
+    NUM_MEM_LOCATIONS
+};
+
 const std::string& IrTypeToString(IrType type);
 const std::string& IrBinaryOperatorToString(IrBinaryOperator op);
 const std::string& IrBooleanOperatorToString(IrBooleanOperator op);
 const std::string& IrAssignmentOperatorToString(IrAssignmentOperator op);
+const std::string& IrMemLocationToString(IrMemLocation loc);
 
 #define IRPRINT_INDENT(depth) { for (int d = 0; d < (int)(depth); d++) std::cout << "  "; }
-
 
 struct SVariableSymbol
 {
     std::string m_name;
     IrType m_type;
-    bool m_global;
+    IrMemLocation m_where;
     size_t m_count; // >1 for arrays
-    size_t m_addr;  // offset from base of stack in bytes
+    ptrdiff_t m_addr;  // offset from base of stack in bytes
 };
   
 struct SMethodSymbol

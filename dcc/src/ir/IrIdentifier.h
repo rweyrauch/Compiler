@@ -52,14 +52,14 @@ public:
     virtual bool codegen(IrTraversalContext* ctx);
     
     const std::string& getIdentifier() const { return m_identifier; }
-    size_t getAddress() const { return m_addr; }
+    ptrdiff_t getAddress() const { return m_addr; }
     bool isLabel() const { return m_isLabel; }
     bool isGlobal() const { return m_isGlobal; }
     
 protected:
     
     std::string m_identifier;
-    size_t m_addr;
+    ptrdiff_t m_addr;
     bool m_isLabel;
     bool m_isGlobal;
     

@@ -38,7 +38,7 @@ class IrSymbolTable
 {
 public:
     IrSymbolTable() :
-		m_startAddr(0),
+        m_startAddr(0),
         m_variableStackSize(0),
         m_variables(),
         m_methods()
@@ -62,13 +62,13 @@ public:
     bool getSymbol(IrMethodCall* method, SMethodSymbol& symbol) const;
     
     size_t getAllocationSize() const;
-    void setStartAddress(size_t addr) { m_startAddr = addr; }
+    void setStartAddress(ptrdiff_t addr) { m_startAddr = addr; }
     
     void print(int depth);
     
 protected:
         
-    size_t m_startAddr;    
+    ptrdiff_t m_startAddr;    
     size_t m_variableStackSize;    
     std::map<std::string, SVariableSymbol> m_variables;
     

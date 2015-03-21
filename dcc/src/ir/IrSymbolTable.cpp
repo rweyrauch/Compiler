@@ -39,7 +39,7 @@ bool IrSymbolTable::addVariable(IrFieldDecl* variable)
         SVariableSymbol symbol;
         symbol.m_name = variable->getName();
         symbol.m_type = variable->getType();
-        symbol.m_global = true;
+        symbol.m_where = IrMemLocation::Global;
         symbol.m_addr = 0;
         symbol.m_count = 1;
         
@@ -92,7 +92,7 @@ bool IrSymbolTable::addVariable(IrVariableDecl* variables)
                 SVariableSymbol symbol;
                 symbol.m_name = variable->getIdentifier();
                 symbol.m_type = variables->getType();
-                symbol.m_global = false; 
+                symbol.m_where = IrMemLocation::Local; 
                 symbol.m_count = 1;
                 symbol.m_addr = m_variableStackSize;
                 m_variables[symbol.m_name] = symbol;
@@ -117,7 +117,7 @@ bool IrSymbolTable::addVariable(IrLocation* variable)
         SVariableSymbol symbol;
         symbol.m_name = variable->getIdentifier()->getIdentifier();
         symbol.m_type = variable->getType();
-        symbol.m_global = false;
+        symbol.m_where = IrMemLocation::Local;
         symbol.m_addr = m_variableStackSize;
         symbol.m_count = 1;
         
@@ -164,7 +164,7 @@ bool IrSymbolTable::addVariable(IrIdentifier* variable, IrType type)
         SVariableSymbol symbol;
         symbol.m_name = variable->getIdentifier();
         symbol.m_type = type;
-        symbol.m_global = false;
+        symbol.m_where = IrMemLocation::Local;
         symbol.m_count = 1;
         symbol.m_addr = m_variableStackSize;
         m_variables[symbol.m_name] = symbol;
@@ -321,11 +321,11 @@ void IrSymbolTable::print(int depth)
     std::cout << "Symbol Table Size = " << table_size << std::endl;
     
     IRPRINT_INDENT(depth);
-    std::cout << "Name\t\tType\t\tGlobal\t\tCount\t\tAddress" << std::endl;
+    std::cout << "Name\t\tType\t\tWhere\t\tCount\t\tAddress" << std::endl;
     for (auto it = m_variables.cbegin(); it != m_variables.cend(); ++it)
     {
         IRPRINT_INDENT(depth);
-        std::cout << it->first << "\t\t" << IrTypeToString(it->second.m_type) << "\t\t" << it->second.m_global << "\t\t" << it->second.m_count
+        std::cout << it->first << "\t\t" << IrTypeToString(it->second.m_type) << "\t\t" << IrMemLocationToString(it->second.m_where) << "\t\t" << it->second.m_count
                   << "\t\t" << (it->second.m_addr + m_startAddr) << std::endl;
     }
     IRPRINT_INDENT(depth);
