@@ -130,6 +130,7 @@ const std::string gIrOpcodeStrings[(int)IrOpcode::NUM_OPCODES] =
     "LABEL",
     "JUMP",
     "IFZ",
+    "IFNZ",
     "PARAM",
     "GETPARAM",
     "STRING",
@@ -331,9 +332,9 @@ void IrGenComparison(const IrTacStmt& stmt, std::ostream& stream)
     IrGenMov(stmt.m_arg1, &g_tempReg, stream);
     
     stream << "cmp ";
-    IrOutputArg(stmt.m_arg0, stream);
-    stream << ", ";
     IrOutputArg(&g_tempReg, stream);
+    stream << ", ";
+    IrOutputArg(stmt.m_arg0, stream);
     stream << std::endl;  
     
     switch (stmt.m_opcode)
@@ -347,19 +348,19 @@ void IrGenComparison(const IrTacStmt& stmt, std::ostream& stream)
         break;
         
     case IrOpcode::LESS:       // arg0 < arg1 -> arg2 (0 or 1)
-        stream << "setge ";
+        stream << "setl ";
         break;
         
     case IrOpcode::LESSEQUAL:  // arg0 <= arg1 -> arg2 (0 or 1)
-        stream << "setg ";
+        stream << "setle ";
         break;
         
     case IrOpcode::GREATER:    // arg0 > arg1 -> arg2 (0 or 1)
-        stream << "setnge ";
+        stream << "setg ";
         break;
         
     case IrOpcode::GREATEREQUAL: // arg0 >= arg1 -> arg2 (0 or 1)
-        stream << "setng ";
+        stream << "setge ";
         break;
         
     default:
@@ -534,6 +535,16 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         stream << std::endl;
         
         stream << "je ";        // jump if cmp == 0
+        IrOutputLabel(stmt.m_arg1, stream);
+        stream << std::endl;
+        break;
+        
+    case IrOpcode::IFNZ:        // jump if cmp != 0
+        stream << "cmp $0, ";       
+        IrOutputArg(stmt.m_arg0, stream);
+        stream << std::endl;
+        
+        stream << "jne ";        // jump if cmp != 0
         IrOutputLabel(stmt.m_arg1, stream);
         stream << std::endl;
         break;

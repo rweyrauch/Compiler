@@ -8,21 +8,26 @@ class Program
         b = 2;
         c = 2;
 
-        if (a < b) { callout("printf", "a < b is correct\n"); }
-        if (a <= b) { callout("printf", "a <= b is correct\n"); }
-        if (a > b) { callout("printf", "a > b is incorrect\n"); }
-        if (a >= b) { callout("printf", "a >= b is incorrect\n"); }
-      
-        if (c < b) { callout("printf", "c < b is incorrect\n"); }
-        if (c <= b) { callout("printf", "c <= b is correct\n"); }
-        if (c > b) { callout("printf", "c > b is incorrect\n"); }
-        if (c >= b) { callout("printf", "c >= b is correct\n"); }
+        if (a < b) { callout("printf", "%d < %d is correct\n", a, b); }
+        else { callout("printf", "%d < %d is incorrect\n", a, b); }
         
-        if (a == a) { callout("printf", "a == a is correct\n"); }
-        if (a != a) { callout("printf", "a != a is incorrect\n"); }
+        if (b < a) { callout("printf", "%d < %d is incorrect\n", b, a); }
+        
+        if (a <= b) { callout("printf", "%d <= %d is correct\n", a, b); }
+        if (a > b) { callout("printf", "%d > %d is incorrect\n", a, b); }
+        if (a >= b) { callout("printf", "%d >= %d is incorrect\n", a, b); }
+      
+        if (c < b) { callout("printf", "%d < %d is incorrect\n", c, b); }
+        if (c <= b) { callout("printf", "%d <= %d is correct\n", c, b); }
+        if (c > b) { callout("printf", "%d > %d is incorrect\n", c, b); }
+        if (c >= b) { callout("printf", "%d >= %d is correct\n", c, b); }
+        
+        if (a == a) { callout("printf", "%d == %d is correct\n", a, a); }
+        if (a != a) { callout("printf", "%d != %d is incorrect\n", a, a); }
 
-        if (a == b) { callout("printf", "a == b is incorrect\n"); }
-        if (a != b) { callout("printf", "a != b is correct\n"); }
+        if (a == b) { callout("printf", "%d == %d is incorrect\n", a, b); }
+        if (a != b) { callout("printf", "%d != %d is correct\n", a, b); }
+        if (a != b) { callout("printf", "%d != %d is correct\n", a, b); }
        
     }
 }
