@@ -1,0 +1,28 @@
+class Program
+{
+    void main () 
+    {
+        int a, b, c;
+        
+        a = 1;
+        b = 2;
+        c = 2;
+
+        if (a < b) { callout("printf", "a < b is correct\n"); }
+        if (a <= b) { callout("printf", "a <= b is correct\n"); }
+        if (a > b) { callout("printf", "a > b is incorrect\n"); }
+        if (a >= b) { callout("printf", "a >= b is incorrect\n"); }
+      
+        if (c < b) { callout("printf", "c < b is incorrect\n"); }
+        if (c <= b) { callout("printf", "c <= b is correct\n"); }
+        if (c > b) { callout("printf", "c > b is incorrect\n"); }
+        if (c >= b) { callout("printf", "c >= b is correct\n"); }
+        
+        if (a == a) { callout("printf", "a == a is correct\n"); }
+        if (a != a) { callout("printf", "a != a is incorrect\n"); }
+
+        if (a == b) { callout("printf", "a == b is incorrect\n"); }
+        if (a != b) { callout("printf", "a != b is correct\n"); }
+       
+    }
+}

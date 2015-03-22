@@ -133,6 +133,48 @@ bool IrBooleanExpression::analyze(IrTraversalContext* ctx)
             valid = false;
         }
     }
+    else if (m_operator == IrBooleanOperator::LogicalAnd ||
+             m_operator == IrBooleanOperator::LogicalOr)
+    {
+        // Rule: both sides of the operation must be of type boolean.
+        if (m_lhs)
+        {
+            if (m_lhs->getType() != IrType::Boolean)
+            {
+                ctx->error(this, "lhs of logical op must of type boolean.");
+                valid = false;             
+            }
+            if (m_lhs->isArray())
+            {
+                ctx->error(this, "lhs of logical op may not be an array name.");
+                valid = false;            
+            }
+        }
+        else
+        {
+            ctx->error(this, "boolean operator requires a lhs expression.");
+            valid = false;
+        }
+        
+        if (m_rhs)
+        {
+            if (m_rhs->getType() != IrType::Boolean)
+            {
+                ctx->error(this, "rhs of logical op must of type boolean.");
+                valid = false;             
+            }
+            if (m_rhs->isArray())
+            {
+                ctx->error(this, "rhs of logical op may not be an array name.");
+                valid = false;            
+            }
+       }
+        else
+        {
+            ctx->error(this, "boolean operator requires a rhs expression.");
+            valid = false;            
+        }
+    }
     else
     {
         // Rule: both sides of the comparison must be of type integer.

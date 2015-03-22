@@ -1,0 +1,16 @@
+class Program
+{
+    void main () 
+    {
+        boolean a, b;
+        
+        a = true;
+        b = false;
+        
+        if (a) { callout("printf", "correct \'a\' true\n"); }
+        if (!a) { callout("printf", "incorrect \'a\' is true\n"); }
+        if (a && b) { callout("printf", "incorrect \'a\' && \'b\' is false\n"); }
+        if (a || b) { callout("printf", "correct \'a\' || \'b\' is true\n"); }
+        if (a && a) { callout("printf", "correct \'a\' && \'a\' is true\n"); }
+    }
+}
