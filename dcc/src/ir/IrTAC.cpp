@@ -500,11 +500,17 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         IrGenMov(&g_tempReg, stmt.m_arg2, stream);        
         break;
         
-    case IrOpcode::NOT:        // !arg0 -> arg2 (0 or 1)
+    case IrOpcode::NOT:        // !arg1 -> arg2 (0 or 1)
         // make sure the arg is not an immediate 
-        IrGenMov(stmt.m_arg0, &g_tempReg, stream);
-            
+        IrGenMov(stmt.m_arg1, &g_tempReg, stream);
+        
+        // 'not' is a bit-wise invert 
         stream << "not ";
+        IrOutputArg(&g_tempReg, stream);
+        stream << std::endl;
+        
+        // mask all but first bit in result
+        stream << "and $1,";
         IrOutputArg(&g_tempReg, stream);
         stream << std::endl;
         
@@ -544,27 +550,27 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         break;
     
     case IrOpcode::GETPARAM:	// stack -> arg0
-		if (g_ia64 && stmt.m_info < NUM_ARG_REGS)
-		{
-			IrGenMov(g_paramRegisters[stmt.m_info], stmt.m_arg0, stream);
-		}
-		else
-		{
-			int argOffset = stmt.m_info - NUM_ARG_REGS;
-			
-			stream << (g_ia64 ? "movq " : "movl ");
-			stream << (argOffset*8+16) << "(%rbp), ";
-			IrOutputArg(&g_tempReg, stream);
-			stream << std::endl;
+        if (g_ia64 && stmt.m_info < NUM_ARG_REGS)
+        {
+            IrGenMov(g_paramRegisters[stmt.m_info], stmt.m_arg0, stream);
+        }
+        else
+        {
+            int argOffset = stmt.m_info - NUM_ARG_REGS;
+            
+            stream << (g_ia64 ? "movq " : "movl ");
+            stream << (argOffset*8+16) << "(%rbp), ";
+            IrOutputArg(&g_tempReg, stream);
+            stream << std::endl;
 
-			stream << (g_ia64 ? "movq " : "movl ");
-			IrOutputArg(&g_tempReg, stream);
-			stream << ", ";
-			IrOutputArg(stmt.m_arg0, stream);
-			stream << std::endl;
-		}
-		break;
-		
+            stream << (g_ia64 ? "movq " : "movl ");
+            IrOutputArg(&g_tempReg, stream);
+            stream << ", ";
+            IrOutputArg(stmt.m_arg0, stream);
+            stream << std::endl;
+        }
+        break;
+        
     case IrOpcode::STRING:     // string label -> arg0 value -> arg1
         IrOutputLabel(stmt.m_arg0, stream);
         stream << ":" << std::endl;
