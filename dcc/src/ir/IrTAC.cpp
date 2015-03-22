@@ -550,9 +550,18 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
 		}
 		else
 		{
-			IrGenMov(g_paramRegisters[0], stmt.m_arg0, stream);
+			int argOffset = stmt.m_info - NUM_ARG_REGS;
 			
-			stream << "# Params on stack not implemented" << std::endl;
+			stream << (g_ia64 ? "movq " : "movl ");
+			stream << (argOffset*8+16) << "(%rbp), ";
+			IrOutputArg(&g_tempReg, stream);
+			stream << std::endl;
+
+			stream << (g_ia64 ? "movq " : "movl ");
+			IrOutputArg(&g_tempReg, stream);
+			stream << ", ";
+			IrOutputArg(stmt.m_arg0, stream);
+			stream << std::endl;
 		}
 		break;
 		
