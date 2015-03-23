@@ -52,7 +52,7 @@ IrForStatement::IrForStatement(int lineNumber, int columnNumber, const std::stri
     m_labelTop = IrIdentifier::CreateLabel();
     m_labelEnd = IrIdentifier::CreateLabel();
     
-    m_terminatingExpr = new IrBooleanExpression(lineNumber, columnNumber, filename, m_loopVar, IrBooleanOperator::LessEqual, m_terminatingValue);
+    m_terminatingExpr = new IrBooleanExpression(lineNumber, columnNumber, filename, m_loopVar, IrBooleanOperator::Less, m_terminatingValue);
 
     m_loopIncrement = new IrIntegerLiteral(lineNumber, columnNumber, filename, "1");
     m_incrementLoop = new IrAssignExpression(lineNumber, columnNumber, filename, m_loopVar, IrAssignmentOperator::IncrementAssign, m_loopIncrement);

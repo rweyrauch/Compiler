@@ -329,12 +329,12 @@ void IrGenComparison(const IrTacStmt& stmt, std::ostream& stream)
     stream << std::endl;
     
     // make sure the second arg is not an immediate nor a memory access
-    IrGenMov(stmt.m_arg1, &g_tempReg, stream);
+    IrGenMov(stmt.m_arg0, &g_tempReg, stream);
     
     stream << "cmp ";
-    IrOutputArg(&g_tempReg, stream);
+    IrOutputArg(stmt.m_arg1, stream);
     stream << ", ";
-    IrOutputArg(stmt.m_arg0, stream);
+    IrOutputArg(&g_tempReg, stream);
     stream << std::endl;  
     
     switch (stmt.m_opcode)
