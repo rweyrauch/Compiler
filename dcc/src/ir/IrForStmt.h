@@ -51,6 +51,9 @@ public:
     virtual size_t getAllocationSize() const;
     virtual void setSymbolStartAddress(size_t addr);
         
+    IrIdentifier* getLoopBegin() const { return m_labelTop; }
+    IrIdentifier* getLoopEnd() const { return m_labelEnd; }
+    
 protected:    
     
     IrLocation* m_loopVar;

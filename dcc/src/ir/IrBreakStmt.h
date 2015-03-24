@@ -26,12 +26,14 @@
 
 namespace Decaf
 {
+class IrForStatement;
 
 class IrBreakStatement : public IrStatement
 {
 public:
     IrBreakStatement(int lineNumber, int columnNumber, const std::string& filename) :
-        IrStatement(lineNumber, columnNumber, filename)
+        IrStatement(lineNumber, columnNumber, filename),
+        m_parentLoop(nullptr)
     {}
     
     virtual ~IrBreakStatement()
@@ -40,8 +42,10 @@ public:
     virtual void propagateTypes(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth);
     virtual bool analyze(IrTraversalContext* ctx);
-        
+    virtual bool codegen(IrTraversalContext* ctx);
+    
 protected:    
+    const IrForStatement* m_parentLoop;
     
 private:
     IrBreakStatement() = delete;

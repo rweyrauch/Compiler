@@ -26,6 +26,7 @@
 #include "IrContinueStmt.h"
 #include "IrTravCtx.h"
 #include "IrForStmt.h"
+#include "IrIdentifier.h"
 
 namespace Decaf
 {
@@ -51,6 +52,7 @@ bool IrContinueStatement::analyze(IrTraversalContext* ctx)
         const IrForStatement* forloop = dynamic_cast<const IrForStatement*>(ctx->getParent(i));
         if (forloop)
         {
+            m_parentLoop = forloop;
             valid = true;
             break;
         }
@@ -59,6 +61,21 @@ bool IrContinueStatement::analyze(IrTraversalContext* ctx)
     if (!valid)
     {
         ctx->error(this, "continue statement not found in a for-loop.");
+    }
+    
+    return valid;
+}
+
+bool IrContinueStatement::codegen(IrTraversalContext* ctx)
+{
+    bool valid = false;
+    
+    if (m_parentLoop != nullptr)
+    {
+        IrTacStmt jump;
+        jump.m_opcode = IrOpcode::JUMP;
+        jump.m_arg0 = m_parentLoop->getLoopBegin();
+        ctx->append(jump);
     }
     
     return valid;

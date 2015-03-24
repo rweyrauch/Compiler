@@ -26,6 +26,7 @@
 #include "IrBreakStmt.h"
 #include "IrTravCtx.h"
 #include "IrForStmt.h"
+#include "IrIdentifier.h"
 
 namespace Decaf
 {
@@ -51,6 +52,7 @@ bool IrBreakStatement::analyze(IrTraversalContext* ctx)
         const IrForStatement* forloop = dynamic_cast<const IrForStatement*>(ctx->getParent(i));
         if (forloop)
         {
+            m_parentLoop = forloop;
             valid = true;
             break;
         }
@@ -60,6 +62,21 @@ bool IrBreakStatement::analyze(IrTraversalContext* ctx)
     {
         ctx->error(this, "break statement not found in a for-loop.");
     }
+    return valid;
+}
+
+bool IrBreakStatement::codegen(IrTraversalContext* ctx)
+{
+    bool valid = false;
+    
+    if (m_parentLoop != nullptr)
+    {
+        IrTacStmt jump;
+        jump.m_opcode = IrOpcode::JUMP;
+        jump.m_arg0 = m_parentLoop->getLoopEnd();
+        ctx->append(jump);
+    }
+    
     return valid;
 }
 
