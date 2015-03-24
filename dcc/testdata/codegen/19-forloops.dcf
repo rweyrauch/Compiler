@@ -1,0 +1,31 @@
+class Program
+{
+    void main()
+    {
+        int i, sum;
+        int j;
+
+		sum = 0;
+		for j = 0, 10 {
+            sum += j;
+        }
+        
+        sum = 0;
+        for j = 0, 10 
+        {
+			sum = sum + j;
+			if (j == 5) 
+			{
+				callout("printf", "Breaking when j == %d(5).\n", j);
+				break;
+			}
+			
+			if (j == 2)
+			{
+				callout("printf", "Continue when j == %d(2).]n", j);
+				continue;
+			}
+			callout("printf", "j = %d\n", j);
+        }
+    }
+}
