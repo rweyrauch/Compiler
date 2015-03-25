@@ -50,6 +50,7 @@ IrForStatement::IrForStatement(int lineNumber, int columnNumber, const std::stri
 
     m_initLoopAuto = new IrAssignExpression(lineNumber, columnNumber, filename, m_loopVar, IrAssignmentOperator::Assign, m_initialValue);
     m_labelTop = IrIdentifier::CreateLabel();
+    m_labelContinue = IrIdentifier::CreateLabel();
     m_labelEnd = IrIdentifier::CreateLabel();
     
     m_terminatingExpr = new IrBooleanExpression(lineNumber, columnNumber, filename, m_loopVar, IrBooleanOperator::Less, m_terminatingValue);
@@ -69,6 +70,7 @@ IrForStatement::~IrForStatement()
     
     delete m_initLoopAuto;
     delete m_labelTop;
+    delete m_labelContinue;
     delete m_labelEnd;
     
     delete m_terminatingExpr;
@@ -90,6 +92,7 @@ void IrForStatement::propagateTypes(IrTraversalContext* ctx)
     if (m_body) m_body->propagateTypes(ctx);
     
     m_labelTop->propagateTypes(ctx);
+    m_labelContinue->propagateTypes(ctx);
     m_labelEnd->propagateTypes(ctx);
     m_initLoopAuto->propagateTypes(ctx);
     m_terminatingExpr->propagateTypes(ctx);
@@ -148,6 +151,7 @@ bool IrForStatement::analyze(IrTraversalContext* ctx)
     }
 
     m_labelTop->analyze(ctx);
+    m_labelContinue->analyze(ctx);
     m_labelEnd->analyze(ctx);
     m_initLoopAuto->analyze(ctx);
     m_terminatingExpr->analyze(ctx);
@@ -165,13 +169,16 @@ bool IrForStatement::codegen(IrTraversalContext* ctx)
     bool valid = true;
     
     // int loop_var = <initial value>
-    // LABEL_CONT:
+    // LABEL_TOP:
     // if (loop_var < term_var)
     // {
     //     <body>
+    // LABEL_CONTINUE:
     //     loop_var += 1;
-    //     goto LABEL_CONT;
+    //     goto LABEL_TOP;
     // }
+    // LABEL_END:
+    //
     
     ctx->pushParent(this);
     
@@ -194,6 +201,11 @@ bool IrForStatement::codegen(IrTraversalContext* ctx)
     ctx->append(tac);
       
     if (m_body) m_body->codegen(ctx);
+    m_labelContinue->codegen(ctx);
+    label.m_opcode = IrOpcode::LABEL;
+    label.m_arg0 = m_labelContinue;
+    ctx->append(label);
+    
     m_incrementLoop->codegen(ctx);
     m_loopGoto->codegen(ctx);
     

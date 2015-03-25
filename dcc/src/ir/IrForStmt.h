@@ -52,6 +52,7 @@ public:
     virtual void setSymbolStartAddress(size_t addr);
         
     IrIdentifier* getLoopBegin() const { return m_labelTop; }
+    IrIdentifier* getLoopContinue() const { return m_labelContinue; }
     IrIdentifier* getLoopEnd() const { return m_labelEnd; }
     
 protected:    
@@ -62,6 +63,7 @@ protected:
     IrBlock* m_body;
     
     IrIdentifier* m_labelTop;
+    IrIdentifier* m_labelContinue;
     IrIdentifier* m_labelEnd;
     IrExpression* m_initLoopAuto;
     IrExpression* m_terminatingExpr;

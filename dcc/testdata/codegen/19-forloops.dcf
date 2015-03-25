@@ -5,10 +5,12 @@ class Program
         int i, sum;
         int j;
 
-		sum = 0;
-		for j = 0, 10 {
+        sum = 0;
+        for j = 2, 5
+        {
             sum += j;
         }
+        callout("printf", "sum = %d\n", sum);
         
         sum = 0;
         for j = 0, 10 
@@ -19,13 +21,21 @@ class Program
 				callout("printf", "Breaking when j == %d(5).\n", j);
 				break;
 			}
-			
-			if (j == 2)
-			{
-				callout("printf", "Continue when j == %d(2).]n", j);
-				continue;
-			}
 			callout("printf", "j = %d\n", j);
         }
+        callout("printf", "sum = %d\n", sum);
+     
+        sum = 0;
+        for j = 1, 5
+        {
+            if (j == 2)
+            {
+				callout("printf", "Continue when j == %d(2).\n", j);
+				continue;            
+            }
+            sum += j;
+        }
+        callout("printf", "sum = %d\n", sum);
+        
     }
 }
