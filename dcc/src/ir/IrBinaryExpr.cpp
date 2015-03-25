@@ -174,7 +174,7 @@ bool IrBinaryExpression::codegen(IrTraversalContext* ctx)
             IrLiteral* literal = dynamic_cast<IrLiteral*>(m_lhs.get());
             if (literal)
             {
-                tac.m_arg0 = m_lhs.get();
+                tac.m_arg0 = m_lhs;
             }
             else
             {
@@ -186,7 +186,7 @@ bool IrBinaryExpression::codegen(IrTraversalContext* ctx)
             IrLiteral* literal = dynamic_cast<IrLiteral*>(m_rhs.get());
             if (literal)
             {
-                tac.m_arg1 = m_rhs.get();
+                tac.m_arg1 = m_rhs;
             }
             else
             {

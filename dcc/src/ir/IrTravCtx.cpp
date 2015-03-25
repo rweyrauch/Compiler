@@ -47,9 +47,9 @@ bool IrTraversalContext::addTempVariable(IrIdentifier* variable, IrType type)
     {
         if (m_symbols.front()->addVariable(variable, type))
         {
-			variable->codegen(this);
-			return true;
-		}
+            variable->codegen(this);
+            return true;
+        }
     }
     return false;
 }
@@ -71,7 +71,7 @@ bool IrTraversalContext::lookup(IrIdentifier* variable, SVariableSymbol& symbol)
 
 bool IrTraversalContext::lookup(IrLocation* location, SVariableSymbol& symbol) const
 {
-    return lookup(location->getIdentifier(), symbol);
+    return lookup(location->getIdentifier().get(), symbol);
 }
 
 bool IrTraversalContext::lookup(IrMethodCall* method, SMethodSymbol& symbol) const
@@ -98,8 +98,8 @@ bool IrTraversalContext::addString(IrIdentifier* identifier, IrStringLiteral* va
         if (it == m_strings.end())
         {
             SStringSymbol symbol;
-            symbol.m_name = identifier;
-            symbol.m_value = value;
+            symbol.m_name = std::shared_ptr<IrIdentifier>(identifier);
+            symbol.m_value = std::shared_ptr<IrStringLiteral>(value);
             m_strings[identifier->getIdentifier()] = symbol;
         }
         else
@@ -114,7 +114,6 @@ bool IrTraversalContext::addString(IrIdentifier* identifier, IrStringLiteral* va
    
 const std::string& IrTraversalContext::sourceAt(int line_num) const
 {
-    
     if (m_source && line_num > 0 && line_num <= (int)m_source->size())
     {
         return m_source->at((size_t)line_num-1);
@@ -145,9 +144,9 @@ void IrTraversalContext::highlightError(int line, int column, int length) const
   
 void IrTraversalContext::codegen(std::ostream& stream)
 {
-	if (!m_ia64)
-		IrGenIA32();
-		
+    if (!m_ia64)
+        IrGenIA32();
+
     stream << ".text" << std::endl;
     for (auto it : m_statements)
     {

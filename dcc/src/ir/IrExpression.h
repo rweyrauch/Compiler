@@ -50,7 +50,7 @@ public:
     IrType getType() const { return m_type; }
     bool isArray() const { return m_isArray; }
     
-    IrIdentifier* getResultIdentifier() const { return m_result.get(); }
+    std::shared_ptr<IrIdentifier> getResultIdentifier() const { return m_result; }
     
 protected:
     

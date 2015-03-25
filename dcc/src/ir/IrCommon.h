@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include <memory>
 #include <cstddef>
 #include <string>
 #include <vector>
@@ -113,8 +114,8 @@ struct SMethodSymbol
 
 struct SStringSymbol
 {
-    IrIdentifier* m_name;
-    IrStringLiteral* m_value;
+    std::shared_ptr<IrIdentifier> m_name;
+    std::shared_ptr<IrStringLiteral> m_value;
 };
 
 } // namespace Decaf

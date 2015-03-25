@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include <memory>
 #include <string>
 #include <iostream>
 
@@ -77,7 +78,7 @@ struct IrTacStmt
     {}
         
     IrOpcode m_opcode;
-    IrBase* m_arg0, *m_arg1, *m_arg2;
+    std::shared_ptr<IrBase> m_arg0, m_arg1, m_arg2;
     int m_info;
 };
 

@@ -45,7 +45,7 @@ bool IrSymbolTable::addVariable(IrFieldDecl* variable)
         
         if (variable->getLocation()->getIndex() != nullptr)
         {
-            IrIntegerLiteral* size = dynamic_cast<IrIntegerLiteral*>(variable->getLocation()->getIndex());
+            IrIntegerLiteral* size = dynamic_cast<IrIntegerLiteral*>(variable->getLocation()->getIndex().get());
             if (size)
             {
                 if (size->getValue() > 0)
@@ -123,7 +123,7 @@ bool IrSymbolTable::addVariable(IrLocation* variable)
         
         if (variable->getIndex() != nullptr)
         {
-            IrIntegerLiteral* size = dynamic_cast<IrIntegerLiteral*>(variable->getIndex());
+            IrIntegerLiteral* size = dynamic_cast<IrIntegerLiteral*>(variable->getIndex().get());
             if (size)
             {
                 if (size->getValue() > 0)
@@ -263,7 +263,7 @@ bool IrSymbolTable::exists(IrMethodCall* method) const
 
 bool IrSymbolTable::getSymbol(IrLocation* variable, SVariableSymbol& symbol) const
 {
-    return getSymbol(variable->getIdentifier(), symbol);
+    return getSymbol(variable->getIdentifier().get(), symbol);
 }
 
 bool IrSymbolTable::getSymbol(IrIdentifier* variable, SVariableSymbol& symbol) const

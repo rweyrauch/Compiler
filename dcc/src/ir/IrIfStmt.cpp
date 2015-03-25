@@ -118,13 +118,13 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
     IrBooleanLiteral* literal = dynamic_cast<IrBooleanLiteral*>(m_condition.get());
     if (literal)
     {
-        tac.m_arg0 = m_condition.get();
+        tac.m_arg0 = m_condition;
     }
     else
     {
         tac.m_arg0 = m_condition->getResultIdentifier();
     }
-    tac.m_arg1 = m_labelFalse.get();
+    tac.m_arg1 = m_labelFalse;
     tac.m_arg2 = nullptr;
     
     ctx->append(tac);
@@ -136,14 +136,14 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
         
         IrTacStmt jump;
         jump.m_opcode = IrOpcode::JUMP;
-        jump.m_arg0 = m_labelEnd.get();
+        jump.m_arg0 = m_labelEnd;
         
         ctx->append(jump);
     }
             
     IrTacStmt label;
     label.m_opcode = IrOpcode::LABEL;
-    label.m_arg0 = m_labelFalse.get();
+    label.m_arg0 = m_labelFalse;
     ctx->append(label);
     
     if (m_falseBlock)
@@ -154,7 +154,7 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
     
     IrTacStmt elabel;
     elabel.m_opcode = IrOpcode::LABEL;
-    elabel.m_arg0 = m_labelEnd.get();
+    elabel.m_arg0 = m_labelEnd;
     
     ctx->append(elabel);
 

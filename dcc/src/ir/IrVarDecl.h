@@ -62,7 +62,7 @@ public:
     virtual bool codegen(IrTraversalContext* ctx);
         
     size_t getNumVariables() const { return m_identifiers.size(); }
-    IrIdentifier* getVariable(size_t which) const;
+    std::shared_ptr<IrIdentifier> getVariable(size_t which) const;
     IrType getType() const { return m_type; }
     
 protected:

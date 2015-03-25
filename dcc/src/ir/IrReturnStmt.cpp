@@ -75,7 +75,7 @@ bool IrReturnStatement::codegen(IrTraversalContext* ctx)
         IrLiteral* literal = dynamic_cast<IrLiteral*>(m_returnValue.get());
         if (literal)
         {
-            tac.m_arg0 = m_returnValue.get();
+            tac.m_arg0 = m_returnValue;
         }
         else
         {

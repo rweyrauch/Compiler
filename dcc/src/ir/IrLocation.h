@@ -58,8 +58,8 @@ public:
     void setAsDeclaration() { m_asDeclaration = true; }
     bool usedAsDeclaration() const { return m_asDeclaration; }
     
-    IrIdentifier* getIdentifier() const { return m_identifier.get(); }
-    IrExpression* getIndex() const { return m_index.get(); }
+    std::shared_ptr<IrIdentifier> getIdentifier() const { return m_identifier; }
+    std::shared_ptr<IrExpression> getIndex() const { return m_index; }
     
 protected:
     

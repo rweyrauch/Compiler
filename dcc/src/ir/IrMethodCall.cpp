@@ -148,7 +148,7 @@ bool IrMethodCall::codegen(IrTraversalContext* ctx)
         }
         else if (literal)
         {
-             tac.m_arg0 = it.get();
+             tac.m_arg0 = it;
         }
         else
         {
@@ -160,8 +160,8 @@ bool IrMethodCall::codegen(IrTraversalContext* ctx)
     
     IrTacStmt callStmt;
     callStmt.m_opcode = IrOpcode::CALL;
-    callStmt.m_arg0 = m_identifier.get();
-    callStmt.m_arg1 = m_result.get();
+    callStmt.m_arg0 = m_identifier;
+    callStmt.m_arg1 = m_result;
     ctx->append(callStmt);
     
     return true; 

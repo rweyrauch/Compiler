@@ -74,11 +74,11 @@ bool IrVariableDecl::analyze(IrTraversalContext* ctx)
     return valid;
 }
  
-IrIdentifier* IrVariableDecl::getVariable(size_t which) const
+std::shared_ptr<IrIdentifier> IrVariableDecl::getVariable(size_t which) const
 {
     if (which < m_identifiers.size())
     {
-        return m_identifiers.at(which).get();
+        return m_identifiers.at(which);
     }
     return nullptr;
 }

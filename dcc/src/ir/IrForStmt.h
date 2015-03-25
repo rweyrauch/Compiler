@@ -51,9 +51,9 @@ public:
     virtual size_t getAllocationSize() const;
     virtual void setSymbolStartAddress(size_t addr);
         
-    IrIdentifier* getLoopBegin() const { return m_labelTop.get(); }
-    IrIdentifier* getLoopContinue() const { return m_labelContinue.get(); }
-    IrIdentifier* getLoopEnd() const { return m_labelEnd.get(); }
+    std::shared_ptr<IrIdentifier> getLoopBegin() const { return m_labelTop; }
+    std::shared_ptr<IrIdentifier> getLoopContinue() const { return m_labelContinue; }
+    std::shared_ptr<IrIdentifier> getLoopEnd() const { return m_labelEnd; }
     
 protected:    
     

@@ -153,7 +153,7 @@ bool IrMethodDecl::codegen(IrTraversalContext* ctx)
     
     IrTacStmt beginTac;
     beginTac.m_opcode = IrOpcode::FBEGIN;
-    beginTac.m_arg0 = m_identifier.get();
+    beginTac.m_arg0 = m_identifier;
     beginTac.m_info = (int)stackSize;
     
     ctx->append(beginTac);
