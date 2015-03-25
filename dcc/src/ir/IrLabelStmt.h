@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include <memory>
 #include "IrStatement.h"
 
 namespace Decaf
@@ -33,7 +34,7 @@ class IrLabelStatement : public IrStatement
 public:
     IrLabelStatement(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* label) :
         IrStatement(lineNumber, columnNumber, filename),
-        m_label(label)
+        m_label(std::shared_ptr<IrIdentifier>(label))
     {}
     
     virtual ~IrLabelStatement()
@@ -45,7 +46,7 @@ public:
     virtual bool codegen(IrTraversalContext* ctx);
     
 protected:    
-    IrIdentifier* m_label;
+    std::shared_ptr<IrIdentifier> m_label;
     
 private:
     IrLabelStatement() = delete;

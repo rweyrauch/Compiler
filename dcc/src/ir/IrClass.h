@@ -23,6 +23,7 @@
 //
 #pragma once
 #include <vector>
+#include <memory>
 #include "IrBase.h"
 #include "IrIdentifier.h"
 #include "IrFieldDecl.h"
@@ -40,9 +41,8 @@ public:
         m_identifier(ident),
         m_field_decl_list(),
         m_method_decl_list(),
-        m_symbols(nullptr)
+        m_symbols(new IrSymbolTable())
     {
-        m_symbols = new IrSymbolTable();
     }
     
     virtual ~IrClass();
@@ -60,17 +60,17 @@ public:
     
     IrSymbolTable* getSymbols()
     {
-        return m_symbols;
+        return m_symbols.get();
     }
     
 protected:
     
-    IrIdentifier* m_identifier;
+    std::shared_ptr<IrIdentifier> m_identifier;
     
-    std::vector<IrFieldDecl*> m_field_decl_list;
-    std::vector<IrMethodDecl*> m_method_decl_list;
+    std::vector<std::shared_ptr<IrFieldDecl>> m_field_decl_list;
+    std::vector<std::shared_ptr<IrMethodDecl>> m_method_decl_list;
     
-    IrSymbolTable* m_symbols;
+    std::unique_ptr<IrSymbolTable> m_symbols;
     
 private:
     IrClass() = delete;

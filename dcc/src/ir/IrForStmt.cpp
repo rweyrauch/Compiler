@@ -42,43 +42,27 @@ namespace Decaf
 IrForStatement::IrForStatement(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* loopVar, IrExpression* initialExpr, IrExpression* endExpr, IrBlock* block) :
     IrStatement(lineNumber, columnNumber, filename),
     m_loopVar(nullptr),
-    m_initialValue(initialExpr),
-    m_terminatingValue(endExpr),
-    m_body(block)
+    m_initialValue(std::shared_ptr<IrExpression>(initialExpr)),
+    m_terminatingValue(std::shared_ptr<IrExpression>(endExpr)),
+    m_body(std::shared_ptr<IrBlock>(block))
 {
-    m_loopVar = new IrLocation(lineNumber, columnNumber, filename, loopVar, IrType::Integer);
+    m_loopVar = std::shared_ptr<IrLocation>(new IrLocation(lineNumber, columnNumber, filename, loopVar, IrType::Integer));
 
-    m_initLoopAuto = new IrAssignExpression(lineNumber, columnNumber, filename, m_loopVar, IrAssignmentOperator::Assign, m_initialValue);
-    m_labelTop = IrIdentifier::CreateLabel();
-    m_labelContinue = IrIdentifier::CreateLabel();
-    m_labelEnd = IrIdentifier::CreateLabel();
+    m_initLoopAuto = std::shared_ptr<IrExpression>(new IrAssignExpression(lineNumber, columnNumber, filename, m_loopVar.get(), IrAssignmentOperator::Assign, m_initialValue.get()));
+    m_labelTop = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
+    m_labelContinue = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
+    m_labelEnd = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
     
-    m_terminatingExpr = new IrBooleanExpression(lineNumber, columnNumber, filename, m_loopVar, IrBooleanOperator::Less, m_terminatingValue);
+    m_terminatingExpr = std::shared_ptr<IrExpression>(new IrBooleanExpression(lineNumber, columnNumber, filename, m_loopVar.get(), IrBooleanOperator::Less, m_terminatingValue.get()));
 
-    m_loopIncrement = new IrIntegerLiteral(lineNumber, columnNumber, filename, "1");
-    m_incrementLoop = new IrAssignExpression(lineNumber, columnNumber, filename, m_loopVar, IrAssignmentOperator::IncrementAssign, m_loopIncrement);
+    m_loopIncrement = std::shared_ptr<IrIntegerLiteral>(new IrIntegerLiteral(lineNumber, columnNumber, filename, "1"));
+    m_incrementLoop = std::shared_ptr<IrExpression>(new IrAssignExpression(lineNumber, columnNumber, filename, m_loopVar.get(), IrAssignmentOperator::IncrementAssign, m_loopIncrement.get()));
 
-    m_loopGoto = new IrGotoStatement(lineNumber, columnNumber, filename, m_labelTop);
+    m_loopGoto = std::shared_ptr<IrGotoStatement>(new IrGotoStatement(lineNumber, columnNumber, filename, m_labelTop.get()));
 }
     
 IrForStatement::~IrForStatement()
 {
-    delete m_loopVar;
-    delete m_initialValue;
-    delete m_terminatingValue;
-    delete m_body;
-    
-    delete m_initLoopAuto;
-    delete m_labelTop;
-    delete m_labelContinue;
-    delete m_labelEnd;
-    
-    delete m_terminatingExpr;
-
-    delete m_loopIncrement;
-    delete m_incrementLoop;
-
-    delete m_loopGoto;
 }
     
 void IrForStatement::propagateTypes(IrTraversalContext* ctx)
@@ -187,7 +171,7 @@ bool IrForStatement::codegen(IrTraversalContext* ctx)
     
     IrTacStmt label;
     label.m_opcode = IrOpcode::LABEL;
-    label.m_arg0 = m_labelTop;
+    label.m_arg0 = m_labelTop.get();
     ctx->append(label);
      
     m_terminatingExpr->codegen(ctx);
@@ -195,7 +179,7 @@ bool IrForStatement::codegen(IrTraversalContext* ctx)
     IrTacStmt tac;
     tac.m_opcode = IrOpcode::IFZ;
     tac.m_arg0 = m_terminatingExpr->getResultIdentifier();
-    tac.m_arg1 = m_labelEnd;
+    tac.m_arg1 = m_labelEnd.get();
     tac.m_arg2 = nullptr;
     
     ctx->append(tac);
@@ -203,7 +187,7 @@ bool IrForStatement::codegen(IrTraversalContext* ctx)
     if (m_body) m_body->codegen(ctx);
     m_labelContinue->codegen(ctx);
     label.m_opcode = IrOpcode::LABEL;
-    label.m_arg0 = m_labelContinue;
+    label.m_arg0 = m_labelContinue.get();
     ctx->append(label);
     
     m_incrementLoop->codegen(ctx);
@@ -211,7 +195,7 @@ bool IrForStatement::codegen(IrTraversalContext* ctx)
     
     m_labelEnd->codegen(ctx);
     label.m_opcode = IrOpcode::LABEL;
-    label.m_arg0 = m_labelEnd;
+    label.m_arg0 = m_labelEnd.get();
     ctx->append(label);
      
     ctx->popParent();

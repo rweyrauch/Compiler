@@ -34,16 +34,11 @@ namespace Decaf
 
  IrBlock::~IrBlock()
 {
-    for (auto it : m_variables)
-        delete it;
-    for (auto it : m_statements)
-        delete it;
-    delete m_symbols;
 }
 
 void IrBlock::propagateTypes(IrTraversalContext* ctx)
 {
-    ctx->pushSymbols(m_symbols);
+    ctx->pushSymbols(m_symbols.get());
     ctx->pushParent(this);
     
     for (auto it : m_variables)
@@ -80,7 +75,7 @@ bool IrBlock::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
     
-    ctx->pushSymbols(m_symbols);
+    ctx->pushSymbols(m_symbols.get());
     ctx->pushParent(this);
     
     for (auto it : m_variables)
@@ -103,7 +98,7 @@ bool IrBlock::analyze(IrTraversalContext* ctx)
 bool IrBlock::codegen(IrTraversalContext* ctx) 
 {
     bool valid = true;
-    ctx->pushSymbols(m_symbols);
+    ctx->pushSymbols(m_symbols.get());
     ctx->pushParent(this);
     
     for (auto it : m_variables)
@@ -123,18 +118,16 @@ bool IrBlock::codegen(IrTraversalContext* ctx)
     
 void IrBlock::addVariableDecl(IrVariableDecl* var)
 {
-    m_variables.push_back(var);
+    m_variables.push_back(std::shared_ptr<IrVariableDecl>(var));
     
     m_symbols->addVariable(var);
 }
 
 void IrBlock::addVariableDecl(const std::vector<IrVariableDecl*>& variables)
 {
-    m_variables.insert(m_variables.end(), variables.begin(), variables.end());
-    
-    for (auto it : m_variables)
+    for (auto it : variables)
     {
-        m_symbols->addVariable(it);
+        addVariableDecl(it);
     }
 }
  
@@ -152,8 +145,8 @@ size_t IrBlock::getAllocationSize() const
     
 void IrBlock::setSymbolStartAddress(size_t addr)
 {
-	m_symbols->setStartAddress(addr);
-	
+    m_symbols->setStartAddress(addr);
+
     // recurse sub-blocks
     for (auto it : m_statements)
     {

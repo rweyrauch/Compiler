@@ -210,10 +210,10 @@ bool IrBooleanExpression::analyze(IrTraversalContext* ctx)
     if (valid)
     {
         // allocate a temporary variable for the result of this expression
-        m_result = IrIdentifier::CreateTemporary();
-        if (!ctx->addTempVariable(m_result, m_type))
+        m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());
+        if (!ctx->addTempVariable(m_result.get(), m_type))
         {
-            ctx->error(m_result, "Internal compiler error.  Failed to add temporary variable to symbol table.");
+            ctx->error(m_result.get(), "Internal compiler error.  Failed to add temporary variable to symbol table.");
             valid = false;
         }
     }
@@ -246,10 +246,10 @@ bool IrBooleanExpression::codegen(IrTraversalContext* ctx)
         tac.m_opcode = opcodeFor(m_operator);
         if (m_lhs != nullptr)
         {
-            IrLiteral* literal = dynamic_cast<IrLiteral*>(m_lhs);
+            IrLiteral* literal = dynamic_cast<IrLiteral*>(m_lhs.get());
             if (literal)
             {
-                tac.m_arg0 = m_lhs;
+                tac.m_arg0 = m_lhs.get();
             }
             else
             {
@@ -258,10 +258,10 @@ bool IrBooleanExpression::codegen(IrTraversalContext* ctx)
         }
         if (m_rhs != nullptr)
         {
-            IrLiteral* literal = dynamic_cast<IrLiteral*>(m_rhs);
+            IrLiteral* literal = dynamic_cast<IrLiteral*>(m_rhs.get());
             if (literal)
             {
-                tac.m_arg1 = m_rhs;
+                tac.m_arg1 = m_rhs.get();
             }
             else
             {

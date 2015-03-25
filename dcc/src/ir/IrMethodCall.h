@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include <memory>
 #include <string>
 #include <vector>
 #include "IrExpression.h"
@@ -35,7 +36,7 @@ class IrMethodCall : public IrExpression
 public:
     IrMethodCall(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType type) :
         IrExpression(lineNumber, columnNumber, filename, type),
-        m_identifier(ident),
+        m_identifier(std::shared_ptr<IrIdentifier>(ident)),
         m_externFuncName(nullptr),
         m_externalFunction(false),
         m_arguments()
@@ -52,20 +53,20 @@ public:
     
     void addArgument(IrExpression* arg)
     {
-        m_arguments.push_back(arg);
+        m_arguments.push_back(std::shared_ptr<IrExpression>(arg));
     }
     
     bool isExternal() const { return m_externalFunction; }
-    const IrIdentifier* getIdentifier() const { return m_identifier; }
+    const IrIdentifier* getIdentifier() const { return m_identifier.get(); }
     size_t getNumArguments() const { return m_arguments.size(); }
     IrType getArgumentType(size_t which) const { return m_arguments.at(which)->getType(); }
     
 protected:    
     
-    IrIdentifier* m_identifier;
-    IrStringLiteral* m_externFuncName;
+    std::shared_ptr<IrIdentifier> m_identifier;
+    std::shared_ptr<IrStringLiteral> m_externFuncName;
     bool m_externalFunction;
-    std::vector<IrExpression*> m_arguments;
+    std::vector<std::shared_ptr<IrExpression>> m_arguments;
     
 private:
     IrMethodCall() = delete;

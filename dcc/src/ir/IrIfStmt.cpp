@@ -35,12 +35,6 @@ namespace Decaf
 
 IrIfStatement::~IrIfStatement()
 {
-    delete m_condition;
-    delete m_trueBlock;
-    delete m_falseBlock;
-    
-    delete m_labelFalse;
-    delete m_labelEnd;
 }
     
 void IrIfStatement::propagateTypes(IrTraversalContext* ctx)
@@ -115,24 +109,22 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
     if (!m_condition->codegen(ctx))
         valid = false;
     
-    delete m_labelFalse;
-    m_labelFalse = IrIdentifier::CreateLabel();
+    m_labelFalse = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
     
-    delete m_labelEnd;
-    m_labelEnd = IrIdentifier::CreateLabel();
+    m_labelEnd = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
     
     IrTacStmt tac;
     tac.m_opcode = IrOpcode::IFZ;
-    IrBooleanLiteral* literal = dynamic_cast<IrBooleanLiteral*>(m_condition);
+    IrBooleanLiteral* literal = dynamic_cast<IrBooleanLiteral*>(m_condition.get());
     if (literal)
     {
-        tac.m_arg0 = m_condition;
+        tac.m_arg0 = m_condition.get();
     }
     else
     {
         tac.m_arg0 = m_condition->getResultIdentifier();
     }
-    tac.m_arg1 = m_labelFalse;
+    tac.m_arg1 = m_labelFalse.get();
     tac.m_arg2 = nullptr;
     
     ctx->append(tac);
@@ -144,14 +136,14 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
         
         IrTacStmt jump;
         jump.m_opcode = IrOpcode::JUMP;
-        jump.m_arg0 = m_labelEnd;
+        jump.m_arg0 = m_labelEnd.get();
         
         ctx->append(jump);
     }
             
     IrTacStmt label;
     label.m_opcode = IrOpcode::LABEL;
-    label.m_arg0 = m_labelFalse;
+    label.m_arg0 = m_labelFalse.get();
     ctx->append(label);
     
     if (m_falseBlock)
@@ -162,7 +154,7 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
     
     IrTacStmt elabel;
     elabel.m_opcode = IrOpcode::LABEL;
-    elabel.m_arg0 = m_labelEnd;
+    elabel.m_arg0 = m_labelEnd.get();
     
     ctx->append(elabel);
 
@@ -187,12 +179,12 @@ size_t IrIfStatement::getAllocationSize() const
 
 void IrIfStatement::setSymbolStartAddress(size_t addr)
 {
-	if (m_trueBlock != nullptr)
+    if (m_trueBlock != nullptr)
     {
         m_trueBlock->setSymbolStartAddress(addr);
         addr += m_trueBlock->getAllocationSize();
     }
-	if (m_falseBlock != nullptr)
+    if (m_falseBlock != nullptr)
     {
         m_falseBlock->setSymbolStartAddress(addr);
         //addr += m_falseBlock->getAllocationSize();

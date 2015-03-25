@@ -50,19 +50,19 @@ bool IrGotoStatement::analyze(IrTraversalContext* ctx)
 
 bool IrGotoStatement::codegen(IrTraversalContext* ctx)
 {
-	bool valid = true;
-	
+    bool valid = true;
+
     ctx->pushParent(this);
     
     IrTacStmt tac;
     tac.m_opcode = IrOpcode::JUMP;
-    tac.m_arg0 = m_label;
+    tac.m_arg0 = m_label.get();
 
     ctx->append(tac);
     
     ctx->popParent();
-    		
-	return valid;
+    
+    return valid;
 }
 
 } // namespace Decaf

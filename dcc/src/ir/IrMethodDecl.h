@@ -23,15 +23,16 @@
 //
 #pragma once
 #include <vector>
+#include <memory>
 #include "IrCommon.h"
 #include "IrBase.h"
+#include "IrBlock.h"
 #include "IrIdentifier.h"
 #include "IrSymbolTable.h"
 
 namespace Decaf
 {
 class IrVariableDecl;
-class IrBlock;
 class IrIntegerLiteral;
 
 class IrMethodDecl : public IrBase
@@ -43,9 +44,8 @@ public:
         m_returnType(returnType),
         m_argument_list(),
         m_block(nullptr),
-        m_symbols(nullptr)
+        m_symbols(new IrSymbolTable())
     {
-        m_symbols = new IrSymbolTable();
     }
     
     virtual ~IrMethodDecl();
@@ -57,27 +57,27 @@ public:
      
     void addArgument(IrVariableDecl* arg)
     {
-        m_argument_list.push_back(arg);
+        m_argument_list.push_back(std::shared_ptr<IrVariableDecl>(arg));
         m_symbols->addVariable(arg);
     }
     void addBlock(IrBlock* block)
     {
-        m_block = block;
+        m_block = std::shared_ptr<IrBlock>(block);
     }
     
     const std::string& getName() const { return m_identifier->getIdentifier(); }
     size_t getNumArguments() const { return m_argument_list.size(); }
-    IrVariableDecl* getArgument(size_t which) { return m_argument_list.at(which); }
+    IrVariableDecl* getArgument(size_t which) { return m_argument_list.at(which).get(); }
     IrType getReturnType() const { return m_returnType; }
     
 protected:
     
-    IrIdentifier* m_identifier;
+    std::shared_ptr<IrIdentifier> m_identifier;
     IrType m_returnType;
-    std::vector<IrVariableDecl*> m_argument_list;
-    IrBlock* m_block;
-    IrSymbolTable* m_symbols;
- 	
+    std::vector<std::shared_ptr<IrVariableDecl>> m_argument_list;
+    std::shared_ptr<IrBlock> m_block;
+    std::unique_ptr<IrSymbolTable> m_symbols;
+ 
 private:
     IrMethodDecl() = delete;
     IrMethodDecl(const IrMethodDecl& rhs) = delete;

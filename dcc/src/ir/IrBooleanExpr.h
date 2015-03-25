@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include <memory>
 #include "IrCommon.h"
 #include "IrExpression.h"
 
@@ -47,14 +48,14 @@ public:
     virtual bool codegen(IrTraversalContext* ctx);
     
     IrBooleanOperator getOperator() const { return m_operator; }
-    IrExpression* getLeftHandSide() const { return m_lhs; }
-    IrExpression* getRightHandSide() const { return m_rhs; }
+    IrExpression* getLeftHandSide() const { return m_lhs.get(); }
+    IrExpression* getRightHandSide() const { return m_rhs.get(); }
     
 protected:
     
     IrBooleanOperator m_operator;
-    IrExpression* m_lhs;
-    IrExpression* m_rhs;
+    std::shared_ptr<IrExpression> m_lhs;
+    std::shared_ptr<IrExpression> m_rhs;
     
 private:
     IrBooleanExpression() = delete;

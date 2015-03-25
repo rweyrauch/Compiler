@@ -105,7 +105,7 @@ bool IrAssignExpression::analyze(IrTraversalContext* ctx)
     // Rule: lhs must be assignable (a location)
     if (m_lhs)
     {
-        if (nullptr == dynamic_cast<IrLocation*>(m_lhs))
+        if (nullptr == dynamic_cast<IrLocation*>(m_lhs.get()))
         {
             ctx->error(this, "lhs of assigment operator must be assignable.");
             valid = false;
@@ -189,10 +189,10 @@ bool IrAssignExpression::codegen(IrTraversalContext* ctx)
         tac.m_opcode = opcodeFor(m_operator);
         if (m_rhs != nullptr)
         {
-            IrLiteral* literal = dynamic_cast<IrLiteral*>(m_rhs);
+            IrLiteral* literal = dynamic_cast<IrLiteral*>(m_rhs.get());
             if (literal)
             {
-                tac.m_arg0 = m_rhs;
+                tac.m_arg0 = m_rhs.get();
             }
             else
             {
@@ -201,10 +201,10 @@ bool IrAssignExpression::codegen(IrTraversalContext* ctx)
         }       
         if (m_lhs != nullptr)
         {
-            IrLiteral* literal = dynamic_cast<IrLiteral*>(m_lhs);
+            IrLiteral* literal = dynamic_cast<IrLiteral*>(m_lhs.get());
             if (literal)
             {
-                tac.m_arg2 = m_lhs;
+                tac.m_arg2 = m_lhs.get();
             }
             else
             {

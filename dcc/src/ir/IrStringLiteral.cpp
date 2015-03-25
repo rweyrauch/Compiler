@@ -38,9 +38,8 @@ void IrStringLiteral::print(unsigned int depth)
     
 bool IrStringLiteral::codegen(IrTraversalContext* ctx)
 {
-    delete m_label;
-    m_label = IrIdentifier::CreateLabel();
-    ctx->addString(m_label, this);
+    m_label = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
+    ctx->addString(m_label.get(), this);
     
     return true;
 }

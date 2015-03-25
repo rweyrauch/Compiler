@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include <memory>
 #include "IrCommon.h"
 #include "IrLiteral.h"
 
@@ -46,10 +47,10 @@ public:
     virtual bool codegen(IrTraversalContext* ctx);
     
     const std::string& getValue() const { return m_valueAsString; }
-    IrIdentifier* getIdentifier() const { return m_label; }
+    IrIdentifier* getIdentifier() const { return m_label.get(); }
     
 protected:
-    IrIdentifier* m_label;
+    std::shared_ptr<IrIdentifier> m_label;
     
 private:
     IrStringLiteral() = delete;

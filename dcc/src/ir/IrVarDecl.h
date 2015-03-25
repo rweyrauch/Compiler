@@ -24,6 +24,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <memory>
 #include "IrCommon.h"
 #include "IrBase.h"
 #include "IrIdentifier.h"
@@ -39,13 +40,18 @@ public:
         m_type(type),
         m_identifiers()
     {
-        m_identifiers.push_back(ident);
+        m_identifiers.push_back(std::shared_ptr<IrIdentifier>(ident));
     }
     IrVariableDecl(int lineNumber, int columnNumber, const std::string& filename, const std::vector<IrIdentifier*> ident_list, IrType type) :
         IrBase(lineNumber, columnNumber, filename),
         m_type(type),
-        m_identifiers(ident_list)
-    {}
+        m_identifiers()
+    {
+        for (auto it : ident_list)
+        {
+            m_identifiers.push_back(std::shared_ptr<IrIdentifier>(it));
+        }
+    }
     
     virtual ~IrVariableDecl()
     {}
@@ -62,7 +68,7 @@ public:
 protected:
     
     IrType m_type;
-    std::vector<IrIdentifier*> m_identifiers;
+    std::vector<std::shared_ptr<IrIdentifier>> m_identifiers;
      
 private:
     IrVariableDecl() = delete;

@@ -22,7 +22,7 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <iostream>
+#include <memory>
 #include "IrCommon.h"
 #include "IrStatement.h"
 
@@ -51,25 +51,25 @@ public:
     virtual size_t getAllocationSize() const;
     virtual void setSymbolStartAddress(size_t addr);
         
-    IrIdentifier* getLoopBegin() const { return m_labelTop; }
-    IrIdentifier* getLoopContinue() const { return m_labelContinue; }
-    IrIdentifier* getLoopEnd() const { return m_labelEnd; }
+    IrIdentifier* getLoopBegin() const { return m_labelTop.get(); }
+    IrIdentifier* getLoopContinue() const { return m_labelContinue.get(); }
+    IrIdentifier* getLoopEnd() const { return m_labelEnd.get(); }
     
 protected:    
     
-    IrLocation* m_loopVar;
-    IrExpression* m_initialValue;
-    IrExpression* m_terminatingValue;
-    IrBlock* m_body;
+    std::shared_ptr<IrLocation> m_loopVar;
+    std::shared_ptr<IrExpression> m_initialValue;
+    std::shared_ptr<IrExpression> m_terminatingValue;
+    std::shared_ptr<IrBlock> m_body;
     
-    IrIdentifier* m_labelTop;
-    IrIdentifier* m_labelContinue;
-    IrIdentifier* m_labelEnd;
-    IrExpression* m_initLoopAuto;
-    IrExpression* m_terminatingExpr;
-    IrExpression* m_incrementLoop;
-    IrIntegerLiteral* m_loopIncrement;
-    IrGotoStatement* m_loopGoto;
+    std::shared_ptr<IrIdentifier> m_labelTop;
+    std::shared_ptr<IrIdentifier> m_labelContinue;
+    std::shared_ptr<IrIdentifier> m_labelEnd;
+    std::shared_ptr<IrExpression> m_initLoopAuto;
+    std::shared_ptr<IrExpression> m_terminatingExpr;
+    std::shared_ptr<IrExpression> m_incrementLoop;
+    std::shared_ptr<IrIntegerLiteral> m_loopIncrement;
+    std::shared_ptr<IrGotoStatement> m_loopGoto;
     
 private:
     IrForStatement() = delete;

@@ -36,18 +36,11 @@ namespace Decaf
 
 IrMethodDecl::~IrMethodDecl()
 {
-	delete m_identifier;
-	delete m_symbols;
-	for (auto it : m_argument_list)
-	{
-		delete it;
-	}
-	delete m_block;
 }
  
 void IrMethodDecl::propagateTypes(IrTraversalContext* ctx)
 {
-    ctx->pushSymbols(m_symbols);
+    ctx->pushSymbols(m_symbols.get());
     ctx->pushParent(this);
     
     m_identifier->propagateTypes(ctx);
@@ -93,7 +86,7 @@ bool IrMethodDecl::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
  
-    ctx->pushSymbols(m_symbols);
+    ctx->pushSymbols(m_symbols.get());
     ctx->pushParent(this);
     
     if (m_block) 
@@ -133,8 +126,8 @@ bool IrMethodDecl::analyze(IrTraversalContext* ctx)
                 m_block->addStatement(new IrReturnStatement(m_block->getLineNumber(), m_block->getColumnNumber(), m_block->getFilename()));
             }
         }
-		// patch up child symbol addresses
-		m_block->setSymbolStartAddress(m_symbols->getAllocationSize());
+        // patch up child symbol addresses
+        m_block->setSymbolStartAddress(m_symbols->getAllocationSize());
     }
        
     ctx->popParent();
@@ -145,7 +138,7 @@ bool IrMethodDecl::analyze(IrTraversalContext* ctx)
     
 bool IrMethodDecl::codegen(IrTraversalContext* ctx) 
 { 
-    ctx->pushSymbols(m_symbols);
+    ctx->pushSymbols(m_symbols.get());
     ctx->pushParent(this);
 
     m_identifier->codegen(ctx);
@@ -157,10 +150,10 @@ bool IrMethodDecl::codegen(IrTraversalContext* ctx)
     // round stack size to multiple of 16 (assuming already a multiple of 8)
     if (stackSize % 16 != 0)
         stackSize += 8;
-		
+    
     IrTacStmt beginTac;
     beginTac.m_opcode = IrOpcode::FBEGIN;
-    beginTac.m_arg0 = m_identifier;
+    beginTac.m_arg0 = m_identifier.get();
     beginTac.m_info = (int)stackSize;
     
     ctx->append(beginTac);
@@ -169,13 +162,13 @@ bool IrMethodDecl::codegen(IrTraversalContext* ctx)
     for (auto it : m_argument_list)
     {
         it->codegen(ctx);
-        		
-		IrTacStmt paramTac;
-		paramTac.m_opcode = IrOpcode::GETPARAM;
-		paramTac.m_arg0 = it->getVariable(0);
-		paramTac.m_info = argNum;
-		argNum++;
-		
+        
+        IrTacStmt paramTac;
+        paramTac.m_opcode = IrOpcode::GETPARAM;
+        paramTac.m_arg0 = it->getVariable(0);
+        paramTac.m_info = argNum;
+        argNum++;
+
         ctx->append(paramTac);
     }
     

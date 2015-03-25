@@ -116,7 +116,7 @@ bool IrLocation::analyze(IrTraversalContext* ctx)
         else
         {
             // Location index must be in range of symbol count when not declaring an array.
-            IrIntegerLiteral* intLit = dynamic_cast<IrIntegerLiteral*>(m_index);
+            IrIntegerLiteral* intLit = dynamic_cast<IrIntegerLiteral*>(m_index.get());
             if (intLit && !usedAsDeclaration() && symbolValid)
             {
                 if (intLit->getValue() < 0 || (size_t)intLit->getValue() >= symbol.m_count)
@@ -149,11 +149,11 @@ bool IrLocation::codegen(IrTraversalContext* ctx)
     
     if (!m_index)
     {
-        m_result = m_identifier;
+        m_result = std::shared_ptr<IrIdentifier>(m_identifier);
     }
     else
     {
-        m_result = m_index->getResultIdentifier();
+        m_result = std::shared_ptr<IrIdentifier>(m_index->getResultIdentifier());
     }
     m_result->codegen(ctx);
     

@@ -23,6 +23,7 @@
 //
 #pragma once
 #include <vector>
+#include <memory>
 #include "IrCommon.h"
 #include "IrBase.h"
 
@@ -49,14 +50,14 @@ public:
     IrType getType() const { return m_type; }
     bool isArray() const { return m_isArray; }
     
-    IrIdentifier* getResultIdentifier() const { return m_result; }
+    IrIdentifier* getResultIdentifier() const { return m_result.get(); }
     
 protected:
     
     IrType m_type;
     bool m_isArray;
     
-    IrIdentifier* m_result;
+    std::shared_ptr<IrIdentifier> m_result;
     
 private:
     IrExpression() = delete;

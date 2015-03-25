@@ -24,6 +24,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <memory>
 #include "IrStatement.h"
 #include "IrSymbolTable.h"
 
@@ -38,9 +39,8 @@ public:
         IrStatement(lineNumber, columnNumber, filename),
         m_variables(),
         m_statements(),
-        m_symbols(nullptr)
+        m_symbols(new IrSymbolTable())
     {
-        m_symbols = new IrSymbolTable();
     }
     
     virtual ~IrBlock();
@@ -55,19 +55,22 @@ public:
     
     void addStatement(IrStatement* stmt)
     {
-        m_statements.push_back(stmt);
+        m_statements.push_back(std::shared_ptr<IrStatement>(stmt));
     }
     void addStatements(const std::vector<IrStatement*>& statements)
     {
-        m_statements.insert(m_statements.end(), statements.begin(), statements.end());
+        for (auto it : statements)
+        {
+            addStatement(it);
+        }
     }
   
     size_t getNumStatements() const { return m_statements.size(); }
-    const IrStatement* getStatement(size_t which) const { return m_statements.at(which); }
+    const IrStatement* getStatement(size_t which) const { return m_statements.at(which).get(); }
     
     IrSymbolTable* getSymbols()
     {
-        return m_symbols;
+        return m_symbols.get();
     }
 
     virtual size_t getAllocationSize() const;
@@ -75,10 +78,10 @@ public:
 
 protected:    
     
-    std::vector<IrVariableDecl*> m_variables;
-    std::vector<IrStatement*> m_statements;
+    std::vector<std::shared_ptr<IrVariableDecl>> m_variables;
+    std::vector<std::shared_ptr<IrStatement>> m_statements;
     
-    IrSymbolTable* m_symbols;
+    std::unique_ptr<IrSymbolTable> m_symbols;
     
 private:
     IrBlock() = delete;

@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include <memory>
 #include "IrCommon.h"
 #include "IrBase.h"
 #include "IrLocation.h"
@@ -49,13 +50,13 @@ public:
     virtual bool analyze(IrTraversalContext* ctx);
     virtual bool codegen(IrTraversalContext* ctx);
    
-    IrLocation* getLocation() const { return m_location; }
+    IrLocation* getLocation() const { return m_location.get(); }
     const std::string& getName() const { return m_location->getIdentifier()->getIdentifier(); }
     IrType getType() const { return m_type; }
     
 protected:
     
-    IrLocation* m_location;
+    std::shared_ptr<IrLocation> m_location;
     IrType m_type; 
     
 private:

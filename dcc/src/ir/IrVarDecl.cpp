@@ -78,7 +78,7 @@ IrIdentifier* IrVariableDecl::getVariable(size_t which) const
 {
     if (which < m_identifiers.size())
     {
-        return m_identifiers.at(which);
+        return m_identifiers.at(which).get();
     }
     return nullptr;
 }

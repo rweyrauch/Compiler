@@ -72,7 +72,7 @@ bool IrFieldDecl::codegen(IrTraversalContext* ctx)
     ctx->pushParent(this);
     
     SVariableSymbol symbol;
-    if (ctx->lookup(m_location, symbol))
+    if (ctx->lookup(m_location.get(), symbol))
     {
         IrTacStmt tac;
         tac.m_opcode = IrOpcode::GLOBAL;

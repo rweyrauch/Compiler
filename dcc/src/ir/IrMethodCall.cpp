@@ -35,23 +35,17 @@ namespace Decaf
 IrMethodCall::IrMethodCall(int lineNumber, int columnNumber, const std::string& filename, IrStringLiteral* name, IrType type) :
     IrExpression(lineNumber, columnNumber, filename, type),
     m_identifier(nullptr),
-    m_externFuncName(name),
+    m_externFuncName(std::shared_ptr<IrStringLiteral>(name)),
     m_externalFunction(true),
     m_arguments()
 {
     // strip quotes from literal
     std::string funcName = name->getValue().substr(1, name->getValue().size()-2);   
-    m_identifier = new IrIdentifier(lineNumber, columnNumber, filename, funcName);
+    m_identifier = std::shared_ptr<IrIdentifier>(new IrIdentifier(lineNumber, columnNumber, filename, funcName));
 }
  
 IrMethodCall::~IrMethodCall()
 {
-    delete m_identifier;
-    delete m_externFuncName;
-    for (auto it : m_arguments)
-    {
-        delete it;
-    }
 }
   
 void IrMethodCall::propagateTypes(IrTraversalContext* ctx)
@@ -112,15 +106,23 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
         }
         else
         {
-			if (symbol.m_type == IrType::Integer || symbol.m_type == IrType::Boolean)
-			{
-				m_result = IrIdentifier::CreateTemporary();
-				ctx->addTempVariable(m_result, symbol.m_type);
-			}
-		}
+            if (symbol.m_type == IrType::Integer || symbol.m_type == IrType::Boolean)
+            {
+                m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());
+                ctx->addTempVariable(m_result.get(), symbol.m_type);
+            }
+        }
     }
     else
     {
+        // External method identifier must not be empty string.
+        if (getIdentifier()->getIdentifier().empty())
+        {
+            std::stringstream msg;
+            msg << "invalid external method name.";
+            ctx->error(this, msg.str());
+            valid = false;
+        }
     }
     
     ctx->popParent();
@@ -130,40 +132,37 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
 
 bool IrMethodCall::codegen(IrTraversalContext* ctx) 
 { 
-    //if (isExternal())
-    {        
-		int argCount = 0;    
-        for (auto it : m_arguments)
-        {
-            it->codegen(ctx);
-            
-            IrTacStmt tac;
-            tac.m_opcode = IrOpcode::PARAM;
-            
-            IrStringLiteral* sliteral = dynamic_cast<IrStringLiteral*>(it);
-            IrLiteral* literal = dynamic_cast<IrLiteral*>(it);
-            if (sliteral)
-            {
-                tac.m_arg0 = sliteral->getIdentifier();
-            }
-            else if (literal)
-            {
-                tac.m_arg0 = it;
-            }
-            else
-            {
-                tac.m_arg0 = it->getResultIdentifier();
-            }
-            tac.m_info = argCount++;
-            ctx->append(tac);
-        }
+    int argCount = 0;    
+    for (auto it : m_arguments)
+    {
+        it->codegen(ctx);
         
-        IrTacStmt callStmt;
-        callStmt.m_opcode = IrOpcode::CALL;
-        callStmt.m_arg0 = m_identifier;
-        callStmt.m_arg1 = m_result;
-        ctx->append(callStmt);
+        IrTacStmt tac;
+        tac.m_opcode = IrOpcode::PARAM;
+        
+        IrStringLiteral* sliteral = dynamic_cast<IrStringLiteral*>(it.get());
+        IrLiteral* literal = dynamic_cast<IrLiteral*>(it.get());
+        if (sliteral)
+        {
+            tac.m_arg0 = sliteral->getIdentifier();
+        }
+        else if (literal)
+        {
+             tac.m_arg0 = it.get();
+        }
+        else
+        {
+            tac.m_arg0 = it->getResultIdentifier();
+        }
+        tac.m_info = argCount++;
+        ctx->append(tac);
     }
+    
+    IrTacStmt callStmt;
+    callStmt.m_opcode = IrOpcode::CALL;
+    callStmt.m_arg0 = m_identifier.get();
+    callStmt.m_arg1 = m_result.get();
+    ctx->append(callStmt);
     
     return true; 
 }

@@ -22,7 +22,7 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <iostream>
+#include <memory>
 #include "IrCommon.h"
 #include "IrStatement.h"
 #include "IrExpression.h"
@@ -35,7 +35,7 @@ class IrReturnStatement : public IrStatement
 public:
     IrReturnStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpression* returnValue = nullptr) :
         IrStatement(lineNumber, columnNumber, filename),
-        m_returnValue(returnValue)
+        m_returnValue(std::shared_ptr<IrExpression>(returnValue))
     {}
     
     virtual ~IrReturnStatement()
@@ -57,7 +57,7 @@ public:
     
 protected:    
     
-    IrExpression* m_returnValue;
+    std::shared_ptr<IrExpression> m_returnValue;
     
 private:
     IrReturnStatement() = delete;

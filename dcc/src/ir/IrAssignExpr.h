@@ -23,6 +23,7 @@
 //
 #pragma once
 #include <string>
+#include <memory>
 #include <vector>
 #include "IrExpression.h"
 
@@ -50,8 +51,8 @@ public:
 protected:    
   
     IrAssignmentOperator m_operator;
-    IrExpression* m_lhs;
-    IrExpression* m_rhs;
+    std::shared_ptr<IrExpression> m_lhs;
+    std::shared_ptr<IrExpression> m_rhs;
     
 private:
     IrAssignExpression() = delete;

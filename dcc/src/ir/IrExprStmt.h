@@ -22,7 +22,7 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <iostream>
+#include <memory>
 #include "IrCommon.h"
 #include "IrStatement.h"
 #include "IrExpression.h"
@@ -48,7 +48,7 @@ public:
   
  protected:    
     
-    IrExpression* m_expression;
+    std::shared_ptr<IrExpression> m_expression;
     
 private:
     IrExpressionStatement() = delete;

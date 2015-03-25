@@ -32,17 +32,11 @@ namespace Decaf
 
 IrClass::~IrClass()
 {
-    delete m_identifier;
-    for (auto it : m_field_decl_list)
-        delete it;
-    for (auto it : m_method_decl_list)
-        delete it;
-    delete m_symbols;
 }
     
 void IrClass::propagateTypes(IrTraversalContext* ctx)
 {
-    ctx->pushSymbols(m_symbols);
+    ctx->pushSymbols(m_symbols.get());
     ctx->pushParent(this);
     
     m_identifier->propagateTypes(ctx);
@@ -87,7 +81,7 @@ bool IrClass::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
     
-    ctx->pushSymbols(m_symbols);
+    ctx->pushSymbols(m_symbols.get());
     ctx->pushParent(this);
     
     // Rule: identifier == "Program"
@@ -133,7 +127,7 @@ bool IrClass::analyze(IrTraversalContext* ctx)
 
 bool IrClass::codegen(IrTraversalContext* ctx) 
 { 
-    ctx->pushSymbols(m_symbols);
+    ctx->pushSymbols(m_symbols.get());
     ctx->pushParent(this);
     
     m_identifier->codegen(ctx);
@@ -154,34 +148,31 @@ bool IrClass::codegen(IrTraversalContext* ctx)
 
 void IrClass::addFieldDecl(IrFieldDecl* field)
 {
-    m_field_decl_list.push_back(field);
+    m_field_decl_list.push_back(std::shared_ptr<IrFieldDecl>(field));
     
     m_symbols->addVariable(field);    
 }
 
 void IrClass::addFieldDecl(const std::vector<IrFieldDecl*>& fields)
 {
-    m_field_decl_list.insert(m_field_decl_list.end(), fields.begin(), fields.end());
-    
     for (auto it : fields)
     {
-        m_symbols->addVariable(it);
+        addFieldDecl(it);
     }
 }
 
 void IrClass::addMethodDecl(IrMethodDecl* method)
 {
-    m_method_decl_list.push_back(method);
+    m_method_decl_list.push_back(std::shared_ptr<IrMethodDecl>(method));
     
     m_symbols->addMethod(method);    
 }
 
 void IrClass::addMethodDecl(const std::vector<IrMethodDecl*>& methods)
 {
-    m_method_decl_list.insert(m_method_decl_list.end(), methods.begin(), methods.end());
     for (auto it : methods)
     {
-        m_symbols->addMethod(it);
+        addMethodDecl(it);
     }
 }
 

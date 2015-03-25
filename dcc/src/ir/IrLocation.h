@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include <memory>
 #include "IrExpression.h"
 
 namespace Decaf
@@ -34,14 +35,14 @@ public:
     
     IrLocation(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType type) :
         IrExpression(lineNumber, columnNumber, filename, type),
-        m_identifier(ident),
+        m_identifier(std::shared_ptr<IrIdentifier>(ident)),
         m_index(nullptr),
         m_asDeclaration(false)
     {}
 
     IrLocation(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType type, IrExpression* index) :
         IrExpression(lineNumber, columnNumber, filename, type),
-        m_identifier(ident),
+        m_identifier(std::shared_ptr<IrIdentifier>(ident)),
         m_index(index),
         m_asDeclaration(false)
     {}
@@ -57,13 +58,13 @@ public:
     void setAsDeclaration() { m_asDeclaration = true; }
     bool usedAsDeclaration() const { return m_asDeclaration; }
     
-    IrIdentifier* getIdentifier() const { return m_identifier; }
-    IrExpression* getIndex() const { return m_index; }
+    IrIdentifier* getIdentifier() const { return m_identifier.get(); }
+    IrExpression* getIndex() const { return m_index.get(); }
     
 protected:
     
-    IrIdentifier* m_identifier;
-    IrExpression* m_index;
+    std::shared_ptr<IrIdentifier> m_identifier;
+    std::shared_ptr<IrExpression> m_index;
     bool m_asDeclaration;
     
 private:

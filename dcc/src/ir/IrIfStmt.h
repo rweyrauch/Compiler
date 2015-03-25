@@ -22,7 +22,7 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <iostream>
+#include <memory>
 #include "IrCommon.h"
 #include "IrStatement.h"
 
@@ -37,9 +37,9 @@ class IrIfStatement : public IrStatement
 public:
     IrIfStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpression* condition, IrBlock* trueBlock, IrBlock* falseBlock = nullptr) :
         IrStatement(lineNumber, columnNumber, filename),
-        m_condition(condition),
-        m_trueBlock(trueBlock),
-        m_falseBlock(falseBlock),
+        m_condition(std::shared_ptr<IrExpression>(condition)),
+        m_trueBlock(std::shared_ptr<IrBlock>(trueBlock)),
+        m_falseBlock(std::shared_ptr<IrBlock>(falseBlock)),
         m_labelFalse(nullptr),
         m_labelEnd(nullptr)
     {}
@@ -56,12 +56,12 @@ public:
     
 protected:    
     
-    IrExpression* m_condition;
-    IrBlock* m_trueBlock;
-    IrBlock* m_falseBlock;
+    std::shared_ptr<IrExpression> m_condition;
+    std::shared_ptr<IrBlock> m_trueBlock;
+    std::shared_ptr<IrBlock> m_falseBlock;
     
-    IrIdentifier* m_labelFalse;
-    IrIdentifier* m_labelEnd;
+    std::shared_ptr<IrIdentifier> m_labelFalse;
+    std::shared_ptr<IrIdentifier> m_labelEnd;
     
 private:
     IrIfStatement() = delete;
