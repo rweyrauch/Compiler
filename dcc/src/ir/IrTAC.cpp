@@ -448,6 +448,11 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
                 IrOutputArg(*it, stream);
                 stream << std::endl;
             }
+            
+            // align the stack 16-byte boundary
+            if (g_extraParams.size() % 2 == 1)
+                stream << "push $0" << std::endl;
+            
             g_extraParams.clear();
         }
         stream << "call ";
