@@ -1,0 +1,47 @@
+class Program
+{
+    int params6(int a, int b, int c, int d, int e, int f)
+    {
+        int sum;
+        sum = a + b + c + d + e + f;
+        return sum;
+    }
+   
+    int params7(int a, int b, int c, int d, int e, int f, int g)
+    {
+        int sum;
+        sum = a + b + c + d + e + f + g;
+        return sum;
+    }
+    
+    int params8(int a, int b, int c, int d, int e, int f, int g, int h)
+    {
+        int sum;
+        sum = a + b + c + d + e + f + g + h;
+        return sum;
+    }
+    
+    void main()
+    {
+        int a, b, c, d, e, f, g, h; 
+        int sum;
+        
+        a = 1;
+        b = 2;
+        c = 3;
+        d = 4;
+        e = 5;
+        f = 6;
+        g = 7;
+        h = 8;
+      
+        sum = params6(a, b, c, d, e, f);
+        callout("printf", "sum(6) = %d (21)\n", sum);
+
+        sum = params7(a, b, c, d, e, f, g);
+        callout("printf", "sum(7) = %d (28)\n", sum);
+       
+        sum = params8(a, b, c, d, e, f, g, h);
+        callout("printf", "sum(8) = %d (36)\n", sum);       
+    }
+}
