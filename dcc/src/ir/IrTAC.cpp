@@ -442,16 +442,16 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         // Pop extra parameters off the param stack
         if (!g_extraParams.empty())
         {
+            // align the stack 16-byte boundary
+            if (g_extraParams.size() % 2 == 1)
+                stream << "push $0" << std::endl;
+            
             for (auto it = g_extraParams.rbegin(); it != g_extraParams.rend(); ++it)
             {
                 stream << "push ";
                 IrOutputArg(*it, stream);
                 stream << std::endl;
             }
-            
-            // align the stack 16-byte boundary
-            if (g_extraParams.size() % 2 == 1)
-                stream << "push $0" << std::endl;
             
             g_extraParams.clear();
         }
