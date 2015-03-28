@@ -92,6 +92,15 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
     
     ctx->pushParent(this);
     
+    if (!m_identifier->analyze(ctx))
+        valid = false;
+    
+    for (auto it : m_arguments)
+    {
+        if (!it->analyze(ctx))
+            valid = false;
+    }
+    
     if (!isExternal())
     {
         // Method must be in symbol table
@@ -124,7 +133,7 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
             valid = false;
         }
     }
-    
+   
     ctx->popParent();
     
     return valid;
@@ -132,11 +141,19 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
 
 bool IrMethodCall::codegen(IrTraversalContext* ctx) 
 { 
-    int argCount = 0;    
+    bool valid = true;
+    
+    ctx->pushParent(this);
+    
     for (auto it : m_arguments)
     {
-        it->codegen(ctx);
-        
+        if (!it->codegen(ctx))
+            valid = false;
+    }
+    
+    int argCount = 0;    
+    for (auto it : m_arguments)
+    {    
         IrTacStmt tac;
         tac.m_opcode = IrOpcode::PARAM;
         
@@ -164,7 +181,9 @@ bool IrMethodCall::codegen(IrTraversalContext* ctx)
     callStmt.m_arg1 = m_result;
     ctx->append(callStmt);
     
-    return true; 
+    ctx->popParent();
+    
+    return valid; 
 }
 
 } // namespace Decaf

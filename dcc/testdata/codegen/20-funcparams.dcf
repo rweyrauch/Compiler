@@ -1,5 +1,6 @@
 class Program
 {
+
     int params6(int a, int b, int c, int d, int e, int f)
     {
         int sum;
@@ -21,6 +22,16 @@ class Program
         return sum;
     }
     
+    int answer()
+    {
+        return 42;
+    }
+    
+    int bar(int arg)
+    {
+        return arg;
+    }
+    
     void main()
     {
         int a, b, c, d, e, f, g, h; 
@@ -34,7 +45,7 @@ class Program
         f = 6;
         g = 7;
         h = 8;
-      
+     
         sum = params6(a, b, c, d, e, f);
         callout("printf", "sum(6) = %d (21)\n", sum);
 
@@ -42,6 +53,9 @@ class Program
         callout("printf", "sum(7) = %d (28)\n", sum);
        
         sum = params8(a, b, c, d, e, f, g, h);
-        callout("printf", "sum(8) = %d (36)\n", sum);       
+        callout("printf", "sum(8) = %d (36)\n", sum);    
+           
+        sum = bar(answer());   
+        callout("printf", "answer = %d (42)\n", sum);
     }
 }
