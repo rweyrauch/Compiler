@@ -238,6 +238,10 @@ bool IrBooleanExpression::codegen(IrTraversalContext* ctx)
         valid = m_rhs->codegen(ctx);
     }
     
+    if (m_result != nullptr)
+        if (!m_result->codegen(ctx))
+            valid = false;
+    
     if (valid)
     {        
         // TAC:
