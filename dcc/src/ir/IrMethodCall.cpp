@@ -175,6 +175,10 @@ bool IrMethodCall::codegen(IrTraversalContext* ctx)
         ctx->append(tac);
     }
     
+    if (m_result != nullptr)
+        if (!m_result->codegen(ctx))
+            valid = false;
+    
     IrTacStmt callStmt;
     callStmt.m_opcode = IrOpcode::CALL;
     callStmt.m_arg0 = m_identifier;

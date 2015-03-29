@@ -1,6 +1,5 @@
 class Program
 {
-
     int params6(int a, int b, int c, int d, int e, int f)
     {
         int sum;
@@ -21,7 +20,7 @@ class Program
         sum = a + b + c + d + e + f + g + h;
         return sum;
     }
-    
+   
     int answer()
     {
         return 42;
@@ -30,6 +29,18 @@ class Program
     int bar(int arg)
     {
         return arg;
+    }
+    
+    int nested(int arg)
+    {
+         return (bar(answer()) + arg);
+    }
+    
+    int nested2(int arg)
+    {
+        int b;
+        b = bar(answer());
+        return b + arg;
     }
     
     void main()
@@ -57,5 +68,10 @@ class Program
            
         sum = bar(answer());   
         callout("printf", "answer = %d (42)\n", sum);
+        
+        sum = nested(1);
+        callout("printf", "nested(1) = %d (43)\n", sum);
+        sum = nested2(1);
+        callout("printf", "nested2(1) = %d (43)\n", sum);
     }
 }
