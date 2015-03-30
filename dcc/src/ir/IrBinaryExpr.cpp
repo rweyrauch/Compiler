@@ -135,8 +135,8 @@ bool IrBinaryExpression::analyze(IrTraversalContext* ctx)
     if (valid)
     {
         // allocate a temporary variable for the result of this expression
-        m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());
-        if (!ctx->addTempVariable(m_result.get(), m_type))
+        m_result = std::shared_ptr<IrAddress>(new IrAddress(std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary())));
+        if (!ctx->addTempVariable(m_result->getIdentifier().get(), m_type))
         {
             ctx->error(m_result.get(), "Internal compiler error.  Failed to add temporary variable to symbol table.");
             valid = false;
@@ -182,7 +182,7 @@ bool IrBinaryExpression::codegen(IrTraversalContext* ctx)
             }
             else
             {
-                tac.m_arg0 = m_lhs->getResultIdentifier();
+                tac.m_arg0 = m_lhs->getResult();
             }
         }
         if (m_rhs != nullptr)
@@ -194,10 +194,10 @@ bool IrBinaryExpression::codegen(IrTraversalContext* ctx)
             }
             else
             {
-                tac.m_arg1 = m_rhs->getResultIdentifier();
+                tac.m_arg1 = m_rhs->getResult();
             }
         }       
-        tac.m_arg2 = getResultIdentifier();
+        tac.m_arg2 = getResult();
         
         ctx->append(tac);
     }

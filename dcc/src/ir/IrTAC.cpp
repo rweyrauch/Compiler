@@ -29,6 +29,7 @@
 #include "IrIntLiteral.h"
 #include "IrBoolLiteral.h"
 #include "IrStringLiteral.h"
+#include "IrExpression.h"
 
 namespace Decaf
 {
@@ -113,8 +114,6 @@ const std::string gIrOpcodeStrings[(int)IrOpcode::NUM_OPCODES] =
     "MUL",
     "DIV",
     "MOD",
-    "LOAD",
-    "STORE",
     "CALL",
     "FBEGIN",
     "RETURN",
@@ -148,6 +147,7 @@ void IrPrintTacArg(const std::shared_ptr<IrBase> arg)
     if (arg == nullptr) return;
     
     const IrIdentifier* ident = dynamic_cast<const IrIdentifier*>(arg.get());
+    const IrAddress* address = dynamic_cast<const IrAddress*>(arg.get());
     const IrIntegerLiteral* iliteral = dynamic_cast<const IrIntegerLiteral*>(arg.get());
     const IrBooleanLiteral* bliteral = dynamic_cast<const IrBooleanLiteral*>(arg.get());
     const IrStringLiteral* sliteral = dynamic_cast<const IrStringLiteral*>(arg.get());
@@ -155,6 +155,10 @@ void IrPrintTacArg(const std::shared_ptr<IrBase> arg)
     if (ident != nullptr)
     {
         std::cout << "$" << ident->getIdentifier();
+    }
+    else if (address != nullptr)
+    {
+        std::cout << "$" << address->getIdentifier()->getIdentifier();
     }
     else if (iliteral != nullptr)
     {
@@ -218,6 +222,7 @@ void IrOutputArg(const std::shared_ptr<IrBase> arg, std::ostream& stream)
     if (arg == nullptr) return;
     
     const IrIdentifier* ident = dynamic_cast<const IrIdentifier*>(arg.get());
+    const IrAddress* address = dynamic_cast<const IrAddress*>(arg.get());
     const IrIntegerLiteral* iliteral = dynamic_cast<const IrIntegerLiteral*>(arg.get());
     const IrBooleanLiteral* bliteral = dynamic_cast<const IrBooleanLiteral*>(arg.get());
     const IrRegister* reg = dynamic_cast<const IrRegister*>(arg.get());
@@ -230,6 +235,15 @@ void IrOutputArg(const std::shared_ptr<IrBase> arg, std::ostream& stream)
             stream << ident->getIdentifier();
         else
             stream << "-" << ident->getAddress()+8 << (g_ia64 ? "(%rbp)" : "(%ebp)");
+    }
+    else if (address != nullptr)
+    {
+        if (address->getIdentifier()->isLabel())
+            stream << "$" << address->getIdentifier()->getIdentifier();
+        else if (address->getIdentifier()->isGlobal())
+            stream << address->getIdentifier()->getIdentifier();
+        else
+            stream << "-" << address->getIdentifier()->getAddress()+8 << (g_ia64 ? "(%rbp)" : "(%ebp)");        
     }
     else if (iliteral != nullptr)
     {
@@ -287,10 +301,12 @@ bool IrIsRegister(const std::shared_ptr<IrBase> value)
     const IrRegister* reg = dynamic_cast<const IrRegister*>(value.get());
     return (reg != nullptr);
 }
+
 bool IrIsMemory(const std::shared_ptr<IrBase> value)
 {
-    const IrIdentifier* reg = dynamic_cast<const IrIdentifier*>(value.get());
-    return (reg != nullptr);
+    const IrIdentifier* ident = dynamic_cast<const IrIdentifier*>(value.get());
+    const IrAddress* address = dynamic_cast<const IrAddress*>(value.get());
+    return (ident != nullptr || address != nullptr);
 }
 
 void IrGenMov(const std::shared_ptr<IrBase> src, const std::shared_ptr<IrBase> dst, std::ostream& stream)
@@ -429,12 +445,6 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
             IrGenMov(g_outReg, stmt.m_arg2, stream); // %rdx => arg2            
         else
             IrGenMov(g_retReg, stmt.m_arg2, stream); // %rax => arg2
-        break;
-        
-    case IrOpcode::LOAD:       // *[arg0 + arg1] -> arg2
-        break;
-        
-    case IrOpcode::STORE:      // arg0 -> *[arg1 + arg2]
         break;
         
     case IrOpcode::CALL:       // call arg0 arg1

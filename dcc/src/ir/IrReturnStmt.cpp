@@ -79,7 +79,7 @@ bool IrReturnStatement::codegen(IrTraversalContext* ctx)
         }
         else
         {
-            tac.m_arg0 = m_returnValue->getResultIdentifier();
+            tac.m_arg0 = m_returnValue->getResult();
         }
     }
     ctx->append(tac);

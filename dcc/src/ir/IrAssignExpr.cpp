@@ -196,7 +196,7 @@ bool IrAssignExpression::codegen(IrTraversalContext* ctx)
             }
             else
             {
-                tac.m_arg0 = m_rhs->getResultIdentifier();
+                tac.m_arg0 = m_rhs->getResult();
             }
         }       
         if (m_lhs != nullptr)
@@ -208,7 +208,7 @@ bool IrAssignExpression::codegen(IrTraversalContext* ctx)
             }
             else
             {
-                tac.m_arg2 = m_lhs->getResultIdentifier();
+                tac.m_arg2 = m_lhs->getResult();
             }
             
             if (m_operator != IrAssignmentOperator::Assign)

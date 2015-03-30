@@ -147,15 +147,16 @@ bool IrLocation::codegen(IrTraversalContext* ctx)
        if (!m_index->codegen(ctx)) valid = false;
     }
     
-    if (!m_index)
+    if (m_index)
     {
-        m_result = std::shared_ptr<IrIdentifier>(m_identifier);
+        m_result = std::shared_ptr<IrAddress>(new IrAddress(m_identifier, m_index->getResult()->getIdentifier()));
     }
     else
     {
-        m_result = std::shared_ptr<IrIdentifier>(m_index->getResultIdentifier());
+        m_result = std::shared_ptr<IrAddress>(new IrAddress(m_identifier));        
     }
-    m_result->codegen(ctx);
+    if (!m_result->codegen(ctx))
+        valid = false;
     
     ctx->popParent();
     

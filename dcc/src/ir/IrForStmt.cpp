@@ -178,7 +178,7 @@ bool IrForStatement::codegen(IrTraversalContext* ctx)
     
     IrTacStmt tac;
     tac.m_opcode = IrOpcode::IFZ;
-    tac.m_arg0 = m_terminatingExpr->getResultIdentifier();
+    tac.m_arg0 = m_terminatingExpr->getResult();
     tac.m_arg1 = m_labelEnd;
     tac.m_arg2 = nullptr;
     

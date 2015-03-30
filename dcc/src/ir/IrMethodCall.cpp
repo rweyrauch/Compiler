@@ -117,8 +117,8 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
         {
             if (symbol.m_type == IrType::Integer || symbol.m_type == IrType::Boolean)
             {
-                m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());
-                ctx->addTempVariable(m_result.get(), symbol.m_type);
+                m_result = std::shared_ptr<IrAddress>(new IrAddress(std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary())));
+                ctx->addTempVariable(m_result->getIdentifier().get(), symbol.m_type);
             }
         }
     }
@@ -169,7 +169,7 @@ bool IrMethodCall::codegen(IrTraversalContext* ctx)
         }
         else
         {
-            tac.m_arg0 = it->getResultIdentifier();
+            tac.m_arg0 = it->getResult();
         }
         tac.m_info = argCount++;
         ctx->append(tac);
