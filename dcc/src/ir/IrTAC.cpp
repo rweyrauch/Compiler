@@ -159,6 +159,10 @@ void IrPrintTacArg(const std::shared_ptr<IrBase> arg)
     else if (address != nullptr)
     {
         std::cout << "$" << address->getIdentifier()->getIdentifier();
+        if (address->getOffset() != nullptr)
+        {
+			std::cout << "[" << address->getOffset()->getIdentifier() << "]";
+		}
     }
     else if (iliteral != nullptr)
     {
@@ -238,12 +242,29 @@ void IrOutputArg(const std::shared_ptr<IrBase> arg, std::ostream& stream)
     }
     else if (address != nullptr)
     {
-        if (address->getIdentifier()->isLabel())
-            stream << "$" << address->getIdentifier()->getIdentifier();
-        else if (address->getIdentifier()->isGlobal())
-            stream << address->getIdentifier()->getIdentifier();
-        else
-            stream << "-" << address->getIdentifier()->getAddress()+8 << (g_ia64 ? "(%rbp)" : "(%ebp)");        
+		if (address->getOffset() == nullptr)
+		{
+			if (address->getIdentifier()->isLabel())
+				stream << "$" << address->getIdentifier()->getIdentifier();
+			else if (address->getIdentifier()->isGlobal())
+				stream << address->getIdentifier()->getIdentifier();
+			else
+				stream << "-" << address->getIdentifier()->getAddress()+8 << (g_ia64 ? "(%rbp)" : "(%ebp)");        
+		}
+		else
+		{
+			// Expect only global values to have index.
+			if (address->getIdentifier()->isGlobal())
+			{
+				// Indexed form of GAS address
+				// D(Rb,Ri,S) -> Mem[Reg[Rb] + S * Reg[Ri] + D]
+				// Where: D is displacement in bytes.
+				//		  Rb is base register.  Using rbx
+				//        Ri is index register.  Using rsi
+				//        S is scaler 
+				stream << (g_ia64 ? "(%rbx,%rsi,8)" : "(%ebx,%esi,4)");		
+			}	
+		}
     }
     else if (iliteral != nullptr)
     {
