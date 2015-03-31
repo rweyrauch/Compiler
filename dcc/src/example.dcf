@@ -1,33 +1,50 @@
-// simplest Decaf program
-badd
-
 class Program
-{    
-    int x;
-    int foo(int z)
-    {
-		int xx;
-        xx = z + 2;
-        return xx;
-    }
-    
+{
+	int sum(int a, int b)
+	{
+		int ab;
+		ab = a + b;
+		return ab;
+	}
+	
+	int sub(int a, int b)
+	{
+		int ab;
+		ab = a - b;
+		return ab;
+	}
+	
+	//int params6(int a, int b, int c, int d, int e, int g)
+	//{
+	//	int total;
+	//	total = a + b + c + d + e + g;
+	//	return total;
+	//}
+	
+	int params7(int a, int b, int c, int d, int e, int g, int h)
+	{
+		int total;
+		total = a + b + c + d + e + g + h;
+		return total;
+	}
+	
     void main()
     {
-        int t;
-        boolean ok;
-        
-        ok = true;
-        
-        t = foo(42);
-        
-        t = -1;
-        
-        if (!ok)
-        {
-        
-        }
-        
-        ok = !true;
-        
+		int a, b, c;
+
+		a = 3;
+		b = 5;
+		
+		c = sum(a, b);
+		
+		callout("printf", "a = %d b = %d c = %d\n", a, b, c);
+		
+		//c = params6(a, b, 1, 2, 3, 4);
+		//callout("printf", "c = %d\n", c);
+		
+		c = params7(1, 2, 3, 4, 5, 6, 7);
+		callout("printf", "c = %d\n", c);
     }
 }
+
+

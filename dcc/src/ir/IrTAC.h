@@ -40,6 +40,8 @@ enum class IrOpcode : int
     MUL,        // arg0 * arg1 -> arg2
     DIV,        // arg0 / arg1 -> arg2
     MOD,        // arg0 % arg1 -> arg2
+    LOAD,       // *[arg0 + arg1] -> arg2
+    STORE,      // arg0 -> *[arg1 + arg2]
     CALL,       // call arg0 arg1
     FBEGIN,     // begin function
     RETURN,     // return |arg0|

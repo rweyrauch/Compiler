@@ -114,6 +114,8 @@ const std::string gIrOpcodeStrings[(int)IrOpcode::NUM_OPCODES] =
     "MUL",
     "DIV",
     "MOD",
+    "LOAD",
+    "STORE",    
     "CALL",
     "FBEGIN",
     "RETURN",
@@ -466,6 +468,12 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
             IrGenMov(g_outReg, stmt.m_arg2, stream); // %rdx => arg2            
         else
             IrGenMov(g_retReg, stmt.m_arg2, stream); // %rax => arg2
+        break;
+        
+    case IrOpcode::LOAD:       // *[arg0 + arg1] -> arg2
+        break;
+        
+    case IrOpcode::STORE:      // arg0 -> *[arg1 + arg2]
         break;
         
     case IrOpcode::CALL:       // call arg0 arg1
