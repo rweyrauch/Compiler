@@ -161,9 +161,18 @@ void IrPrintTacArg(const std::shared_ptr<IrBase> arg)
     {
         std::cout << "$" << location->getIdentifier()->getIdentifier();
         if (location->getIndex() != nullptr)
-        {
-			//std::cout << "[" << location->getIndex()->getResult()->getIdentifier() << "]";
-		}
+        {           
+            const IrIntegerLiteral* indexlit = dynamic_cast<const IrIntegerLiteral*>(location->getIndex().get());
+            const IrLocation* indexident = dynamic_cast<const IrLocation*>(location->getIndex().get());
+            if (indexlit != nullptr)
+            {
+                std::cout << "[" << indexlit->getValue() << "]";
+            }
+            else if (indexident)
+            {
+                std::cout << "[$" << indexident->getIdentifier()->getIdentifier() << "]";
+            }
+        }
     }
     else if (iliteral != nullptr)
     {
@@ -254,6 +263,17 @@ void IrOutputArg(const std::shared_ptr<IrBase> arg, std::ostream& stream)
         }
         else
         {
+            const IrIntegerLiteral* indexlit = dynamic_cast<const IrIntegerLiteral*>(location->getIndex().get());
+            const IrLocation* indexident = dynamic_cast<const IrLocation*>(location->getIndex().get());
+            if (indexlit != nullptr)
+            {
+                //std::cout << "[" << indexlit->getValue() << "]";
+            }
+            else if (indexident)
+            {
+                //std::cout << "[$" << indexident->getIdentifier()->getIdentifier() << "]";
+            }
+            
             // Expect only global values to have index.
             if (location->getIdentifier()->isGlobal())
             {
