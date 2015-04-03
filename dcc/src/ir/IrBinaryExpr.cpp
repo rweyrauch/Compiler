@@ -25,6 +25,7 @@
 #include "IrCommon.h"
 #include "IrBinaryExpr.h"
 #include "IrLiteral.h"
+#include "IrLocation.h"
 #include "IrIdentifier.h"
 #include "IrTravCtx.h"
 
@@ -135,10 +136,10 @@ bool IrBinaryExpression::analyze(IrTraversalContext* ctx)
     if (valid)
     {
         // allocate a temporary variable for the result of this expression
-        m_result = std::shared_ptr<IrAddress>(new IrAddress(std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary())));
+        m_result = IrLocation::CreateTemporary(m_type);
         if (!ctx->addTempVariable(m_result->getIdentifier().get(), m_type))
         {
-            ctx->error(m_result.get(), "Internal compiler error.  Failed to add temporary variable to symbol table.");
+            ctx->error(m_result, "Internal compiler error.  Failed to add temporary variable to symbol table.");
             valid = false;
         }
     }   
@@ -182,7 +183,7 @@ bool IrBinaryExpression::codegen(IrTraversalContext* ctx)
             }
             else
             {
-                tac.m_arg0 = m_lhs->getResult();
+                tac.m_arg0 = std::shared_ptr<IrBase>(m_lhs->getResult());
             }
         }
         if (m_rhs != nullptr)
@@ -194,10 +195,10 @@ bool IrBinaryExpression::codegen(IrTraversalContext* ctx)
             }
             else
             {
-                tac.m_arg1 = m_rhs->getResult();
+                tac.m_arg1 = std::shared_ptr<IrBase>(m_rhs->getResult());
             }
         }       
-        tac.m_arg2 = getResult();
+        tac.m_arg2 = std::shared_ptr<IrBase>(getResult());
         
         ctx->append(tac);
     }

@@ -24,6 +24,7 @@
 #include "IrReturnStmt.h"
 #include "IrLiteral.h"
 #include "IrIdentifier.h"
+#include "IrLocation.h"
 #include "IrTravCtx.h"
 
 namespace Decaf
@@ -79,7 +80,7 @@ bool IrReturnStatement::codegen(IrTraversalContext* ctx)
         }
         else
         {
-            tac.m_arg0 = m_returnValue->getResult();
+            tac.m_arg0 = std::shared_ptr<IrBase>(m_returnValue->getResult());
         }
     }
     ctx->append(tac);

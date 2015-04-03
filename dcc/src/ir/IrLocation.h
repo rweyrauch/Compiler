@@ -33,6 +33,8 @@ class IrLocation : public IrExpression
 {
 public:
     
+    static IrLocation* CreateTemporary(IrType type);
+     
     IrLocation(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType type) :
         IrExpression(lineNumber, columnNumber, filename, type),
         m_identifier(std::shared_ptr<IrIdentifier>(ident)),
@@ -66,6 +68,8 @@ protected:
     std::shared_ptr<IrIdentifier> m_identifier;
     std::shared_ptr<IrExpression> m_index;
     bool m_asDeclaration;
+    
+    static int s_tempLocationCounter;
     
 private:
     IrLocation() = delete;

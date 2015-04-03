@@ -30,42 +30,7 @@
 
 namespace Decaf
 {
-
-class IrAddress : public IrBase
-{
-public:
-    IrAddress(std::shared_ptr<IrIdentifier> identifier) :
-        IrBase(0, 0, __FILE__),
-        m_identifier(identifier),
-        m_offset(nullptr)
-    {}
-        
-    IrAddress(std::shared_ptr<IrIdentifier> identifier, std::shared_ptr<IrIdentifier> offset) :
-        IrBase(0, 0, __FILE__),
-        m_identifier(identifier),
-        m_offset(offset)
-    {}
-
-    virtual void print(unsigned int depth) {} 
-    virtual bool codegen(IrTraversalContext* ctx)
-    {
-        bool valid = true;
-        if (m_identifier) 
-            if (!m_identifier->codegen(ctx)) valid = false;
-        if (m_offset)
-            if (!m_offset->codegen(ctx)) valid = false;
-            
-        return valid;
-    }
-    
-    std::shared_ptr<IrIdentifier> getIdentifier() const { return m_identifier; }
-    std::shared_ptr<IrIdentifier> getOffset() const { return m_offset; }
-    
-protected:
-    std::shared_ptr<IrIdentifier> m_identifier;
-    std::shared_ptr<IrIdentifier> m_offset;
-};
-
+class IrLocation;
 
 class IrExpression : public IrBase
 {
@@ -86,14 +51,14 @@ public:
     IrType getType() const { return m_type; }
     bool isArray() const { return m_isArray; }
     
-    std::shared_ptr<IrAddress> getResult() const { return m_result; }
+    IrLocation* getResult() const { return m_result; }
     
 protected:
     
     IrType m_type;
     bool m_isArray;
     
-    std::shared_ptr<IrAddress> m_result;
+    IrLocation* m_result;
     
 private:
     IrExpression() = delete;

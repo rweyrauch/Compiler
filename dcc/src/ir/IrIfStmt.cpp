@@ -122,7 +122,7 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
     }
     else
     {
-        tac.m_arg0 = m_condition->getResult();
+        tac.m_arg0 = std::shared_ptr<IrBase>(m_condition->getResult());
     }
     tac.m_arg1 = m_labelFalse;
     tac.m_arg2 = nullptr;

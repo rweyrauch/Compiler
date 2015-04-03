@@ -30,20 +30,12 @@
 namespace Decaf
 {
 
-int IrIdentifier::s_tempLocationCounter = 0;
-
-IrIdentifier* IrIdentifier::CreateTemporary()
-{
-    std::stringstream tempName;
-    tempName << ".LC" << s_tempLocationCounter++;
-    IrIdentifier* tempId = new IrIdentifier(0, 0, "temp", tempName.str());
-    return tempId;
-}
+int IrIdentifier::s_tempLabelCounter = 0;
 
 IrIdentifier* IrIdentifier::CreateLabel()
 {
     std::stringstream tempName;
-    tempName << ".L" << s_tempLocationCounter++;
+    tempName << ".L" << s_tempLabelCounter++;
     IrIdentifier* tempId = new IrIdentifier(0, 0, "label", tempName.str(), true);
     return tempId;
 }

@@ -34,6 +34,17 @@
 namespace Decaf
 {
 
+int IrLocation::s_tempLocationCounter = 0;
+
+IrLocation* IrLocation::CreateTemporary(IrType type)
+{
+    std::stringstream tempName;
+    tempName << ".LC" << s_tempLocationCounter++;
+    IrIdentifier* tempId = new IrIdentifier(0, 0, __FILE__, tempName.str());
+    IrLocation* tempLoc = new IrLocation(0, 0, __FILE__, tempId, type);
+    return tempLoc;
+}
+    
 void IrLocation::propagateTypes(IrTraversalContext* ctx)
 {
     ctx->pushParent(this);
@@ -142,21 +153,16 @@ bool IrLocation::codegen(IrTraversalContext* ctx)
     bool valid = true;
     ctx->pushParent(this);
     
+    if (!m_identifier->codegen(ctx)) valid = false;
     if (m_index) 
     {
        if (!m_index->codegen(ctx)) valid = false;
     }
     
-    if (m_index)
+    if (!usedAsDeclaration())
     {
-        m_result = std::shared_ptr<IrAddress>(new IrAddress(m_identifier, m_index->getResult()->getIdentifier()));
+        m_result = this;
     }
-    else
-    {
-        m_result = std::shared_ptr<IrAddress>(new IrAddress(m_identifier));        
-    }
-    if (!m_result->codegen(ctx))
-        valid = false;
     
     ctx->popParent();
     
