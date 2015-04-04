@@ -28,12 +28,13 @@
 }
 
 %token RETURN CALLOUT
-%token BOOLTYPE INTTYPE CLASS VOID
-%token IF ELSE FOR CONTINUE BREAK GOTO
+%token BOOLTYPE INTTYPE DOUBLETYPE STRINGTYPE CLASS VOID
+%token IF ELSE FOR CONTINUE BREAK GOTO WHILE
+%token INTERFACE NULLVALUE EXTENDS IMPLEMENTS THIS NEW
 
-%token IDENTIFIER INTEGER BOOLEAN CHARACTER STRING
+%token IDENTIFIER INTEGER BOOLEAN CHARACTER STRING DOUBLE
 %token EQUAL PLUSEQUAL MINUSEQUAL
-%token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA SEMI BANG COLON
+%token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA SEMI BANG COLON DOT
 %token MOD LOR LAND
 
 %token PLUS MINUS CEQ CNE CLT CLE CGT CGE 
@@ -246,6 +247,14 @@ type
     { 
         $$ = (int)Decaf::IrType::Boolean; 
     }
+    | DOUBLETYPE
+    {
+        $$ = (int)Decaf::IrType::Double;
+    }
+    | STRINGTYPE
+    {
+        $$ = (int)Decaf::IrType::String;
+    }
     | VOID 
     { 
         $$ = (int)Decaf::IrType::Void; 
@@ -283,6 +292,10 @@ statement
     | FOR ident EQUAL expr COMMA expr block 
     { 
         $$ = new Decaf::IrForStatement(@1.first_line, @1.first_column, d_scanner.filename(), $2, $4, $6, $7); 
+    }
+    | WHILE LPAREN expr RPAREN block
+    {
+        $$ = new Decaf::IrWhileStatement(@1.first_line, @1.first_column, d_scanner.filename(), $3, $5); 
     }
     | RETURN SEMI 
     { 
@@ -486,6 +499,14 @@ literal
     | CHARACTER 
     { 
         $$ = new Decaf::IrCharacterLiteral(@1.first_line, @1.first_column, d_scanner.filename(), d_scanner.matched()); 
+    }
+    | DOUBLE
+    {
+        $$ = new Decaf::IrDoubleLiteral(@1.first_line, @1.first_column, d_scanner.filename(), d_scanner.matched());
+    }
+    | NULLVALUE
+    {
+        $$ = new Decaf::IrNullLiteral(@1.first_line, @1.first_column, d_scanner.filename(), d_scanner.matched());
     }
     ;
 

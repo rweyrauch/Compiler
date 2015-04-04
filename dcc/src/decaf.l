@@ -21,16 +21,26 @@ xdigit [a-fA-F0-9]
 
 "boolean"						{ track_column(); return (Parser::BOOLTYPE); }
 "int"							{ track_column(); return (Parser::INTTYPE); }
+"double"                        { track_column(); return (Parser::DOUBLETYPE); }
+"string"                        { track_column(); return (Parser::STRINGTYPE); }
+"void"                          { track_column(); return (Parser::VOID); }
+
 "class"							{ track_column(); return (Parser::CLASS); }
-"void"							{ track_column(); return (Parser::VOID); }
+"interface"                     { track_column(); return (Parser::INTERFACE); }
+"null"                          { track_column(); return (Parser::NULLVALUE); }
+"this"                          { track_column(); return (Parser::THIS); }
+"extends"                       { track_column(); return (Parser::EXTENDS); }
+"implements"                    { track_column(); return (Parser::IMPLEMENTS); }
 
 "if"							{ track_column(); return (Parser::IF); }
 "else"							{ track_column(); return (Parser::ELSE); }
 
 "for"							{ track_column(); return (Parser::FOR); }
+"while"                         { track_column(); return (Parser::WHILE); }
 "break"							{ track_column(); return (Parser::BREAK); }
 "continue"						{ track_column(); return (Parser::CONTINUE); }
 "goto"                          { track_column(); return (Parser::GOTO); }
+"new"                           { track_column(); return (Parser::NEW); }
 
 false|true				        { track_column(); return (Parser::BOOLEAN); }
 
@@ -82,6 +92,7 @@ false|true				        { track_column(); return (Parser::BOOLEAN); }
 
 ","				          		{ track_column(); return (Parser::COMMA); }
 "!"								{ track_column(); return (Parser::BANG); }
+"."                             { track_column(); return (Parser::DOT); }
 
 "+"				          		{ track_column(); return (Parser::PLUS); }
 "-"		          				{ track_column(); return (Parser::MINUS); }

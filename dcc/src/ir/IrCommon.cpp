@@ -34,7 +34,8 @@ const std::string gIrTypeStrings[(int)IrType::NUM_IR_TYPES] =
     std::string("Integer"),
     std::string("Boolean"),
     std::string("Character"),
-    std::string("String")
+    std::string("String"),
+    std::string("Double")
 };
 static_assert(sizeof(gIrTypeStrings)/sizeof(std::string) == (size_t)IrType::NUM_IR_TYPES, "Unexpected number of IrType strings.");
 

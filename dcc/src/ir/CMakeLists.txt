@@ -28,5 +28,6 @@ add_library(
     IrTAC.cpp
     IrTravCtx.cpp
     IrVarDecl.cpp
+    IrWhileStmt.cpp
 )
     

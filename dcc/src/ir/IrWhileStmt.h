@@ -22,40 +22,39 @@
 // THE SOFTWARE.
 //
 #pragma once
-
+#include <memory>
 #include "IrCommon.h"
-#include "IrBase.h"
-
-#include "IrAssignExpr.h"
-#include "IrBinaryExpr.h"
-#include "IrBlock.h"
-#include "IrBooleanExpr.h"
-#include "IrBoolLiteral.h"
-#include "IrBreakStmt.h"
-#include "IrCharLiteral.h"
-#include "IrClass.h"
-#include "IrContinueStmt.h"
-#include "IrDoubleLiteral.h"
-#include "IrExpression.h"
-#include "IrExprStmt.h"
-#include "IrFieldDecl.h"
-#include "IrForStmt.h"
-#include "IrGotoStmt.h"
-#include "IrIdentifier.h"
-#include "IrIfStmt.h"
-#include "IrIntLiteral.h"
-#include "IrLabelStmt.h"
-#include "IrLiteral.h"
-#include "IrLocation.h"
-#include "IrMethodCall.h"
-#include "IrMethodDecl.h"
-#include "IrNullLiteral.h"
-#include "IrReturnStmt.h"
 #include "IrStatement.h"
-#include "IrStringLiteral.h"
-#include "IrSymbolTable.h"
-#include "IrTravCtx.h"
-#include "IrVarDecl.h"
-#include "IrWhileStmt.h"
 
+namespace Decaf
+{
+class IrExpression;
+class IrBlock;
 
+class IrWhileStatement : public IrStatement
+{
+public:
+    IrWhileStatement(int lineNumber, int columnNumber, const std::string& filename,
+                     IrExpression* expr, IrBlock* block = nullptr);
+    
+    virtual ~IrWhileStatement();
+    
+    virtual void propagateTypes(IrTraversalContext* ctx); 
+    virtual void print(unsigned int depth);
+    virtual bool analyze(IrTraversalContext* ctx);
+    virtual bool codegen(IrTraversalContext* ctx);
+       
+    virtual size_t getAllocationSize() const;
+    virtual void setSymbolStartAddress(size_t addr);
+    
+protected:    
+    
+    std::shared_ptr<IrExpression> m_loopExpr;
+    std::shared_ptr<IrBlock> m_body;
+    
+private:
+    IrWhileStatement() = delete;
+    IrWhileStatement(const IrWhileStatement& rhs) = delete;
+};
+
+} // namespace Decaf

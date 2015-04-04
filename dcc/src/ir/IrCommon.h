@@ -40,6 +40,7 @@ enum class IrType : int
     Boolean,
     Character,
     String,
+    Double,
     
     NUM_IR_TYPES
 };

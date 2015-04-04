@@ -50,6 +50,9 @@ enum class IrRegName : int
     rParam5,
     rParam6,
     
+    rBase,
+    rIndex,
+    
     NUM
 };
 
@@ -68,17 +71,21 @@ const std::string g_registerNames[(int)IrRegName::NUM] =
     "%rdx",
     "%rcx",
     "%r8",
-    "%r9"    
+    "%r9",
+    
+    // addressing register
+    "%rbx",
+    "%rsi"
 };
 
 const std::string g_registerNames_ia32[(int)IrRegName::NUM] =
 {
     // temp registers
-    "%ebx",
     "%eax",
     "%al",
     "%edx",
     "%dl",
+    "%ebx",
     
     // parameter registers
     "---",
@@ -87,6 +94,10 @@ const std::string g_registerNames_ia32[(int)IrRegName::NUM] =
     "---",
     "---",
     "---"    
+
+    // addressing register
+    "%ebx",
+    "%esi"    
 };
 
 class IrRegister : public IrBase
@@ -104,6 +115,8 @@ public:
 protected:
     IrRegName m_which;
 };
+
+const std::shared_ptr<IrRegister> g_indexRegister = std::make_shared<IrRegister>(IrRegName::rIndex);
 
     
 const std::string gIrOpcodeStrings[(int)IrOpcode::NUM_OPCODES] =
@@ -261,31 +274,37 @@ void IrOutputArg(const std::shared_ptr<IrBase> arg, std::ostream& stream)
             else
                 stream << "-" << location->getIdentifier()->getAddress()+8 << (g_ia64 ? "(%rbp)" : "(%ebp)");        
         }
-        else
-        {
+        else //if (location->getIdentifier()->isGlobal())
+        {           
+            // Expect only global values to have index.        
             const IrIntegerLiteral* indexlit = dynamic_cast<const IrIntegerLiteral*>(location->getIndex().get());
             const IrLocation* indexident = dynamic_cast<const IrLocation*>(location->getIndex().get());
             if (indexlit != nullptr)
             {
-                //std::cout << "[" << indexlit->getValue() << "]";
+                if (location->getIdentifier()->isLabel())
+                    stream << "$" << location->getIdentifier()->getIdentifier();
+                else if (location->getIdentifier()->isGlobal())
+                    stream << location->getIdentifier()->getIdentifier();
+                
+                stream << "+(" << indexlit->getValue() << "*8)";    
             }
             else if (indexident)
-            {
-                //std::cout << "[$" << indexident->getIdentifier()->getIdentifier() << "]";
-            }
-            
-            // Expect only global values to have index.
-            if (location->getIdentifier()->isGlobal())
             {
                 // Indexed form of GAS address
                 // D(Rb,Ri,S) -> Mem[Reg[Rb] + S * Reg[Ri] + D]
                 // Where: D is displacement in bytes.
-                //		  Rb is base register.  Using rbx
+                //        Rb is base register.  Using rbx
                 //        Ri is index register.  Using rsi
                 //        S is scaler 
-                stream << (g_ia64 ? "(%rbx,%rsi,8)" : "(%ebx,%esi,4)");		
-            }	
-        }
+               if (location->getIdentifier()->isLabel())
+                    stream << "$" << location->getIdentifier()->getIdentifier();
+                else if (location->getIdentifier()->isGlobal())
+                    stream << location->getIdentifier()->getIdentifier();
+                
+                stream << (g_ia64 ? "(,%rsi,8)" : "(,%esi,4)");
+            }
+    
+         }
     }
     else if (iliteral != nullptr)
     {

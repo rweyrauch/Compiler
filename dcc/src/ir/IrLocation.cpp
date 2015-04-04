@@ -156,7 +156,14 @@ bool IrLocation::codegen(IrTraversalContext* ctx)
     if (!m_identifier->codegen(ctx)) valid = false;
     if (m_index) 
     {
-       if (!m_index->codegen(ctx)) valid = false;
+        if (!m_index->codegen(ctx)) valid = false;
+       
+        // TODO: move index result into %rsi register!!!
+        IrTacStmt tac;
+        tac.m_opcode = IrOpcode::MOV;
+        tac.m_arg0 = nullptr; // m_index->getResult()->getIdentifier();
+        tac.m_arg2 = nullptr; // %rsi
+        ctx->append(tac);
     }
     
     if (!usedAsDeclaration())

@@ -22,40 +22,34 @@
 // THE SOFTWARE.
 //
 #pragma once
-
+#include <iostream>
+#include <sstream>
 #include "IrCommon.h"
-#include "IrBase.h"
-
-#include "IrAssignExpr.h"
-#include "IrBinaryExpr.h"
-#include "IrBlock.h"
-#include "IrBooleanExpr.h"
-#include "IrBoolLiteral.h"
-#include "IrBreakStmt.h"
-#include "IrCharLiteral.h"
-#include "IrClass.h"
-#include "IrContinueStmt.h"
-#include "IrDoubleLiteral.h"
-#include "IrExpression.h"
-#include "IrExprStmt.h"
-#include "IrFieldDecl.h"
-#include "IrForStmt.h"
-#include "IrGotoStmt.h"
-#include "IrIdentifier.h"
-#include "IrIfStmt.h"
-#include "IrIntLiteral.h"
-#include "IrLabelStmt.h"
 #include "IrLiteral.h"
-#include "IrLocation.h"
-#include "IrMethodCall.h"
-#include "IrMethodDecl.h"
-#include "IrNullLiteral.h"
-#include "IrReturnStmt.h"
-#include "IrStatement.h"
-#include "IrStringLiteral.h"
-#include "IrSymbolTable.h"
-#include "IrTravCtx.h"
-#include "IrVarDecl.h"
-#include "IrWhileStmt.h"
 
+namespace Decaf
+{
+ 
+class IrNullLiteral : public IrLiteral
+{
+public:
+    IrNullLiteral(int lineNumber, int columnNumber, const std::string& filename, const std::string& value) :
+        IrLiteral(lineNumber, columnNumber, filename, IrType::Void, value)
+    {
+    }
+    
+    virtual ~IrNullLiteral()
+    {}
+    
+    virtual void print(unsigned int depth) 
+    {
+        IRPRINT_INDENT(depth);
+        std::cout << "Null(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
+    }
+    
+private:
+    IrNullLiteral() = delete;
+    IrNullLiteral(const IrNullLiteral& rhs) = delete;
+};
 
+}
