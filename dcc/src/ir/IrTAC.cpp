@@ -359,16 +359,65 @@ void IrGenLoad(const std::shared_ptr<IrBase> baseAddr, const std::shared_ptr<IrB
     
     if (offsetLiteral != nullptr)
     {
+        stream << "+(" << offsetLiteral->getValue() << "*8), "; 
+    }
+    else if (offsetIdent != nullptr)
+    {
+        stream << (g_ia64 ? "(,%rsi,8), " : "(,%esi,4), ");
+    }
+    IrOutputArg(g_tempReg, stream); 
+    stream << std::endl;
+    
+    stream << (g_ia64 ? "movq " : "movl ");
+    IrOutputArg(g_tempReg, stream);
+    stream << ", ";
+    IrOutputArg(dst, stream);
+    stream << std::endl;      
+}
+
+void IrGenStore(const std::shared_ptr<IrBase> src, const std::shared_ptr<IrBase> baseAddr, const std::shared_ptr<IrBase> offset, std::ostream& stream)
+{
+	// Load source value into a register.
+	stream << (g_ia64 ? "movq " : "movl ");
+	IrOutputArg(src, stream);
+	stream << ", ";
+	IrOutputArg(g_tempReg, stream);
+	stream << std::endl;
+	
+    const IrIdentifier* baseIdent = dynamic_cast<const IrIdentifier*>(baseAddr.get());   
+    const IrIntegerLiteral* offsetLiteral = dynamic_cast<const IrIntegerLiteral*>(offset.get());
+    const IrIdentifier* offsetIdent = dynamic_cast<const IrIdentifier*>(offset.get());
+
+    if (offsetIdent != nullptr)
+    {
+        // load offset value into rsi/esi register
+        IrGenMov(offset, g_indexRegister, stream);
+    }
+
+    stream << (g_ia64 ? "movq " : "movl ");
+    
+    IrOutputArg(g_tempReg, stream); 
+    stream << ",";
+    
+    if (baseIdent->isLabel())
+    {
+        stream << "$" << baseIdent->getIdentifier();
+    }
+    else if (baseIdent->isGlobal())
+    {
+        stream << baseIdent->getIdentifier();
+    }
+    
+    if (offsetLiteral != nullptr)
+    {
         stream << "+(" << offsetLiteral->getValue() << "*8)"; 
     }
     else if (offsetIdent != nullptr)
     {
         stream << (g_ia64 ? "(,%rsi,8)" : "(,%esi,4)");
     }
-}
-
-void IrGenStore(const std::shared_ptr<IrBase> src, const std::shared_ptr<IrBase> baseAddr, const std::shared_ptr<IrBase> offset, std::ostream& stream)
-{
+    stream << std::endl;
+	
 }
 
 void IrGenComparison(const IrTacStmt& stmt, std::ostream& stream)
