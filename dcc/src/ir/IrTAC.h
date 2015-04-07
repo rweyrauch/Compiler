@@ -35,6 +35,8 @@ enum class IrOpcode : int
 {
     NOOP = 0,
     MOV,        // arg0 -> arg2
+    LOAD,       // *[arg0 + arg1] -> arg2
+    STORE,      // arg0 -> *[arg1 + arg2]
     ADD,        // arg0 + arg1 -> arg2
     SUB,        // arg0 - arg1 -> arg2
     MUL,        // arg0 * arg1 -> arg2

@@ -47,7 +47,12 @@ void IrAssignExpression::propagateTypes(IrTraversalContext* ctx)
 {
     ctx->pushParent(this);
     
-    if (m_lhs) m_lhs->propagateTypes(ctx);
+    if (m_lhs) 
+    {
+        m_lhs->setAsWrite(true);
+        m_lhs->propagateTypes(ctx);
+    }
+    
     if (m_rhs) m_rhs->propagateTypes(ctx);
     
     if (getType() == IrType::Unknown)
@@ -170,7 +175,7 @@ bool IrAssignExpression::codegen(IrTraversalContext* ctx)
     
     ctx->pushParent(this);
     
-    if (m_lhs) 
+    if (m_lhs && !m_lhs->usedAsWrite()) 
     {
         valid = m_lhs->codegen(ctx);
     }
@@ -217,7 +222,13 @@ bool IrAssignExpression::codegen(IrTraversalContext* ctx)
             }
         }
         ctx->append(tac);
+    
+        if (m_lhs && m_lhs->usedAsWrite()) 
+        {
+            valid = m_lhs->codegen(ctx);
+        }
     }
+    
     ctx->popParent();
     
     return valid;

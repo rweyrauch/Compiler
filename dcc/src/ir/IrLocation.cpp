@@ -33,18 +33,7 @@
 
 namespace Decaf
 {
-
-int IrLocation::s_tempLocationCounter = 0;
-
-IrLocation* IrLocation::CreateTemporary(IrType type)
-{
-    std::stringstream tempName;
-    tempName << ".LC" << s_tempLocationCounter++;
-    IrIdentifier* tempId = new IrIdentifier(0, 0, __FILE__, tempName.str());
-    IrLocation* tempLoc = new IrLocation(0, 0, __FILE__, tempId, type);
-    return tempLoc;
-}
-    
+ 
 void IrLocation::propagateTypes(IrTraversalContext* ctx)
 {
     ctx->pushParent(this);
@@ -75,7 +64,8 @@ void IrLocation::print(unsigned int depth)
     IRPRINT_INDENT(depth);
     std::cout << "Location(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
     IRPRINT_INDENT(depth+1);
-    std::cout << "Type: " << IrTypeToString(m_type) << " Array: " << (isArray() ? "true" : "false") << std::endl;
+    std::cout << "Type: " << IrTypeToString(m_type) << " Array: " << (isArray() ? "true" : "false")
+              << " Store: " << (usedAsWrite() ? "true" : "false") << std::endl;
     
     if (m_identifier) 
     {
@@ -142,7 +132,25 @@ bool IrLocation::analyze(IrTraversalContext* ctx)
             }
         }
     }
-       
+      
+    if (valid)
+    {
+        if (m_index)
+        {
+            // allocate a temporary variable for the result of this expression
+            m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());
+            if (!ctx->addTempVariable(m_result.get(), m_type))
+            {
+                ctx->error(m_result.get(), "Internal compiler error.  Failed to add temporary variable to symbol table.");
+                valid = false;
+            } 
+        }
+        else
+        {
+            m_result = m_identifier;
+        }
+    }
+    
     ctx->popParent();
        
     return valid;
@@ -153,24 +161,45 @@ bool IrLocation::codegen(IrTraversalContext* ctx)
     bool valid = true;
     ctx->pushParent(this);
     
-    if (!m_identifier->codegen(ctx)) valid = false;
+    if (!m_identifier->codegen(ctx)) 
+        valid = false;
+    
     if (m_index) 
     {
-        if (!m_index->codegen(ctx)) valid = false;
-       
-        // TODO: move index result into %rsi register!!!
-        IrTacStmt tac;
-        tac.m_opcode = IrOpcode::MOV;
-        tac.m_arg0 = nullptr; // m_index->getResult()->getIdentifier();
-        tac.m_arg2 = nullptr; // %rsi
-        ctx->append(tac);
+        if (!m_index->codegen(ctx)) 
+            valid = false;
+
+        if (!m_result->codegen(ctx)) 
+            valid = false;
+            
+        if (usedAsWrite())
+        {
+            IrTacStmt store;
+            store.m_opcode = IrOpcode::STORE;
+            store.m_arg0 = m_result;        // source of the the store is in the m_result identifier
+            store.m_arg1 = m_identifier;
+            if (m_index->getResult())
+                store.m_arg2 = m_index->getResult();
+            else
+                store.m_arg2 = m_index;
+            
+            ctx->append(store);
+        }
+        else
+        {
+            IrTacStmt load;
+            load.m_opcode = IrOpcode::LOAD;
+            load.m_arg0 = m_identifier;
+            if (m_index->getResult())
+                load.m_arg1 = m_index->getResult();
+            else
+                load.m_arg1 = m_index;
+            load.m_arg2 = m_result;
+            
+            ctx->append(load);
+        }
     }
-    
-    if (!usedAsDeclaration())
-    {
-        m_result = this;
-    }
-    
+        
     ctx->popParent();
     
     return valid;

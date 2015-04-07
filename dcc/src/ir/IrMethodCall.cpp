@@ -118,8 +118,8 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
         {
             if (symbol.m_type == IrType::Integer || symbol.m_type == IrType::Boolean)
             {
-                m_result = IrLocation::CreateTemporary(symbol.m_type);
-                ctx->addTempVariable(m_result->getIdentifier().get(), symbol.m_type);
+                m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());
+                ctx->addTempVariable(m_result.get(), symbol.m_type);
             }
         }
     }

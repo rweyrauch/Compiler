@@ -32,8 +32,6 @@ class IrIdentifier;
 class IrLocation : public IrExpression
 {
 public:
-    
-    static IrLocation* CreateTemporary(IrType type);
      
     IrLocation(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType type) :
         IrExpression(lineNumber, columnNumber, filename, type),

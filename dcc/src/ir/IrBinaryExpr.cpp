@@ -136,10 +136,10 @@ bool IrBinaryExpression::analyze(IrTraversalContext* ctx)
     if (valid)
     {
         // allocate a temporary variable for the result of this expression
-        m_result = IrLocation::CreateTemporary(m_type);
-        if (!ctx->addTempVariable(m_result->getIdentifier().get(), m_type))
+        m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());
+        if (!ctx->addTempVariable(m_result.get(), m_type))
         {
-            ctx->error(m_result, "Internal compiler error.  Failed to add temporary variable to symbol table.");
+            ctx->error(m_result.get(), "Internal compiler error.  Failed to add temporary variable to symbol table.");
             valid = false;
         }
     }   

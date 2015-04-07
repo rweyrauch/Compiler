@@ -1,4 +1,4 @@
-//
+// //
 // The MIT License (MIT)
 //
 // Copyright (c) 2015 Rick Weyrauch (rpweyrauch@gmail.com)
@@ -30,7 +30,6 @@
 #include "IrBoolLiteral.h"
 #include "IrStringLiteral.h"
 #include "IrExpression.h"
-#include "IrLocation.h"
 
 namespace Decaf
 {
@@ -123,6 +122,8 @@ const std::string gIrOpcodeStrings[(int)IrOpcode::NUM_OPCODES] =
 {
     "NOOP",
     "MOV",
+    "LOAD",
+    "STORE",
     "ADD",
     "SUB",
     "MUL",
@@ -161,7 +162,6 @@ void IrPrintTacArg(const std::shared_ptr<IrBase> arg)
     if (arg == nullptr) return;
     
     const IrIdentifier* ident = dynamic_cast<const IrIdentifier*>(arg.get());
-    const IrLocation* location = dynamic_cast<const IrLocation*>(arg.get());
     const IrIntegerLiteral* iliteral = dynamic_cast<const IrIntegerLiteral*>(arg.get());
     const IrBooleanLiteral* bliteral = dynamic_cast<const IrBooleanLiteral*>(arg.get());
     const IrStringLiteral* sliteral = dynamic_cast<const IrStringLiteral*>(arg.get());
@@ -169,23 +169,6 @@ void IrPrintTacArg(const std::shared_ptr<IrBase> arg)
     if (ident != nullptr)
     {
         std::cout << "$" << ident->getIdentifier();
-    }
-    else if (location != nullptr)
-    {
-        std::cout << "$" << location->getIdentifier()->getIdentifier();
-        if (location->getIndex() != nullptr)
-        {           
-            const IrIntegerLiteral* indexlit = dynamic_cast<const IrIntegerLiteral*>(location->getIndex().get());
-            const IrLocation* indexident = dynamic_cast<const IrLocation*>(location->getIndex().get());
-            if (indexlit != nullptr)
-            {
-                std::cout << "[" << indexlit->getValue() << "]";
-            }
-            else if (indexident)
-            {
-                std::cout << "[$" << indexident->getIdentifier()->getIdentifier() << "]";
-            }
-        }
     }
     else if (iliteral != nullptr)
     {
@@ -249,7 +232,6 @@ void IrOutputArg(const std::shared_ptr<IrBase> arg, std::ostream& stream)
     if (arg == nullptr) return;
     
     const IrIdentifier* ident = dynamic_cast<const IrIdentifier*>(arg.get());
-    const IrLocation* location = dynamic_cast<const IrLocation*>(arg.get());
     const IrIntegerLiteral* iliteral = dynamic_cast<const IrIntegerLiteral*>(arg.get());
     const IrBooleanLiteral* bliteral = dynamic_cast<const IrBooleanLiteral*>(arg.get());
     const IrRegister* reg = dynamic_cast<const IrRegister*>(arg.get());
@@ -262,49 +244,6 @@ void IrOutputArg(const std::shared_ptr<IrBase> arg, std::ostream& stream)
             stream << ident->getIdentifier();
         else
             stream << "-" << ident->getAddress()+8 << (g_ia64 ? "(%rbp)" : "(%ebp)");
-    }
-    else if (location != nullptr)
-    {
-        if (location->getIndex() == nullptr)
-        {
-            if (location->getIdentifier()->isLabel())
-                stream << "$" << location->getIdentifier()->getIdentifier();
-            else if (location->getIdentifier()->isGlobal())
-                stream << location->getIdentifier()->getIdentifier();
-            else
-                stream << "-" << location->getIdentifier()->getAddress()+8 << (g_ia64 ? "(%rbp)" : "(%ebp)");        
-        }
-        else //if (location->getIdentifier()->isGlobal())
-        {           
-            // Expect only global values to have index.        
-            const IrIntegerLiteral* indexlit = dynamic_cast<const IrIntegerLiteral*>(location->getIndex().get());
-            const IrLocation* indexident = dynamic_cast<const IrLocation*>(location->getIndex().get());
-            if (indexlit != nullptr)
-            {
-                if (location->getIdentifier()->isLabel())
-                    stream << "$" << location->getIdentifier()->getIdentifier();
-                else if (location->getIdentifier()->isGlobal())
-                    stream << location->getIdentifier()->getIdentifier();
-                
-                stream << "+(" << indexlit->getValue() << "*8)";    
-            }
-            else if (indexident)
-            {
-                // Indexed form of GAS address
-                // D(Rb,Ri,S) -> Mem[Reg[Rb] + S * Reg[Ri] + D]
-                // Where: D is displacement in bytes.
-                //        Rb is base register.  Using rbx
-                //        Ri is index register.  Using rsi
-                //        S is scaler 
-               if (location->getIdentifier()->isLabel())
-                    stream << "$" << location->getIdentifier()->getIdentifier();
-                else if (location->getIdentifier()->isGlobal())
-                    stream << location->getIdentifier()->getIdentifier();
-                
-                stream << (g_ia64 ? "(,%rsi,8)" : "(,%esi,4)");
-            }
-    
-         }
     }
     else if (iliteral != nullptr)
     {
@@ -366,8 +305,7 @@ bool IrIsRegister(const std::shared_ptr<IrBase> value)
 bool IrIsMemory(const std::shared_ptr<IrBase> value)
 {
     const IrIdentifier* ident = dynamic_cast<const IrIdentifier*>(value.get());
-    const IrLocation* location = dynamic_cast<const IrLocation*>(value.get());
-    return (ident != nullptr || location != nullptr);
+    return (ident != nullptr);
 }
 
 void IrGenMov(const std::shared_ptr<IrBase> src, const std::shared_ptr<IrBase> dst, std::ostream& stream)
@@ -394,6 +332,43 @@ void IrGenMov(const std::shared_ptr<IrBase> src, const std::shared_ptr<IrBase> d
         IrOutputArg(dst, stream);
         stream << std::endl;
     }
+}
+
+void IrGenLoad(const std::shared_ptr<IrBase> baseAddr, const std::shared_ptr<IrBase> offset, const std::shared_ptr<IrBase> dst, std::ostream& stream)
+{
+    const IrIdentifier* baseIdent = dynamic_cast<const IrIdentifier*>(baseAddr.get());   
+    const IrIntegerLiteral* offsetLiteral = dynamic_cast<const IrIntegerLiteral*>(offset.get());
+    const IrIdentifier* offsetIdent = dynamic_cast<const IrIdentifier*>(offset.get());
+
+    if (offsetIdent != nullptr)
+    {
+        // load offset value into rsi/esi register
+        IrGenMov(offset, g_indexRegister, stream);
+    }
+    
+    stream << (g_ia64 ? "movq " : "movl ");
+    
+    if (baseIdent->isLabel())
+    {
+        stream << "$" << baseIdent->getIdentifier();
+    }
+    else if (baseIdent->isGlobal())
+    {
+        stream << baseIdent->getIdentifier();
+    }
+    
+    if (offsetLiteral != nullptr)
+    {
+        stream << "+(" << offsetLiteral->getValue() << "*8)"; 
+    }
+    else if (offsetIdent != nullptr)
+    {
+        stream << (g_ia64 ? "(,%rsi,8)" : "(,%esi,4)");
+    }
+}
+
+void IrGenStore(const std::shared_ptr<IrBase> src, const std::shared_ptr<IrBase> baseAddr, const std::shared_ptr<IrBase> offset, std::ostream& stream)
+{
 }
 
 void IrGenComparison(const IrTacStmt& stmt, std::ostream& stream)
@@ -468,6 +443,14 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
     {
     case IrOpcode::MOV:        // arg0 -> arg2
         IrGenMov(stmt.m_arg0, stmt.m_arg2, stream);
+        break;
+        
+    case IrOpcode::LOAD:       // *[arg0 + arg1] -> arg2
+        IrGenLoad(stmt.m_arg0, stmt.m_arg1, stmt.m_arg2, stream);
+        break;
+        
+    case IrOpcode::STORE:      // arg0 -> *[arg1 + arg2]
+        IrGenStore(stmt.m_arg0, stmt.m_arg1, stmt.m_arg2, stream);
         break;
         
     case IrOpcode::ADD:        // arg0 + arg1 -> arg2

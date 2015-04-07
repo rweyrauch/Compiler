@@ -33,7 +33,8 @@ class IrTraversalContext;
 class IrIdentifier : public IrBase
 {
 public:
-    
+       
+    static IrIdentifier* CreateTemporary();    
     static IrIdentifier* CreateLabel();
     
     IrIdentifier(int lineNumber, int columnNumber, const std::string& filename, const std::string& ident, bool isLabel = false) :
@@ -62,7 +63,7 @@ protected:
     bool m_isLabel;
     bool m_isGlobal;
     
-    static int s_tempLabelCounter;
+    static int s_tempCounter;
     
 private:
     IrIdentifier() = delete;

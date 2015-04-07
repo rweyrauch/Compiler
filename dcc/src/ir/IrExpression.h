@@ -30,7 +30,6 @@
 
 namespace Decaf
 {
-class IrLocation;
 
 class IrExpression : public IrBase
 {
@@ -39,6 +38,7 @@ public:
         IrBase(lineNumber, columnNumber, filename),
         m_type(type),
         m_isArray(false),
+        m_asWrite(false),
         m_result(nullptr)
     {}
     
@@ -51,14 +51,18 @@ public:
     IrType getType() const { return m_type; }
     bool isArray() const { return m_isArray; }
     
-    IrLocation* getResult() const { return m_result; }
+    void setAsWrite(bool write ) { m_asWrite = write; }
+    bool usedAsWrite() const { return m_asWrite; }
+    
+    std::shared_ptr<IrIdentifier> getResult() const { return m_result; }
     
 protected:
     
     IrType m_type;
     bool m_isArray;
+    bool m_asWrite;
     
-    IrLocation* m_result;
+    std::shared_ptr<IrIdentifier> m_result;
     
 private:
     IrExpression() = delete;
