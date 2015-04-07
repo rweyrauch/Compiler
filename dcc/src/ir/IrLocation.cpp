@@ -105,6 +105,8 @@ bool IrLocation::analyze(IrTraversalContext* ctx)
    
     if (m_index)
     {
+		valid = m_index->analyze(ctx);
+		
         // Location index must be an integer expression
         if (m_index->getType() != IrType::Integer)
         {
