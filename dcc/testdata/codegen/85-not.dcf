@@ -1,19 +1,17 @@
 class Program
 {
-
-	boolean fail(boolean b)
-	{
-		callout("printf", "INCORRECT - shorcircuiting failed\n");
-		return b;
-	}
-
+    boolean fail(boolean ok)
+    {
+        callout("printf", "short-circuit failed\n");
+        return ok;
+    }
+    
 	void main()
 	{
-		boolean a, b, c;
-		a = (0 == 0);
-		b = (0 - 3) == 1;
-		c = ! a;
-		if (! a && fail(false)) {
+		boolean a, b;
+		a = true;
+		b = false;
+		if (b && !a && fail(false)) {
 			callout("printf", "INCORRECT\n");
 		} else {
 			callout("printf", "correct\n");

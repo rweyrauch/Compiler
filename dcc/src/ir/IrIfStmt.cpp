@@ -28,10 +28,23 @@
 #include "IrExpression.h"
 #include "IrBlock.h"
 #include "IrBoolLiteral.h"
+#include "IrBooleanExpr.h"
 #include "IrTravCtx.h"
 
 namespace Decaf
 {
+    
+IrIfStatement::IrIfStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpression* condition, IrBlock* trueBlock, IrBlock* falseBlock) :
+    IrStatement(lineNumber, columnNumber, filename),
+    m_condition(std::shared_ptr<IrExpression>(condition)),
+    m_trueBlock(std::shared_ptr<IrBlock>(trueBlock)),
+    m_falseBlock(std::shared_ptr<IrBlock>(falseBlock)),
+    m_labelFalse(nullptr),
+    m_labelEnd(nullptr)
+{
+    m_labelFalse = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());  
+    m_labelEnd = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());    
+}
 
 IrIfStatement::~IrIfStatement()
 {
@@ -106,12 +119,18 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
     
     ctx->pushParent(this);
     
-    if (!m_condition->codegen(ctx))
-        valid = false;
-    
-    m_labelFalse = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
-    
-    m_labelEnd = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
+    IrBooleanExpression* boolexpr = dynamic_cast<IrBooleanExpression*>(m_condition.get());
+    if (boolexpr && (boolexpr->getOperator() == IrBooleanOperator::LogicalAnd || boolexpr->getOperator() == IrBooleanOperator::LogicalOr))
+    {
+        // TODO: handle short-circuit expressions
+        if (!m_condition->codegen(ctx))
+            valid = false;
+    }
+    else
+    {
+        if (!m_condition->codegen(ctx))
+            valid = false;
+    }
     
     IrTacStmt tac;
     tac.m_opcode = IrOpcode::IFZ;
