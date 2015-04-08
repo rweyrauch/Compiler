@@ -11,11 +11,25 @@ class Program
 		boolean a, b;
 		a = true;
 		b = false;
+        
 		if (b && !a && fail(false)) {
 			callout("printf", "INCORRECT\n");
 		} else {
 			callout("printf", "correct\n");
 		}
+/*        
+        if (false && fail(false)) {
+			callout("printf", "INCORRECT\n");
+		} else {
+			callout("printf", "correct\n");
+		}
+        
+        if (false || fail(false)) {
+			callout("printf", "INCORRECT\n");
+		} else {
+			callout("printf", "correct\n");
+		}
+*/        
  	}
 }
 

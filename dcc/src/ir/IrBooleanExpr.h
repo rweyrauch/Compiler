@@ -48,8 +48,8 @@ public:
     virtual bool codegen(IrTraversalContext* ctx);
     
     IrBooleanOperator getOperator() const { return m_operator; }
-    IrExpression* getLeftHandSide() const { return m_lhs.get(); }
-    IrExpression* getRightHandSide() const { return m_rhs.get(); }
+    std::shared_ptr<IrExpression> getLeftHandSide() const { return m_lhs; }
+    std::shared_ptr<IrExpression> getRightHandSide() const { return m_rhs; }
     
 protected:
     

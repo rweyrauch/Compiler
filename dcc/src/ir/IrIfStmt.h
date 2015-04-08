@@ -57,6 +57,9 @@ protected:
     std::shared_ptr<IrIdentifier> m_labelEnd;
     
 private:
+    static bool isBooleanLiteral(const IrExpression* expr);
+    
+private:
     IrIfStatement() = delete;
     IrIfStatement(const IrIfStatement& rhs) = delete;
 };

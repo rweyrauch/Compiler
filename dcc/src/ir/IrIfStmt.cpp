@@ -109,7 +109,7 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
     bool valid = true;
     
     // Template:
-    // <evaluate condition>
+    // <evaluate condition(s)>
     // jump<oper> <label_false>
     // <true_body>
     // jmp <label_end>
@@ -118,35 +118,79 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
     // label_end:
     
     ctx->pushParent(this);
-    
-    IrBooleanExpression* boolexpr = dynamic_cast<IrBooleanExpression*>(m_condition.get());
-    if (boolexpr && (boolexpr->getOperator() == IrBooleanOperator::LogicalAnd || boolexpr->getOperator() == IrBooleanOperator::LogicalOr))
-    {
-        // TODO: handle short-circuit expressions
-        if (!m_condition->codegen(ctx))
-            valid = false;
-    }
-    else
-    {
-        if (!m_condition->codegen(ctx))
-            valid = false;
-    }
-    
+
     IrTacStmt tac;
     tac.m_opcode = IrOpcode::IFZ;
+    
+    IrBooleanExpression* boolexpr = dynamic_cast<IrBooleanExpression*>(m_condition.get());
     IrBooleanLiteral* literal = dynamic_cast<IrBooleanLiteral*>(m_condition.get());
-    if (literal)
+    if (boolexpr && (boolexpr->getOperator() == IrBooleanOperator::LogicalAnd || boolexpr->getOperator() == IrBooleanOperator::LogicalOr))
     {
-        tac.m_arg0 = m_condition;
+        // handle short-circuit expressions
+        if (boolexpr->getLeftHandSide())
+        {
+            if (!boolexpr->getLeftHandSide()->codegen(ctx))
+                valid = false;
+            
+            tac.m_opcode = IrOpcode::IFZ;
+            if (isBooleanLiteral(boolexpr->getLeftHandSide().get()))
+            {
+                tac.m_arg0 = boolexpr->getLeftHandSide();
+            }
+            else
+            {
+                tac.m_arg0 = boolexpr->getLeftHandSide()->getResult();        
+            }
+            tac.m_arg1 = m_labelFalse;
+            tac.m_arg2 = nullptr;
+    
+            ctx->append(tac);
+        }
+        if (boolexpr->getRightHandSide())
+        {
+            if (!boolexpr->getRightHandSide()->codegen(ctx))
+                valid = false;
+            
+            tac.m_opcode = IrOpcode::IFZ;
+            if (isBooleanLiteral(boolexpr->getRightHandSide().get()))
+            {
+                tac.m_arg0 = boolexpr->getRightHandSide();
+            }
+            else
+            {
+                tac.m_arg0 = boolexpr->getRightHandSide()->getResult();        
+            }
+            tac.m_arg1 = m_labelFalse;
+            tac.m_arg2 = nullptr;
+    
+            ctx->append(tac);
+        }
+    }
+    else if (literal)
+    {
+        // TODO: reduce/remove if-else code as needed
+        if (!m_condition->codegen(ctx))
+            valid = false;
+        
+        tac.m_opcode = IrOpcode::IFZ;
+        tac.m_arg0 = m_condition;        
+        tac.m_arg1 = m_labelFalse;
+        tac.m_arg2 = nullptr;
+    
+        ctx->append(tac);
     }
     else
     {
-        tac.m_arg0 = std::shared_ptr<IrBase>(m_condition->getResult());
-    }
-    tac.m_arg1 = m_labelFalse;
-    tac.m_arg2 = nullptr;
+        if (!m_condition->codegen(ctx))
+            valid = false;
+        
+        tac.m_opcode = IrOpcode::IFZ;
+        tac.m_arg0 = std::shared_ptr<IrBase>(m_condition->getResult());        
+        tac.m_arg1 = m_labelFalse;
+        tac.m_arg2 = nullptr;
     
-    ctx->append(tac);
+        ctx->append(tac);
+    }
     
     if (m_trueBlock)
     {
@@ -209,5 +253,11 @@ void IrIfStatement::setSymbolStartAddress(size_t addr)
         //addr += m_falseBlock->getAllocationSize();
     }
 }
- 
+
+bool IrIfStatement::isBooleanLiteral(const IrExpression* expr)
+{
+    const IrBooleanLiteral* literal = dynamic_cast<const IrBooleanLiteral*>(expr);
+    return (literal != nullptr) ? true : false;
+}
+
 } // namespace Decaf
