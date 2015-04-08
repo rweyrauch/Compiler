@@ -208,7 +208,8 @@ void IrPrintTac(const IrTacStmt& stmt)
         }
         if (stmt.m_arg1)
         {
-            std::cout << ", ";
+            if (stmt.m_arg0) std::cout << ", ";
+            
             IrPrintTacArg(stmt.m_arg1);
         }
         if (stmt.m_arg2)
