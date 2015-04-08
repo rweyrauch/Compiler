@@ -133,6 +133,13 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
             ctx->error(this, msg.str());
             valid = false;
         }
+        
+        // External methods always return an integer.
+        if (valid)
+        {
+            m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());
+            ctx->addTempVariable(m_result.get(), IrType::Integer);
+        }
     }
    
     ctx->popParent();
