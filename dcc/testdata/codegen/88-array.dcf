@@ -1,0 +1,14 @@
+class Program
+{
+    int array[10];
+
+    void main()
+    {
+        int i;
+         
+        array[2] = 4;
+        i = array[2];
+        
+        callout("printf", "Array2 = %d\n", i);
+    }
+}

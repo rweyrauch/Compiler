@@ -378,13 +378,13 @@ void IrGenLoad(const std::shared_ptr<IrBase> baseAddr, const std::shared_ptr<IrB
 
 void IrGenStore(const std::shared_ptr<IrBase> src, const std::shared_ptr<IrBase> baseAddr, const std::shared_ptr<IrBase> offset, std::ostream& stream)
 {
-	// Load source value into a register.
-	stream << (g_ia64 ? "movq " : "movl ");
-	IrOutputArg(src, stream);
-	stream << ", ";
-	IrOutputArg(g_tempReg, stream);
-	stream << std::endl;
-	
+    // Load source value into a register.
+    stream << (g_ia64 ? "movq " : "movl ");
+    IrOutputArg(src, stream);
+    stream << ", ";
+    IrOutputArg(g_tempReg, stream);
+    stream << std::endl;
+    
     const IrIdentifier* baseIdent = dynamic_cast<const IrIdentifier*>(baseAddr.get());   
     const IrIntegerLiteral* offsetLiteral = dynamic_cast<const IrIntegerLiteral*>(offset.get());
     const IrIdentifier* offsetIdent = dynamic_cast<const IrIdentifier*>(offset.get());
@@ -418,7 +418,6 @@ void IrGenStore(const std::shared_ptr<IrBase> src, const std::shared_ptr<IrBase>
         stream << (g_ia64 ? "(,%rsi,8)" : "(,%esi,4)");
     }
     stream << std::endl;
-	
 }
 
 void IrGenComparison(const IrTacStmt& stmt, std::ostream& stream)
