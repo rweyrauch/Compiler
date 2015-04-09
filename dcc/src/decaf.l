@@ -37,6 +37,7 @@ xdigit [a-fA-F0-9]
 
 "for"                           { track_column(); return (Parser::FOR); }
 "while"                         { track_column(); return (Parser::WHILE); }
+"do"                            { track_column(); return (Parser::DO); }
 "break"                         { track_column(); return (Parser::BREAK); }
 "continue"                      { track_column(); return (Parser::CONTINUE); }
 "goto"                          { track_column(); return (Parser::GOTO); }

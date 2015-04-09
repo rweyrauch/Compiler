@@ -29,7 +29,7 @@
 
 %token RETURN CALLOUT
 %token BOOLTYPE INTTYPE DOUBLETYPE STRINGTYPE CLASS VOID
-%token IF ELSE FOR CONTINUE BREAK GOTO WHILE
+%token IF ELSE FOR DO CONTINUE BREAK GOTO WHILE
 %token INTERFACE NULLVALUE EXTENDS IMPLEMENTS THIS NEW
 
 %token IDENTIFIER INTEGER BOOLEAN CHARACTER STRING DOUBLE
@@ -296,6 +296,10 @@ statement
     | WHILE LPAREN expr RPAREN block
     {
         $$ = new Decaf::IrWhileStatement(@1.first_line, @1.first_column, d_scanner.filename(), $3, $5); 
+    }
+    | DO block WHILE LPAREN expr RPAREN
+    {
+        $$ = new Decaf::IrDoWhileStatement(@1.first_line, @1.first_column, d_scanner.filename(), $5, $2); 
     }
     | RETURN SEMI 
     { 

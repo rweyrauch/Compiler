@@ -12,6 +12,7 @@ add_library(
     IrClass.cpp
     IrCommon.cpp
     IrContinueStmt.cpp
+    IrDoWhileStmt.cpp
     IrExprStmt.cpp
     IrFieldDecl.cpp
     IrForStmt.cpp
