@@ -22,42 +22,44 @@
 // THE SOFTWARE.
 //
 #pragma once
-
-#include "IrCommon.h"
+#include <vector>
+#include <memory>
 #include "IrBase.h"
-
-#include "IrAssignExpr.h"
-#include "IrBinaryExpr.h"
-#include "IrBlock.h"
-#include "IrBooleanExpr.h"
-#include "IrBoolLiteral.h"
-#include "IrBreakStmt.h"
-#include "IrCharLiteral.h"
-#include "IrClass.h"
-#include "IrContinueStmt.h"
-#include "IrDoubleLiteral.h"
-#include "IrDoWhileStmt.h"
-#include "IrExpression.h"
-#include "IrExprStmt.h"
-#include "IrFieldDecl.h"
-#include "IrForStmt.h"
-#include "IrGotoStmt.h"
 #include "IrIdentifier.h"
-#include "IrIfStmt.h"
-#include "IrIntLiteral.h"
-#include "IrInterface.h"
-#include "IrLabelStmt.h"
-#include "IrLiteral.h"
-#include "IrLocation.h"
-#include "IrMethodCall.h"
 #include "IrMethodDecl.h"
-#include "IrNullLiteral.h"
-#include "IrReturnStmt.h"
-#include "IrStatement.h"
-#include "IrStringLiteral.h"
-#include "IrSymbolTable.h"
-#include "IrTravCtx.h"
-#include "IrVarDecl.h"
-#include "IrWhileStmt.h"
 
+namespace Decaf
+{
 
+class IrInterface : public IrBase
+{
+public:
+    IrInterface(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident) :
+        IrBase(lineNumber, columnNumber, filename),
+        m_identifier(ident),
+        m_method_decl_list()
+    {
+    }
+    
+    virtual ~IrInterface();
+    
+    virtual void propagateTypes(IrTraversalContext* ctx); 
+    virtual void print(unsigned int depth); 
+    virtual bool analyze(IrTraversalContext* ctx);
+    virtual bool codegen(IrTraversalContext* ctx);
+    
+    void addMethodDecl(IrMethodDecl* method);
+    void addMethodDecl(const std::vector<IrMethodDecl*>& methods);
+    
+protected:
+    
+    std::shared_ptr<IrIdentifier> m_identifier;
+    
+    std::vector<std::shared_ptr<IrMethodDecl>> m_method_decl_list;
+    
+private:
+    IrInterface() = delete;
+    IrInterface(const IrInterface& rhs) = delete;
+};
+
+} // namespace Decaf

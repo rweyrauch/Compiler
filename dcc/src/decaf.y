@@ -4,6 +4,7 @@
 
 %union {
     Decaf::IrClass *programClass;
+    Decaf::IrInterface *interfaceClass;
     Decaf::IrIdentifier *ident;
     std::vector<Decaf::IrIdentifier*> *identList;
     Decaf::IrLocation *location;
@@ -41,6 +42,7 @@
 %token MUL DIV
 
 %type <programClass> program
+%type <interfaceClass> interface
 %type <block> block
 %type <methodDecl> method_decl
 %type <methodDeclList> method_decl_list
@@ -98,6 +100,14 @@ program
     }
     ;
     
+interface
+    : INTERFACE ident LBRACE method_decl_list RBRACE
+    {
+        $$ = new Decaf::IrInterface(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
+        $$->addMethodDecl(*$4); 
+    }
+    ;
+
 location_list
     : location 
     { 
