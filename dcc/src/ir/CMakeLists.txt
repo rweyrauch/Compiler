@@ -24,6 +24,7 @@ add_library(
     IrLocation.cpp
     IrMethodCall.cpp
     IrMethodDecl.cpp
+    IrProgram.cpp
     IrReturnStmt.cpp
     IrStringLiteral.cpp
     IrSymbolTable.cpp

@@ -210,6 +210,18 @@ bool IrSymbolTable::addMethod(IrMethodDecl* method)
     return ok;
 }
 
+bool IrSymbolTable::addClass(IrClass* classDecl)
+{
+    // TODO: implement classes in symbol table
+    return true;
+}
+
+bool IrSymbolTable::addInterface(IrInterface* interfaceDecl)
+{
+    // TODO: implement interfaces in symbol table
+    return true;
+}
+
 bool IrSymbolTable::exists(IrLocation* variable) const
 { 
     auto it = m_variables.find(variable->getIdentifier()->getIdentifier());

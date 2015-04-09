@@ -3,8 +3,9 @@
 %lsp-needed 
 
 %union {
-    Decaf::IrClass *programClass;
-    Decaf::IrInterface *interfaceClass;
+    Decaf::IrProgram *programDef;
+    Decaf::IrClass *classDef;
+    Decaf::IrInterface *interfaceDef;
     Decaf::IrIdentifier *ident;
     std::vector<Decaf::IrIdentifier*> *identList;
     Decaf::IrLocation *location;
@@ -41,8 +42,9 @@
 %token PLUS MINUS CEQ CNE CLT CLE CGT CGE 
 %token MUL DIV
 
-%type <programClass> program
-%type <interfaceClass> interface
+%type <classDef> program
+%type <classDef> class
+%type <interfaceDef> interface
 %type <block> block
 %type <methodDecl> method_decl
 %type <methodDeclList> method_decl_list

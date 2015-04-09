@@ -52,6 +52,7 @@
 #include "IrMethodCall.h"
 #include "IrMethodDecl.h"
 #include "IrNullLiteral.h"
+#include "IrProgram.h"
 #include "IrReturnStmt.h"
 #include "IrStatement.h"
 #include "IrStringLiteral.h"

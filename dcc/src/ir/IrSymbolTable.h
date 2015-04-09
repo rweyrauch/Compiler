@@ -33,6 +33,8 @@ class IrMethodCall;
 class IrMethodDecl;
 class IrLocation;
 class IrIdentifier;
+class IrClass;
+class IrInterface;
 
 class IrSymbolTable
 {
@@ -53,6 +55,8 @@ public:
     bool addVariable(IrIdentifier* variable, IrType type);
     
     bool addMethod(IrMethodDecl* method);
+    bool addClass(IrClass* classDecl);
+    bool addInterface(IrInterface* interfaceDecl);
     
     bool exists(IrLocation* variable) const;
     bool exists(IrMethodCall* method) const;
