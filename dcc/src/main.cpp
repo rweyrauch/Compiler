@@ -8,6 +8,8 @@ char* g_target = 0;
 char* g_outputFilename = 0;
 int g_debug = 0;
 int g_ia32 = false;
+int g_opt_global_cse = false;
+int g_opt_all = false;
 
 poptOption appOptions[] =
 {
@@ -15,6 +17,8 @@ poptOption appOptions[] =
     { "output", 'o', POPT_ARG_STRING, &g_outputFilename, 0, "output filename", NULL },
     { "debug", 'd', POPT_ARG_NONE, &g_debug, 0, "debugging output", NULL },
     { "m32", '3', POPT_ARG_NONE, &g_ia32, 0, "generate 32-bit code", NULL },
+    { "opt-common-subexpr-elim", 0, POPT_ARG_NONE, &g_opt_global_cse, 0, "enable global common subexpression elimination", NULL },
+    { "opt-all", 0, POPT_ARG_NONE, &g_opt_all, 0, "enable all optimizations", NULL },
     POPT_AUTOHELP
     POPT_TABLEEND
 };
@@ -79,6 +83,9 @@ int main(int argc, char **argv)
         {
             parser = new Parser(std::cin, std::cout, !g_ia32);
         }
+        
+        if (g_opt_global_cse) parser->enableOpt(Optimization::GLOBAL_CSE);
+        if (g_opt_all) parser->enableOpt(Optimization::ALL);
         
         parser->parse();        
         parser->semanticChecks();

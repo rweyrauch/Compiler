@@ -13,6 +13,11 @@ using namespace Decaf;
 // $insert scanner.h
 #include "Scanner.h"
 
+enum class Optimization : int
+{
+    GLOBAL_CSE,
+    ALL
+};
 
 #undef Parser
 class Parser: public ParserBase
@@ -26,7 +31,10 @@ class Parser: public ParserBase
     std::vector<std::string> d_source;
     std::string d_blank;
     
+    std::vector<Optimization> m_optimizations;
+    
     public:
+        
         Parser(std::istream &in, std::ostream &out, bool ia64) :
             d_scanner(in, out),
             d_root(0) 
@@ -44,6 +52,10 @@ class Parser: public ParserBase
             d_ctx->setSource(&d_source);
         }
         virtual ~Parser() {}
+        void enableOpt(Optimization which)
+        {
+            m_optimizations.push_back(which);
+        }
         int parse();
         bool codegen()
         {
