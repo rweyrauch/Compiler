@@ -169,7 +169,7 @@ bool IrBooleanExpression::analyze(IrTraversalContext* ctx)
                 ctx->error(this, "rhs of logical op may not be an array name.");
                 valid = false;            
             }
-       }
+        }
         else
         {
             ctx->error(this, "boolean operator requires a rhs expression.");
@@ -178,12 +178,13 @@ bool IrBooleanExpression::analyze(IrTraversalContext* ctx)
     }
     else
     {
-        // Rule: both sides of the comparison must be of type integer.
+        // Rule: both sides of the comparison must be of type integer or boolean
         if (m_lhs)
         {
-            if (m_lhs->getType() != IrType::Integer)
+            
+            if (m_lhs->getType() != IrType::Integer && m_lhs->getType() != IrType::Boolean)
             {
-                ctx->error(this, "lhs of boolean expression must be of type integer.");
+                ctx->error(this, "lhs of boolean expression must be of type integer or boolean.");
                 valid = false;
             }
             if (m_lhs->isArray())
@@ -195,9 +196,9 @@ bool IrBooleanExpression::analyze(IrTraversalContext* ctx)
         
         if (m_rhs)
         {
-            if (m_rhs->getType() != IrType::Integer)
+            if (m_rhs->getType() != IrType::Integer && m_rhs->getType() != IrType::Boolean)
             {
-                ctx->error(this, "rhs of boolean expression must be of type integer.");
+                ctx->error(this, "rhs of boolean expression must be of type integer or boolean.");
                 valid = false;
             }
             if (m_rhs->isArray())
