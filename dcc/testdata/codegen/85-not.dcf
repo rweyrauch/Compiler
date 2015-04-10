@@ -12,7 +12,7 @@ class Program
 		a = true;
 		b = false;
         c = true;
-/*        
+       
 		if (b && !a && fail(false)) {
 			callout("printf", "INCORRECT\n");
 		} else {
@@ -30,7 +30,7 @@ class Program
 		} else {
 			callout("printf", "correct\n");
 		}
-*/
+
 		c = ! ! a;
 		if (!a != c) {
 			callout("printf", "correct\n");
