@@ -5,6 +5,7 @@ include_directories(.)
 add_library(
     IrAst STATIC
     IrAssignExpr.cpp
+    IrBasicBlock.cpp
     IrBinaryExpr.cpp
     IrBlock.cpp
     IrBooleanExpr.cpp
@@ -24,6 +25,7 @@ add_library(
     IrLocation.cpp
     IrMethodCall.cpp
     IrMethodDecl.cpp
+    IrOptimizer.cpp
     IrProgram.cpp
     IrReturnStmt.cpp
     IrStringLiteral.cpp

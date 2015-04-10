@@ -3,6 +3,7 @@
 #ifndef Parser_h_included
 #define Parser_h_included
 
+#include <algorithm>
 #include <fstream>
 #include "Ir.h"
 
@@ -27,6 +28,7 @@ class Parser: public ParserBase
 
     IrClass* d_root;
     IrTraversalContext* d_ctx;
+    IrOptimizer* d_optimizer;
     
     std::vector<std::string> d_source;
     std::string d_blank;
@@ -37,21 +39,31 @@ class Parser: public ParserBase
         
         Parser(std::istream &in, std::ostream &out, bool ia64) :
             d_scanner(in, out),
-            d_root(0) 
+            d_root(nullptr),
+            d_ctx(nullptr),
+            d_optimizer(nullptr)
         {
             d_scanner.setSLoc(&d_loc__);
             d_ctx = new IrTraversalContext(ia64);
+            d_optimizer = new IrOptimizer();
         }
         Parser(std::string const &infile, std::string const &outfile, bool ia64) :
             d_scanner(infile, outfile),
-            d_root(0) 
-        {
+            d_root(nullptr),
+            d_ctx(nullptr),
+            d_optimizer(nullptr)
+       {
             preloadSource(infile);            
             d_scanner.setSLoc(&d_loc__);            
             d_ctx = new IrTraversalContext(ia64);
             d_ctx->setSource(&d_source);
+            d_optimizer = new IrOptimizer();
         }
-        virtual ~Parser() {}
+        virtual ~Parser() 
+        {
+			delete d_ctx;
+			delete d_optimizer;
+		}
         void enableOpt(Optimization which)
         {
             m_optimizations.push_back(which);
@@ -62,7 +74,10 @@ class Parser: public ParserBase
             if (d_root)
             {
                 d_root->codegen(d_ctx);
-                    
+                
+                // convert generated TAC into basic blocks and optimize
+                std::vector<IrTacStmt> statements = optimize(d_ctx->getStatements());
+                
                 // write string table
                 d_ctx->genStrings();
     
@@ -85,6 +100,24 @@ class Parser: public ParserBase
             }
             return false; 
         }
+        std::vector<IrTacStmt> optimize(const std::vector<IrTacStmt>& statements)
+        {
+			std::vector<IrTacStmt> optimized_statements = statements;
+			d_optimizer->generateBasicBlocks(statements);
+			
+			std::sort(m_optimizations.begin(), m_optimizations.end());
+			std::unique(m_optimizations.begin(), m_optimizations.end());
+			
+			// apply requested optimizations in the required order
+			for (auto it : m_optimizations)
+			{
+				if (it == Optimization::GLOBAL_CSE)
+				{
+					d_optimizer->globalCommonSubexpressionElimination();
+				}
+			}
+			return d_optimizer->getOptimizedStatements();
+		}
         
     private:
         void error(char const *msg);    // called on (syntax) errors

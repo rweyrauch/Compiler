@@ -22,45 +22,35 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include <vector>
+#include <memory>
+#include "IrTAC.h"
 
-#include "IrCommon.h"
-#include "IrBase.h"
-#include "IrBasicBlock.h"
-#include "IrOptimizer.h"
+namespace Decaf
+{
+class IrTraversalContext;
+class IrBasicBlock;
 
-#include "IrAssignExpr.h"
-#include "IrBinaryExpr.h"
-#include "IrBlock.h"
-#include "IrBooleanExpr.h"
-#include "IrBoolLiteral.h"
-#include "IrBreakStmt.h"
-#include "IrCharLiteral.h"
-#include "IrClass.h"
-#include "IrContinueStmt.h"
-#include "IrDoubleLiteral.h"
-#include "IrDoWhileStmt.h"
-#include "IrExpression.h"
-#include "IrExprStmt.h"
-#include "IrFieldDecl.h"
-#include "IrForStmt.h"
-#include "IrGotoStmt.h"
-#include "IrIdentifier.h"
-#include "IrIfStmt.h"
-#include "IrIntLiteral.h"
-#include "IrInterface.h"
-#include "IrLabelStmt.h"
-#include "IrLiteral.h"
-#include "IrLocation.h"
-#include "IrMethodCall.h"
-#include "IrMethodDecl.h"
-#include "IrNullLiteral.h"
-#include "IrProgram.h"
-#include "IrReturnStmt.h"
-#include "IrStatement.h"
-#include "IrStringLiteral.h"
-#include "IrSymbolTable.h"
-#include "IrTravCtx.h"
-#include "IrVarDecl.h"
-#include "IrWhileStmt.h"
+class IrOptimizer
+{
+public:
+    IrOptimizer()
+    {}
+    
+    virtual ~IrOptimizer() 
+    {}
+   
+	void generateBasicBlocks(const std::vector<IrTacStmt>& statements);
+	void globalCommonSubexpressionElimination();
+	
+    const std::vector<IrTacStmt>& getOptimizedStatements() const { return m_statements; }
+    
+protected:
+   std::shared_ptr<IrBasicBlock> m_blocks;
+   std::vector<IrTacStmt> m_statements;
+   
+private:
+    IrOptimizer(const IrOptimizer& rhs) = delete;
+};
 
-
+} // namespace Decaf

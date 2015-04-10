@@ -75,9 +75,10 @@ public:
     
     void append(const IrTacStmt& stmt)
     {
-        //IrPrintTac(stmt);
         m_statements.push_back(stmt);
     }
+    const std::vector<IrTacStmt>& getStatements() const { return m_statements; }
+    
     void codegen(std::ostream& stream);
     
     void genStrings();

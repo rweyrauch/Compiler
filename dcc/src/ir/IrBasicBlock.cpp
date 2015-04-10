@@ -21,46 +21,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#pragma once
-
-#include "IrCommon.h"
-#include "IrBase.h"
 #include "IrBasicBlock.h"
-#include "IrOptimizer.h"
 
-#include "IrAssignExpr.h"
-#include "IrBinaryExpr.h"
-#include "IrBlock.h"
-#include "IrBooleanExpr.h"
-#include "IrBoolLiteral.h"
-#include "IrBreakStmt.h"
-#include "IrCharLiteral.h"
-#include "IrClass.h"
-#include "IrContinueStmt.h"
-#include "IrDoubleLiteral.h"
-#include "IrDoWhileStmt.h"
-#include "IrExpression.h"
-#include "IrExprStmt.h"
-#include "IrFieldDecl.h"
-#include "IrForStmt.h"
-#include "IrGotoStmt.h"
-#include "IrIdentifier.h"
-#include "IrIfStmt.h"
-#include "IrIntLiteral.h"
-#include "IrInterface.h"
-#include "IrLabelStmt.h"
-#include "IrLiteral.h"
-#include "IrLocation.h"
-#include "IrMethodCall.h"
-#include "IrMethodDecl.h"
-#include "IrNullLiteral.h"
-#include "IrProgram.h"
-#include "IrReturnStmt.h"
-#include "IrStatement.h"
-#include "IrStringLiteral.h"
-#include "IrSymbolTable.h"
-#include "IrTravCtx.h"
-#include "IrVarDecl.h"
-#include "IrWhileStmt.h"
+namespace Decaf
+{
+	
+bool IrBasicBlock::optimize()
+{
+	return false;
+}
+    	
+bool IrBasicBlock::codegen(IrTraversalContext* ctx)
+{
+	return false;
+}
 
+} // namespace Decaf
 
