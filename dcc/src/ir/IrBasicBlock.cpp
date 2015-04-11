@@ -40,14 +40,17 @@ bool IrBasicBlock::codegen(IrTraversalContext* ctx)
 
 void IrBasicBlock::print()
 {
-    std::cout << "----Begin----" << std::endl;
-    
-    for (auto it : m_statements)
+    if (!m_statements.empty())
     {
-        IrPrintTac(it);
+        std::cout << "----Begin----" << std::endl;
+        
+        for (auto it : m_statements)
+        {
+            IrPrintTac(it);
+        }
+        
+        std::cout << "----End----" << std::endl;
     }
-    
-    std::cout << "----End----" << std::endl;
     
     for (auto it : m_children)
     {

@@ -34,6 +34,9 @@ xdigit [a-fA-F0-9]
 
 "if"                            { track_column(); return (Parser::IF); }
 "else"                          { track_column(); return (Parser::ELSE); }
+"switch"                        { track_column(); return (Parser::SWITCH); }
+"case"                          { track_column(); return (Parser::CASE); }
+"default"                       { track_column(); return (Parser::DEFAULT); }
 
 "for"                           { track_column(); return (Parser::FOR); }
 "while"                         { track_column(); return (Parser::WHILE); }

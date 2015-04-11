@@ -21,6 +21,8 @@
     std::vector<std::vector<Decaf::IrFieldDecl*>> *fieldDeclListList;
     Decaf::IrStatement *stmt;
     std::vector<Decaf::IrStatement*> *stmtList;
+    Decaf::IrCaseStatement *caseStmt;
+    std::vector<Decaf::IrCaseStatement*> *caseList;    
     Decaf::IrVariableDecl *varDecl;
     std::vector<Decaf::IrVariableDecl*> *varDeclList;
     Decaf::IrLiteral *literal;
@@ -31,7 +33,7 @@
 
 %token RETURN CALLOUT
 %token BOOLTYPE INTTYPE DOUBLETYPE STRINGTYPE CLASS VOID
-%token IF ELSE FOR DO CONTINUE BREAK GOTO WHILE
+%token IF ELSE SWITCH CASE DEFAULT FOR DO CONTINUE BREAK GOTO WHILE
 %token INTERFACE NULLVALUE EXTENDS IMPLEMENTS THIS NEW
 
 %token IDENTIFIER INTEGER BOOLEAN CHARACTER STRING DOUBLE
@@ -53,12 +55,14 @@
 %type <methodCall> method_call
 %type <stmt> statement
 %type <stmtList> statement_list
+%type <caseStmt> case_statement
+%type <caseList> case_list
 %type <varDecl> var_decl argument_decl
 %type <varDeclList> var_decl_list argument_decl_list
 %type <ident> ident
 %type <identList> ident_list
 %type <token> type rel_op logic_op assign_op
-%type <literal> literal
+%type <literal> literal int_literal
 %type <stringLiteral> string_literal
 %type <location> location
 %type <locationList> location_list
@@ -238,6 +242,31 @@ var_decl
     }
     ;
 
+case_list
+    : case_statement
+    {
+        $$ = new std::vector<Decaf::IrCaseStatement*>();
+        $$->push_back($1);
+    }
+    | case_list case_statement
+    {
+        $1->push_back($2);
+    }
+    ;
+
+case_statement
+    : CASE literal COLON statement_list
+    {
+        $$ = new Decaf::IrCaseStatement(@1.first_line, @1.first_column, d_scanner.filename(), $2);
+        $$->addStatements(*$4); 
+    }
+    | DEFAULT COLON statement_list
+    {
+        $$ = new Decaf::IrCaseStatement(@1.first_line, @1.first_column, d_scanner.filename());
+        $$->addStatements(*$3); 
+    }
+    ;
+
 statement_list 
     : statement 
     { 
@@ -313,6 +342,12 @@ statement
     {
         $$ = new Decaf::IrDoWhileStatement(@1.first_line, @1.first_column, d_scanner.filename(), $5, $2); 
     }
+    | SWITCH LPAREN expr RPAREN LBRACE case_list RBRACE
+    {
+        Decaf::IrSwitchStatement* stmt = new Decaf::IrSwitchStatement(@1.first_line, @1.first_column, d_scanner.filename(), $3);
+        stmt->addStatements(*$6); 
+        $$ = stmt;
+    }
     | RETURN SEMI 
     { 
         $$ = new Decaf::IrReturnStatement(@1.first_line, @1.first_column, d_scanner.filename()); 
@@ -338,9 +373,9 @@ statement
         $$ = new Decaf::IrGotoStatement(@1.first_line, @1.first_column, d_scanner.filename(), $2);
     }
     | ident COLON
-	{
-		$$ = new Decaf::IrLabelStatement(@1.first_line, @1.first_column, d_scanner.filename(), $1);
-	}
+    {
+        $$ = new Decaf::IrLabelStatement(@1.first_line, @1.first_column, d_scanner.filename(), $1);
+    }
     | block 
     { 
         $$ = $1; 
@@ -502,11 +537,18 @@ logic_op
     : LAND { $$ = (int)Decaf::IrBooleanOperator::LogicalAnd; }
     | LOR { $$ = (int)Decaf::IrBooleanOperator::LogicalOr; }
     ;
-    
-literal 
+   
+int_literal
     : INTEGER 
     { 
         $$ = new Decaf::IrIntegerLiteral(@1.first_line, @1.first_column, d_scanner.filename(), d_scanner.matched()); 
+    }
+    ;
+
+literal 
+    : int_literal
+    {
+        $$ = $1;
     }
     | BOOLEAN 
     { 

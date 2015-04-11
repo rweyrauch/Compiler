@@ -21,57 +21,71 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#include "IrOptimizer.h"
-#include "IrBasicBlock.h"
+#include <iostream>
+#include "IrCommon.h"
+#include "IrCaseStmt.h"
+#include "IrTravCtx.h"
 
 namespace Decaf
 {
 
-void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
+ IrCaseStatement::~IrCaseStatement()
 {
-    m_blocks = std::shared_ptr<IrBasicBlock>(new IrBasicBlock(nullptr));
-    
-    auto curBlock = m_blocks;
-    
-    for (auto it : statements)
+}
+
+void IrCaseStatement::propagateTypes(IrTraversalContext* ctx)
+{
+    ctx->pushParent(this);
+
+    for (auto it : m_statements)
     {
-        curBlock->append(it);
-        
-        if (isLeader(it))
-        {
-            auto newBlock = std::shared_ptr<IrBasicBlock>(new IrBasicBlock(m_blocks.get()));
-            m_blocks->addChild(newBlock);
-            curBlock = newBlock;
-        }
+        it->propagateTypes(ctx);
     }
     
-    print();
+    ctx->popParent();
 }
 
-void IrOptimizer::globalCommonSubexpressionElimination()
+void IrCaseStatement::print(unsigned int depth) 
 {
-}
-
-bool IrOptimizer::isLeader(const IrTacStmt& stmt)
-{
-    switch (stmt.m_opcode)
+    IRPRINT_INDENT(depth);
+    std::cout << "Case(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
+    
+    for (auto it : m_statements)
     {
-        case IrOpcode::CALL:
-        case IrOpcode::RETURN:
-        case IrOpcode::LABEL:
-        case IrOpcode::JUMP:
-        case IrOpcode::IFZ:
-        case IrOpcode::IFNZ:
-            return true;
-        default:
-            break;
+        it->print(depth+1);
     }
-    return false;
 }
-
-void IrOptimizer::print()
+    
+bool IrCaseStatement::analyze(IrTraversalContext* ctx)
 {
-    if (m_blocks) m_blocks->print();
+    bool valid = true;
+    
+    ctx->pushParent(this);
+    
+    for (auto it : m_statements)
+    {
+        if (!it->analyze(ctx))
+            valid = false;
+    }   
+    
+    ctx->popParent();
+    
+    return valid;
 }
-
+    
+bool IrCaseStatement::codegen(IrTraversalContext* ctx) 
+{
+    bool valid = true;
+    ctx->pushParent(this);
+    
+    for (auto it : m_statements)
+    {
+        if (!it->codegen(ctx)) valid = false;
+    }
+    
+    ctx->popParent();
+    
+    return valid; 
+}
+    
 } // namespace Decaf

@@ -45,7 +45,7 @@ public:
 
     const std::vector<IrTacStmt>& getOptimizedStatements() const { return m_statements; }
     
-    bool isHead(const IrTacStmt& stmt);
+    bool isLeader(const IrTacStmt& stmt);
 
     void print();
     

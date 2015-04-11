@@ -10,6 +10,7 @@ add_library(
     IrBlock.cpp
     IrBooleanExpr.cpp
     IrBreakStmt.cpp
+    IrCaseStmt.cpp
     IrClass.cpp
     IrCommon.cpp
     IrContinueStmt.cpp
@@ -29,6 +30,7 @@ add_library(
     IrProgram.cpp
     IrReturnStmt.cpp
     IrStringLiteral.cpp
+    IrSwitchStmt.cpp
     IrSymbolTable.cpp
     IrTAC.cpp
     IrTravCtx.cpp

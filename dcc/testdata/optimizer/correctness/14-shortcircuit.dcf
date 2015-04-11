@@ -28,7 +28,7 @@ class Program
     int result;
     boolean a;
     int x;
-
+    int i;
 
     callout("printf","hello world from main\n");
 

@@ -21,57 +21,52 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#include "IrOptimizer.h"
-#include "IrBasicBlock.h"
+#pragma once
+#include <memory>
+#include "IrCommon.h"
+#include "IrStatement.h"
+#include "IrCaseStmt.h"
+#include "IrExpression.h"
 
 namespace Decaf
 {
 
-void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
+class IrSwitchStatement : public IrStatement
 {
-    m_blocks = std::shared_ptr<IrBasicBlock>(new IrBasicBlock(nullptr));
+public:
+    IrSwitchStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpression* expr) :
+        IrStatement(lineNumber, columnNumber, filename),
+        m_expression(expr)
+    {}
     
-    auto curBlock = m_blocks;
+    virtual ~IrSwitchStatement()
+    {}
     
-    for (auto it : statements)
+    virtual void propagateTypes(IrTraversalContext* ctx); 
+    virtual void print(unsigned int depth); 
+    virtual bool analyze(IrTraversalContext* ctx);
+    virtual bool codegen(IrTraversalContext* ctx);
+  
+    void addStatement(IrCaseStatement* stmt)
     {
-        curBlock->append(it);
-        
-        if (isLeader(it))
+        m_statements.push_back(std::shared_ptr<IrCaseStatement>(stmt));
+    }
+    void addStatements(const std::vector<IrCaseStatement*>& statements)
+    {
+        for (auto it : statements)
         {
-            auto newBlock = std::shared_ptr<IrBasicBlock>(new IrBasicBlock(m_blocks.get()));
-            m_blocks->addChild(newBlock);
-            curBlock = newBlock;
+            addStatement(it);
         }
     }
+   
+ protected:    
     
-    print();
-}
-
-void IrOptimizer::globalCommonSubexpressionElimination()
-{
-}
-
-bool IrOptimizer::isLeader(const IrTacStmt& stmt)
-{
-    switch (stmt.m_opcode)
-    {
-        case IrOpcode::CALL:
-        case IrOpcode::RETURN:
-        case IrOpcode::LABEL:
-        case IrOpcode::JUMP:
-        case IrOpcode::IFZ:
-        case IrOpcode::IFNZ:
-            return true;
-        default:
-            break;
-    }
-    return false;
-}
-
-void IrOptimizer::print()
-{
-    if (m_blocks) m_blocks->print();
-}
+    std::shared_ptr<IrExpression> m_expression;
+    std::vector<std::shared_ptr<IrCaseStatement>> m_statements;
+    
+private:
+    IrSwitchStatement() = delete;
+    IrSwitchStatement(const IrSwitchStatement& rhs) = delete;
+};
 
 } // namespace Decaf

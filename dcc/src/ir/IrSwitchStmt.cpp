@@ -21,57 +21,58 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#include "IrOptimizer.h"
-#include "IrBasicBlock.h"
+#include <iostream>
+#include "IrCommon.h"
+#include "IrSwitchStmt.h"
+#include "IrTravCtx.h"
 
 namespace Decaf
 {
 
-void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
+void IrSwitchStatement::propagateTypes(IrTraversalContext* ctx)
 {
-    m_blocks = std::shared_ptr<IrBasicBlock>(new IrBasicBlock(nullptr));
+    ctx->pushParent(this);
+
+    if (m_expression) m_expression->propagateTypes(ctx);
     
-    auto curBlock = m_blocks;
+    ctx->popParent();    
+}
     
-    for (auto it : statements)
+void IrSwitchStatement::print(unsigned int depth) 
+{
+    IRPRINT_INDENT(depth);
+    std::cout << "Switch(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
+    if (m_expression) m_expression->print(depth+1);
+}
+
+bool IrSwitchStatement::analyze(IrTraversalContext* ctx)
+{
+    bool valid = true;
+    
+    ctx->pushParent(this);
+    
+    if (m_expression) 
     {
-        curBlock->append(it);
-        
-        if (isLeader(it))
-        {
-            auto newBlock = std::shared_ptr<IrBasicBlock>(new IrBasicBlock(m_blocks.get()));
-            m_blocks->addChild(newBlock);
-            curBlock = newBlock;
-        }
+        if (!m_expression->analyze(ctx))
+            valid = false;
     }
     
-    print();
+    ctx->popParent();
+    
+    return valid;
 }
 
-void IrOptimizer::globalCommonSubexpressionElimination()
+bool IrSwitchStatement::codegen(IrTraversalContext* ctx)
 {
-}
+    bool valid = true;
+    
+    ctx->pushParent(this);
 
-bool IrOptimizer::isLeader(const IrTacStmt& stmt)
-{
-    switch (stmt.m_opcode)
-    {
-        case IrOpcode::CALL:
-        case IrOpcode::RETURN:
-        case IrOpcode::LABEL:
-        case IrOpcode::JUMP:
-        case IrOpcode::IFZ:
-        case IrOpcode::IFNZ:
-            return true;
-        default:
-            break;
-    }
-    return false;
-}
-
-void IrOptimizer::print()
-{
-    if (m_blocks) m_blocks->print();
+    if (m_expression) valid = m_expression->codegen(ctx);
+    
+    ctx->popParent();  
+    
+    return valid;
 }
 
 } // namespace Decaf
