@@ -21,19 +21,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+#include <iostream>
 #include "IrBasicBlock.h"
+#include "IrTAC.h"
 
 namespace Decaf
 {
-	
+
 bool IrBasicBlock::optimize()
 {
-	return false;
+    return false;
 }
-    	
+   
 bool IrBasicBlock::codegen(IrTraversalContext* ctx)
 {
-	return false;
+    return false;
+}
+
+void IrBasicBlock::print()
+{
+    std::cout << "----Begin----" << std::endl;
+    
+    for (auto it : m_statements)
+    {
+        IrPrintTac(it);
+    }
+    
+    std::cout << "----End----" << std::endl;
+    
+    for (auto it : m_children)
+    {
+        it->print();
+    }
 }
 
 } // namespace Decaf

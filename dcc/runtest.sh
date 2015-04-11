@@ -8,7 +8,6 @@ DCC=`pwd`/src/build/dcc
 echo $DCC
 
 TESTFILES=testdata/semantic/*.dcf
-
 for input in ${TESTFILES}
 do
     dcfinput=${input##*/}
@@ -19,6 +18,17 @@ popd
 echo "Running dcc codegen tests."
 
 TESTFILES=testdata/codegen/*.dcf
+for input in ${TESTFILES}
+do
+    dcfinput=${input##*/}
+    echo $dcfinput
+    ${DCC} -o out/$dcfinput.s $input
+    gcc out/$dcfinput.s -o out/$dcfinput.out 2> out/$dcfinput.log
+done
+
+echo "Running dcc dataflow tests."
+
+TESTFILES=testdata/dataflow/*.dcf
 for input in ${TESTFILES}
 do
     dcfinput=${input##*/}

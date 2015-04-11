@@ -40,10 +40,14 @@ public:
     virtual ~IrOptimizer() 
     {}
    
-	void generateBasicBlocks(const std::vector<IrTacStmt>& statements);
-	void globalCommonSubexpressionElimination();
-	
+    void generateBasicBlocks(const std::vector<IrTacStmt>& statements);
+    void globalCommonSubexpressionElimination();
+
     const std::vector<IrTacStmt>& getOptimizedStatements() const { return m_statements; }
+    
+    bool isHead(const IrTacStmt& stmt);
+
+    void print();
     
 protected:
    std::shared_ptr<IrBasicBlock> m_blocks;

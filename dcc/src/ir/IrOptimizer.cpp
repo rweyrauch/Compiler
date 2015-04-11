@@ -29,10 +29,48 @@ namespace Decaf
 
 void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
 {
+    m_blocks = std::shared_ptr<IrBasicBlock>(new IrBasicBlock(nullptr));
+    
+    auto curBlock = m_blocks;
+    
+    for (auto it : statements)
+    {
+        if (isHead(it))
+        {
+            auto newBlock = std::shared_ptr<IrBasicBlock>(new IrBasicBlock(m_blocks.get()));
+            m_blocks->addChild(newBlock);
+            curBlock = newBlock;
+        }
+        curBlock->append(it);
+    }
+    
+    print();
 }
 
 void IrOptimizer::globalCommonSubexpressionElimination()
 {
+}
+
+bool IrOptimizer::isHead(const IrTacStmt& stmt)
+{
+    switch (stmt.m_opcode)
+    {
+        case IrOpcode::CALL:
+        case IrOpcode::FBEGIN:
+        case IrOpcode::LABEL:
+        case IrOpcode::JUMP:
+        case IrOpcode::IFZ:
+        case IrOpcode::IFNZ:
+            return true;
+        default:
+            break;
+    }
+    return false;
+}
+
+void IrOptimizer::print()
+{
+    if (m_blocks) m_blocks->print();
 }
 
 } // namespace Decaf

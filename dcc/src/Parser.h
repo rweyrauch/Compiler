@@ -60,10 +60,7 @@ class Parser: public ParserBase
             d_optimizer = new IrOptimizer();
         }
         virtual ~Parser() 
-        {
-			delete d_ctx;
-			delete d_optimizer;
-		}
+        {}
         void enableOpt(Optimization which)
         {
             m_optimizations.push_back(which);
@@ -102,22 +99,22 @@ class Parser: public ParserBase
         }
         std::vector<IrTacStmt> optimize(const std::vector<IrTacStmt>& statements)
         {
-			std::vector<IrTacStmt> optimized_statements = statements;
-			d_optimizer->generateBasicBlocks(statements);
-			
-			std::sort(m_optimizations.begin(), m_optimizations.end());
-			std::unique(m_optimizations.begin(), m_optimizations.end());
-			
-			// apply requested optimizations in the required order
-			for (auto it : m_optimizations)
-			{
-				if (it == Optimization::GLOBAL_CSE)
-				{
-					d_optimizer->globalCommonSubexpressionElimination();
-				}
-			}
-			return d_optimizer->getOptimizedStatements();
-		}
+            std::vector<IrTacStmt> optimized_statements = statements;
+            d_optimizer->generateBasicBlocks(statements);
+            
+            std::sort(m_optimizations.begin(), m_optimizations.end());
+            std::unique(m_optimizations.begin(), m_optimizations.end());
+            
+            // apply requested optimizations in the required order
+            for (auto it : m_optimizations)
+            {
+                if (it == Optimization::GLOBAL_CSE)
+                {
+                    d_optimizer->globalCommonSubexpressionElimination();
+                }
+            }
+            return d_optimizer->getOptimizedStatements();
+        }
         
     private:
         void error(char const *msg);    // called on (syntax) errors

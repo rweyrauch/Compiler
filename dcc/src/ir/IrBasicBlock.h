@@ -34,9 +34,9 @@ class IrBasicBlock
 {
 public:
     IrBasicBlock(IrBasicBlock* parent) :
-		m_parent(parent),
-		m_children(),
-		m_statements()
+        m_parent(parent),
+        m_children(),
+        m_statements()
     {}
     
     virtual ~IrBasicBlock() 
@@ -44,16 +44,18 @@ public:
     
     void addChild(std::shared_ptr<IrBasicBlock> child)
     {
-		m_children.push_back(child);
-	}
+        m_children.push_back(child);
+    }
     void append(const IrTacStmt& tac)
     {
-		m_statements.push_back(tac);
-	}
+        m_statements.push_back(tac);
+    }
     
     bool optimize();
     
     bool codegen(IrTraversalContext* ctx);
+    
+    void print();
     
 protected:
      
