@@ -11,6 +11,7 @@ TESTFILES=testdata/semantic/*.dcf
 for input in ${TESTFILES}
 do
     dcfinput=${input##*/}
+    echo $dcfinput
     ${DCC} -o out/$dcfinput.s $input 2> out/$dcfinput.log
 done
 popd

@@ -35,28 +35,42 @@
 namespace Decaf
 {
 
-enum class IrRegName : int
+enum class IrReg : int
 {
-    rTemp,
-    rRet,
-    rRetWord,
-    rOutput,
-    rOutputWord,
+    Temp,
+    Ret,
+    RetWord,
+    Output,
+    OutputWord,
     
-    rParam1,
-    rParam2,
-    rParam3,
-    rParam4,
-    rParam5,
-    rParam6,
+    DoubleTemp,
+    DoubleRet,
     
-    rBase,
-    rIndex,
+    // General parameters (non double/float)
+    Param1,
+    Param2,
+    Param3,
+    Param4,
+    Param5,
+    Param6,
+    
+    // Floating-point parameters
+    DoubleParam1,
+    DoubleParam2,
+    DoubleParam3,
+    DoubleParam4,
+    DoubleParam5,
+    DoubleParam6,
+    DoubleParam7,
+    DoubleParam8,
+    
+    Base,
+    Index,
     
     NUM
 };
 
-const std::string g_registerNames[(int)IrRegName::NUM] =
+const std::string g_registerNames[(int)IrReg::NUM] =
 {
     // temp registers
     "%r10",
@@ -64,6 +78,9 @@ const std::string g_registerNames[(int)IrRegName::NUM] =
     "%al",
     "%rdx",
     "%dl",
+    
+    "%xmm7",
+    "%xmm0",
     
     // parameter registers
     "%rdi",
@@ -73,12 +90,22 @@ const std::string g_registerNames[(int)IrRegName::NUM] =
     "%r8",
     "%r9",
     
+    // double parameter registers
+    "%xmm0",
+    "%xmm1",
+    "%xmm2",
+    "%xmm3",
+    "%xmm4",
+    "%xmm5",
+    "%xmm6",
+    "%xmm7",
+    
     // addressing register
     "%rbx",
     "%rsi"
 };
 
-const std::string g_registerNames_ia32[(int)IrRegName::NUM] =
+const std::string g_registerNames_ia32[(int)IrReg::NUM] =
 {
     // temp registers
     "%eax",
@@ -86,6 +113,9 @@ const std::string g_registerNames_ia32[(int)IrRegName::NUM] =
     "%edx",
     "%dl",
     "%ebx",
+    
+    "%xmm7",
+    "%xmm0",
     
     // parameter registers
     "---",
@@ -95,6 +125,16 @@ const std::string g_registerNames_ia32[(int)IrRegName::NUM] =
     "---",
     "---"    
 
+    // double parameter registers
+    "---",
+    "---",
+    "---",
+    "---",
+    "---",
+    "---"    
+    "---",
+    "---"    
+    
     // addressing register
     "%ebx",
     "%esi"    
@@ -103,20 +143,23 @@ const std::string g_registerNames_ia32[(int)IrRegName::NUM] =
 class IrRegister : public IrBase
 {
 public:
-    IrRegister(IrRegName which) :
+    IrRegister(IrReg which, bool isDouble = false) :
         IrBase(0, 0, __FILE__),
-        m_which(which) {}
+        m_which(which),
+        m_isDouble(isDouble) {}
     virtual ~IrRegister() {}
     
     virtual void print(unsigned int depth) {} 
     
-    IrRegName name() const { return m_which; }
+    IrReg name() const { return m_which; }
+    bool isDouble() const { return m_isDouble; }
     
 protected:
-    IrRegName m_which;
+    IrReg m_which;
+    bool m_isDouble;
 };
 
-const std::shared_ptr<IrRegister> g_indexRegister = std::make_shared<IrRegister>(IrRegName::rIndex);
+const std::shared_ptr<IrRegister> g_indexRegister = std::make_shared<IrRegister>(IrReg::Index);
 
     
 const std::string gIrOpcodeStrings[(int)IrOpcode::NUM_OPCODES] =
@@ -291,22 +334,40 @@ void IrOutputLabel(const std::shared_ptr<IrBase> arg, std::ostream& stream)
     }
 }
 
-const std::shared_ptr<IrRegister> g_tempReg = std::make_shared<IrRegister>(IrRegName::rTemp);
-const std::shared_ptr<IrRegister> g_retReg = std::make_shared<IrRegister>(IrRegName::rRet);
-const std::shared_ptr<IrRegister> g_retRegWord = std::make_shared<IrRegister>(IrRegName::rRetWord);
-const std::shared_ptr<IrRegister> g_outReg = std::make_shared<IrRegister>(IrRegName::rOutput);
-const std::shared_ptr<IrRegister> g_outRegWord = std::make_shared<IrRegister>(IrRegName::rOutputWord);
+const std::shared_ptr<IrRegister> g_tempReg = std::make_shared<IrRegister>(IrReg::Temp);
+const std::shared_ptr<IrRegister> g_retReg = std::make_shared<IrRegister>(IrReg::Ret);
+const std::shared_ptr<IrRegister> g_retRegWord = std::make_shared<IrRegister>(IrReg::RetWord);
+const std::shared_ptr<IrRegister> g_outReg = std::make_shared<IrRegister>(IrReg::Output);
+const std::shared_ptr<IrRegister> g_outRegWord = std::make_shared<IrRegister>(IrReg::OutputWord);
+
+const std::shared_ptr<IrRegister> g_tempDoubleReg = std::make_shared<IrRegister>(IrReg::DoubleTemp, true);
+const std::shared_ptr<IrRegister> g_retDoubleReg = std::make_shared<IrRegister>(IrReg::DoubleRet, true);
 
 const int NUM_ARG_REGS = 6;
 const std::shared_ptr<IrRegister> g_paramRegisters[NUM_ARG_REGS] =
 {
-    std::make_shared<IrRegister>(IrRegName::rParam1),
-    std::make_shared<IrRegister>(IrRegName::rParam2),
-    std::make_shared<IrRegister>(IrRegName::rParam3),
-    std::make_shared<IrRegister>(IrRegName::rParam4),
-    std::make_shared<IrRegister>(IrRegName::rParam5),
-    std::make_shared<IrRegister>(IrRegName::rParam6)
+    std::make_shared<IrRegister>(IrReg::Param1),
+    std::make_shared<IrRegister>(IrReg::Param2),
+    std::make_shared<IrRegister>(IrReg::Param3),
+    std::make_shared<IrRegister>(IrReg::Param4),
+    std::make_shared<IrRegister>(IrReg::Param5),
+    std::make_shared<IrRegister>(IrReg::Param6)
 };
+static int g_nextParamRegister = 0;
+
+const int NUM_DOUBLE_ARG_REGS = 8;
+const std::shared_ptr<IrRegister> g_paramDoubleRegisters[NUM_DOUBLE_ARG_REGS] =
+{
+    std::make_shared<IrRegister>(IrReg::DoubleParam1, true),
+    std::make_shared<IrRegister>(IrReg::DoubleParam2, true),
+    std::make_shared<IrRegister>(IrReg::DoubleParam3, true),
+    std::make_shared<IrRegister>(IrReg::DoubleParam4, true),
+    std::make_shared<IrRegister>(IrReg::DoubleParam5, true),
+    std::make_shared<IrRegister>(IrReg::DoubleParam6, true),
+    std::make_shared<IrRegister>(IrReg::DoubleParam7, true),
+    std::make_shared<IrRegister>(IrReg::DoubleParam8, true)
+};
+static int g_nextDoubleParamRegister = 0;
 
 bool IrIsRegister(const std::shared_ptr<IrBase> value)
 {
@@ -318,6 +379,29 @@ bool IrIsMemory(const std::shared_ptr<IrBase> value)
 {
     const IrIdentifier* ident = dynamic_cast<const IrIdentifier*>(value.get());
     return (ident != nullptr);
+}
+
+bool IrIsDouble(const std::shared_ptr<IrBase> value)
+{
+    const IrIdentifier* ident = dynamic_cast<const IrIdentifier*>(value.get());   
+    const IrRegister* reg = dynamic_cast<const IrRegister*>(value.get());
+    const IrDoubleLiteral* literal = dynamic_cast<const IrDoubleLiteral*>(value.get());
+    
+    bool isDouble = false;
+    
+    if (ident != nullptr)
+    {
+        isDouble = (ident->getType() == IrType::Double);
+    }
+    else if (reg != nullptr)
+    {
+        isDouble = reg->isDouble();
+    }
+    else
+    {
+        isDouble = (literal != nullptr);
+    }
+    return isDouble;
 }
 
 void IrGenMov(const std::shared_ptr<IrBase> src, const std::shared_ptr<IrBase> dst, std::ostream& stream)

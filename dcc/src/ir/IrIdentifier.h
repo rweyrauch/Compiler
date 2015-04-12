@@ -42,7 +42,8 @@ public:
         m_identifier(ident),
         m_addr(0),
         m_isLabel(isLabel),
-        m_isGlobal(false)
+        m_isGlobal(false),
+        m_type(IrType::Unknown)
     {}
     
     virtual ~IrIdentifier()
@@ -55,6 +56,7 @@ public:
     ptrdiff_t getAddress() const { return m_addr; }
     bool isLabel() const { return m_isLabel; }
     bool isGlobal() const { return m_isGlobal; }
+    IrType getType() const { return m_type; }
     
 protected:
     
@@ -62,6 +64,7 @@ protected:
     ptrdiff_t m_addr;
     bool m_isLabel;
     bool m_isGlobal;
+    IrType m_type;
     
     static int s_tempCounter;
     

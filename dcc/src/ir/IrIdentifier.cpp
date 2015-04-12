@@ -63,6 +63,7 @@ bool IrIdentifier::codegen(IrTraversalContext* ctx)
     {
         m_isGlobal = (symbol.m_where == IrMemLocation::Global);
         m_addr = symbol.m_addr;
+        m_type = symbol.m_type;
         
         ok = true;
     }

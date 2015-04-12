@@ -95,11 +95,13 @@ int main(int argc, char **argv)
         if (g_opt_all) parser->enableOpt(Optimization::ALL);
         
         parser->parse();        
-        parser->semanticChecks();
-        if (g_debug)
-            parser->dumpAST();
-        parser->codegen();
-         
+        if (parser->semanticChecks())
+        {
+            if (g_debug)
+                parser->dumpAST();
+            parser->codegen();
+        }
+        
         delete parser;
     }
     return 0;
