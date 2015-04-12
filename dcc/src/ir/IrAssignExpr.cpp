@@ -140,15 +140,15 @@ bool IrAssignExpression::analyze(IrTraversalContext* ctx)
         }
         else 
         {
-            // Rule: both side of increment/decrement assignment must be integer.
-            if (m_lhs->getType() != IrType::Integer)
+            // Rule: both side of increment/decrement assignment must be integer or double.
+            if (!IsNumeric(m_lhs->getType()))
             {
-                ctx->error(this, "lhs of increment/decrement assigment operator must be of type integer.");
+                ctx->error(this, "lhs of increment/decrement assigment operator must be of type integer or double.");
                 valid = false;
             }
-            if (m_rhs->getType() != IrType::Integer)
+            if (!IsNumeric(m_rhs->getType()))
             {
-                ctx->error(this, "rhs of increment/decrement assigment operator must be of type integer.");              
+                ctx->error(this, "rhs of increment/decrement assigment operator must be of type integer or double.");              
                 valid = false;
             }
             if (m_lhs->isArray())

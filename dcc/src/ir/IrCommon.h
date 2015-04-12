@@ -44,7 +44,9 @@ enum class IrType : int
     
     NUM_IR_TYPES
 };
-    
+bool IsNumeric(IrType type);
+bool IsComparable(IrType type);
+
 enum class IrBinaryOperator : int
 {
     Add = 0,

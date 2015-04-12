@@ -107,9 +107,9 @@ bool IrBinaryExpression::analyze(IrTraversalContext* ctx)
     
     if (m_lhs)
     {
-        if (m_lhs->getType() != IrType::Integer)
+        if (!IsNumeric(m_lhs->getType()))
         {
-            ctx->error(this, "lhs of binary expression must be of type integer.");           
+            ctx->error(this, "lhs of binary expression must be of type integer or double.");           
             valid = false;
         }
         if (m_lhs->isArray())
@@ -121,9 +121,9 @@ bool IrBinaryExpression::analyze(IrTraversalContext* ctx)
     
     if (m_rhs)
     {
-        if (m_rhs->getType() != IrType::Integer)
+        if (!IsNumeric(m_rhs->getType()))
         {
-            ctx->error(this, "rhs of binary expression must be of type integer.");          
+            ctx->error(this, "rhs of binary expression must be of type integer or double.");          
             valid = false;
         }
         if (m_rhs->isArray())

@@ -27,6 +27,7 @@
 #include "IrBase.h"
 #include "IrIdentifier.h"
 #include "IrIntLiteral.h"
+#include "IrDoubleLiteral.h"
 #include "IrBoolLiteral.h"
 #include "IrStringLiteral.h"
 #include "IrExpression.h"
@@ -163,6 +164,7 @@ void IrPrintTacArg(const std::shared_ptr<IrBase> arg, std::ostream& stream)
     
     const IrIdentifier* ident = dynamic_cast<const IrIdentifier*>(arg.get());
     const IrIntegerLiteral* iliteral = dynamic_cast<const IrIntegerLiteral*>(arg.get());
+    const IrDoubleLiteral* dliteral = dynamic_cast<const IrDoubleLiteral*>(arg.get());
     const IrBooleanLiteral* bliteral = dynamic_cast<const IrBooleanLiteral*>(arg.get());
     const IrStringLiteral* sliteral = dynamic_cast<const IrStringLiteral*>(arg.get());
     
@@ -173,6 +175,10 @@ void IrPrintTacArg(const std::shared_ptr<IrBase> arg, std::ostream& stream)
     else if (iliteral != nullptr)
     {
         stream << "$" << iliteral->getValue();
+    }
+    else if (dliteral != nullptr)
+    {
+        stream << "$" << dliteral->getValue();
     }
     else if (bliteral != nullptr)
     {
@@ -233,7 +239,8 @@ void IrOutputArg(const std::shared_ptr<IrBase> arg, std::ostream& stream)
     if (arg == nullptr) return;
     
     const IrIdentifier* ident = dynamic_cast<const IrIdentifier*>(arg.get());
-    const IrIntegerLiteral* iliteral = dynamic_cast<const IrIntegerLiteral*>(arg.get());
+    const IrIntegerLiteral* iliteral = dynamic_cast<const IrIntegerLiteral*>(arg.get());    
+    const IrDoubleLiteral* dliteral = dynamic_cast<const IrDoubleLiteral*>(arg.get());
     const IrBooleanLiteral* bliteral = dynamic_cast<const IrBooleanLiteral*>(arg.get());
     const IrRegister* reg = dynamic_cast<const IrRegister*>(arg.get());
 
@@ -249,6 +256,10 @@ void IrOutputArg(const std::shared_ptr<IrBase> arg, std::ostream& stream)
     else if (iliteral != nullptr)
     {
         stream << "$" << iliteral->getValue();
+    }
+    else if (dliteral != nullptr)
+    {
+        stream << "$" << dliteral->getValue();
     }
     else if (bliteral != nullptr)
     {

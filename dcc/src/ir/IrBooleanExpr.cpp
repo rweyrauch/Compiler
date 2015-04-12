@@ -178,13 +178,13 @@ bool IrBooleanExpression::analyze(IrTraversalContext* ctx)
     }
     else
     {
-        // Rule: both sides of the comparison must be of type integer or boolean
+        // Rule: both sides of the comparison must be of type integer, double or boolean
         if (m_lhs)
         {
             
-            if (m_lhs->getType() != IrType::Integer && m_lhs->getType() != IrType::Boolean)
+            if (!IsComparable(m_lhs->getType()))
             {
-                ctx->error(this, "lhs of boolean expression must be of type integer or boolean.");
+                ctx->error(this, "lhs of boolean expression must be of type integer, double or boolean.");
                 valid = false;
             }
             if (m_lhs->isArray())
@@ -196,9 +196,9 @@ bool IrBooleanExpression::analyze(IrTraversalContext* ctx)
         
         if (m_rhs)
         {
-            if (m_rhs->getType() != IrType::Integer && m_rhs->getType() != IrType::Boolean)
+            if (!IsComparable(m_rhs->getType()))
             {
-                ctx->error(this, "rhs of boolean expression must be of type integer or boolean.");
+                ctx->error(this, "rhs of boolean expression must be of type integer, double or boolean.");
                 valid = false;
             }
             if (m_rhs->isArray())

@@ -39,6 +39,16 @@ const std::string gIrTypeStrings[(int)IrType::NUM_IR_TYPES] =
 };
 static_assert(sizeof(gIrTypeStrings)/sizeof(std::string) == (size_t)IrType::NUM_IR_TYPES, "Unexpected number of IrType strings.");
 
+bool IsNumeric(IrType type)
+{
+    return (type == IrType::Integer || type == IrType::Double);
+}
+
+bool IsComparable(IrType type)
+{
+    return (type == IrType::Integer || type == IrType::Double || type == IrType::Boolean);
+}
+
 const std::string gIrBinaryOperatorStrings[(int)IrBinaryOperator::NUM_IR_BINARY_OPERATORS] =
 {
     std::string("Add"),
