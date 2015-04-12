@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include <iostream>
 #include <vector>
 #include <memory>
 #include "IrTAC.h"
@@ -33,19 +34,13 @@ class IrTraversalContext;
 class IrBasicBlock
 {
 public:
-    IrBasicBlock(IrBasicBlock* parent) :
-        m_parent(parent),
-        m_children(),
+    IrBasicBlock() :
         m_statements()
     {}
     
     virtual ~IrBasicBlock() 
     {}
     
-    void addChild(std::shared_ptr<IrBasicBlock> child)
-    {
-        m_children.push_back(child);
-    }
     void append(const IrTacStmt& tac)
     {
         m_statements.push_back(tac);
@@ -55,17 +50,13 @@ public:
     
     bool codegen(IrTraversalContext* ctx);
     
-    void print();
+    void print(std::ostream& stream);
     
 protected:
-     
-    IrBasicBlock* m_parent;
-    std::vector<std::shared_ptr<IrBasicBlock>> m_children;
      
     std::vector<IrTacStmt> m_statements;
     
 private:
-    IrBasicBlock() = delete;
     IrBasicBlock(const IrBasicBlock& rhs) = delete;
 };
 

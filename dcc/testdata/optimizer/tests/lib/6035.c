@@ -75,7 +75,7 @@ void end_caliper() {
   
   timeval_subtract(diff_6035, t2_6035, t1_6035);
   
-  printf("Timer: %d usecs\n", ((1000000 * diff_6035->tv_sec) + diff_6035->tv_usec));
+  printf("Timer: %ld usecs\n", ((1000000 * diff_6035->tv_sec) + diff_6035->tv_usec));
 }
 
 void pgm_open_for_read(char* name)

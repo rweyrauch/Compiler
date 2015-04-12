@@ -21,7 +21,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#include <iostream>
 #include "IrBasicBlock.h"
 #include "IrTAC.h"
 
@@ -38,23 +37,18 @@ bool IrBasicBlock::codegen(IrTraversalContext* ctx)
     return false;
 }
 
-void IrBasicBlock::print()
+void IrBasicBlock::print(std::ostream& stream)
 {
     if (!m_statements.empty())
     {
-        std::cout << "----Begin----" << std::endl;
+        stream << "----Begin----" << std::endl;
         
         for (auto it : m_statements)
         {
-            IrPrintTac(it);
+            IrPrintTac(it, stream);
         }
         
-        std::cout << "----End----" << std::endl;
-    }
-    
-    for (auto it : m_children)
-    {
-        it->print();
+        stream << "----End----" << std::endl;
     }
 }
 

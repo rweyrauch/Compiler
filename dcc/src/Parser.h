@@ -34,6 +34,8 @@ class Parser: public ParserBase
     std::string d_blank;
     
     std::vector<Optimization> m_optimizations;
+    bool m_enableIrOutput;
+    bool m_enableBasicBlocksOutput;
     
     public:
         
@@ -41,7 +43,9 @@ class Parser: public ParserBase
             d_scanner(in, out),
             d_root(nullptr),
             d_ctx(nullptr),
-            d_optimizer(nullptr)
+            d_optimizer(nullptr),
+            m_enableIrOutput(false),
+            m_enableBasicBlocksOutput(false)
         {
             d_scanner.setSLoc(&d_loc__);
             d_ctx = new IrTraversalContext(ia64);
@@ -51,7 +55,9 @@ class Parser: public ParserBase
             d_scanner(infile, outfile),
             d_root(nullptr),
             d_ctx(nullptr),
-            d_optimizer(nullptr)
+            d_optimizer(nullptr),
+            m_enableIrOutput(false),
+            m_enableBasicBlocksOutput(false)
        {
             preloadSource(infile);            
             d_scanner.setSLoc(&d_loc__);            
@@ -65,6 +71,14 @@ class Parser: public ParserBase
         {
             m_optimizations.push_back(which);
         }
+        void enableIrOutput()
+        {
+            m_enableIrOutput = true;
+        }
+        void enableBasicBlocksOutput()
+        {
+            m_enableBasicBlocksOutput = true;
+        }
         int parse();
         bool codegen()
         {
@@ -74,6 +88,14 @@ class Parser: public ParserBase
                 
                 // convert generated TAC into basic blocks and optimize
                 std::vector<IrTacStmt> statements = optimize(d_ctx->getStatements());
+                
+                if (m_enableIrOutput)
+                {
+                    for (auto it : statements)
+                    {
+                        IrPrintTac(it);
+                    }
+                }
                 
                 // write string table
                 d_ctx->genStrings();
@@ -101,6 +123,8 @@ class Parser: public ParserBase
         {
             std::vector<IrTacStmt> optimized_statements = statements;
             d_optimizer->generateBasicBlocks(statements);
+            
+            if (m_enableBasicBlocksOutput) d_optimizer->print();
             
             std::sort(m_optimizations.begin(), m_optimizations.end());
             std::unique(m_optimizations.begin(), m_optimizations.end());

@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include <iostream>
 #include <vector>
 #include <memory>
 #include "IrTAC.h"
@@ -47,10 +48,11 @@ public:
     
     bool isLeader(const IrTacStmt& stmt);
 
-    void print();
+    void print(std::ostream& stream = std::cout);
     
 protected:
-   std::shared_ptr<IrBasicBlock> m_blocks;
+    
+   std::vector<std::shared_ptr<IrBasicBlock>> m_blocks;
    std::vector<IrTacStmt> m_statements;
    
 private:

@@ -29,23 +29,24 @@ namespace Decaf
 
 void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
 {
-    m_blocks = std::shared_ptr<IrBasicBlock>(new IrBasicBlock(nullptr));
+    m_statements = statements;
     
-    auto curBlock = m_blocks;
+    m_blocks.clear();
+    
+    auto curBlock = std::shared_ptr<IrBasicBlock>(new IrBasicBlock());;
+    m_blocks.push_back(curBlock);
     
     for (auto it : statements)
     {
         curBlock->append(it);
         
+        // start a new block when a leader statement is found
         if (isLeader(it))
         {
-            auto newBlock = std::shared_ptr<IrBasicBlock>(new IrBasicBlock(m_blocks.get()));
-            m_blocks->addChild(newBlock);
-            curBlock = newBlock;
+            curBlock = std::shared_ptr<IrBasicBlock>(new IrBasicBlock());
+            m_blocks.push_back(curBlock);
         }
     }
-    
-    print();
 }
 
 void IrOptimizer::globalCommonSubexpressionElimination()
@@ -69,9 +70,12 @@ bool IrOptimizer::isLeader(const IrTacStmt& stmt)
     return false;
 }
 
-void IrOptimizer::print()
+void IrOptimizer::print(std::ostream& stream)
 {
-    if (m_blocks) m_blocks->print();
+    for (auto it : m_blocks)
+    {
+        it->print(stream);
+    }
 }
 
 } // namespace Decaf

@@ -157,7 +157,7 @@ const std::string& IrOpcodeToString(IrOpcode opcode)
     return gIrOpcodeStrings[(int)opcode];
 }
 
-void IrPrintTacArg(const std::shared_ptr<IrBase> arg)
+void IrPrintTacArg(const std::shared_ptr<IrBase> arg, std::ostream& stream)
 {
     if (arg == nullptr) return;
     
@@ -168,23 +168,23 @@ void IrPrintTacArg(const std::shared_ptr<IrBase> arg)
     
     if (ident != nullptr)
     {
-        std::cout << "$" << ident->getIdentifier();
+        stream << "$" << ident->getIdentifier();
     }
     else if (iliteral != nullptr)
     {
-        std::cout << "$" << iliteral->getValue();
+        stream << "$" << iliteral->getValue();
     }
     else if (bliteral != nullptr)
     {
-        std::cout << (bliteral->getValue() ? "$1" : "$0");
+        stream << (bliteral->getValue() ? "$1" : "$0");
     }
     else if (sliteral != nullptr)
     {
-        std::cout << sliteral->getValue();
+        stream << sliteral->getValue();
     }
 }
 
-void IrPrintTacLabel(const std::shared_ptr<IrBase> label)
+void IrPrintTacLabel(const std::shared_ptr<IrBase> label, std::ostream& stream)
 {
     if (label == nullptr) return;
     
@@ -192,38 +192,38 @@ void IrPrintTacLabel(const std::shared_ptr<IrBase> label)
     
     if (ident != nullptr)
     {
-        std::cout << ident->getIdentifier();
+        stream << ident->getIdentifier();
     }
 }
 
-void IrPrintTac(const IrTacStmt& stmt)
+void IrPrintTac(const IrTacStmt& stmt, std::ostream& stream)
 {
-    std::cout << IrOpcodeToString(stmt.m_opcode) << " ";
+    stream << IrOpcodeToString(stmt.m_opcode) << " ";
     
     if (stmt.m_opcode != IrOpcode::LABEL)
     {
         if (stmt.m_arg0)
         {
-            IrPrintTacArg(stmt.m_arg0);
+            IrPrintTacArg(stmt.m_arg0, stream);
         }
         if (stmt.m_arg1)
         {
-            if (stmt.m_arg0) std::cout << ", ";
+            if (stmt.m_arg0) stream << ", ";
             
-            IrPrintTacArg(stmt.m_arg1);
+            IrPrintTacArg(stmt.m_arg1, stream);
         }
         if (stmt.m_arg2)
         {
-            std::cout << ", ";
-            IrPrintTacArg(stmt.m_arg2);
+            stream << ", ";
+            IrPrintTacArg(stmt.m_arg2, stream);
         }
     }
     else
     {
-        IrPrintTacLabel(stmt.m_arg0); std::cout << " ";
+        IrPrintTacLabel(stmt.m_arg0, stream); stream << " ";
     }
     
-    std::cout << "\t// " << stmt.m_info << std::endl;
+    stream << "\t// " << stmt.m_info << std::endl;
 }
 
 static bool g_ia64 = true;

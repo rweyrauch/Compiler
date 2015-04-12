@@ -83,7 +83,7 @@ struct IrTacStmt
     int m_info;
 };
 
-void IrPrintTac(const IrTacStmt& stmt);
+void IrPrintTac(const IrTacStmt& stmt, std::ostream& stream = std::cout);
 
 void IrGenIA32();
 
