@@ -46,14 +46,17 @@ public:
 
     const std::vector<IrTacStmt>& getOptimizedStatements() const { return m_statements; }
     
-    bool isLeader(const IrTacStmt& stmt);
-
     void print(std::ostream& stream = std::cout);
     
 protected:
+
+    bool isLeader(const IrTacStmt& stmt);
+    bool isLeaderPost(const IrTacStmt& stmt);
+
+protected:
     
-   std::vector<std::shared_ptr<IrBasicBlock>> m_blocks;
-   std::vector<IrTacStmt> m_statements;
+    std::vector<std::shared_ptr<IrBasicBlock>> m_blocks;
+    std::vector<IrTacStmt> m_statements;
    
 private:
     IrOptimizer(const IrOptimizer& rhs) = delete;

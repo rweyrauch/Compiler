@@ -27,7 +27,7 @@
 namespace Decaf
 {
 
-bool IrBasicBlock::optimize()
+bool IrBasicBlock::commonSubexpressionElimination()
 {
     return false;
 }

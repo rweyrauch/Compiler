@@ -46,7 +46,7 @@ public:
         m_statements.push_back(tac);
     }
     
-    bool optimize();
+    bool commonSubexpressionElimination();
     
     bool codegen(IrTraversalContext* ctx);
     

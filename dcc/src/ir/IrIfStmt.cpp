@@ -141,7 +141,7 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
             {
                 tac.m_arg0 = boolexpr->getLeftHandSide()->getResult();        
             }
-            tac.m_arg1 = m_labelFalse;
+            tac.m_arg1 = m_falseBlock ? m_labelFalse : m_labelEnd;
             tac.m_arg2 = nullptr;
     
             ctx->append(tac);
@@ -160,7 +160,7 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
             {
                 tac.m_arg0 = boolexpr->getRightHandSide()->getResult();        
             }
-            tac.m_arg1 = m_labelFalse;
+            tac.m_arg1 = m_falseBlock ? m_labelFalse : m_labelEnd;
             tac.m_arg2 = nullptr;
     
             ctx->append(tac);
@@ -174,7 +174,7 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
         
         tac.m_opcode = IrOpcode::IFZ;
         tac.m_arg0 = m_condition;        
-        tac.m_arg1 = m_labelFalse;
+        tac.m_arg1 = m_falseBlock ? m_labelFalse : m_labelEnd;
         tac.m_arg2 = nullptr;
     
         ctx->append(tac);
@@ -186,7 +186,7 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
         
         tac.m_opcode = IrOpcode::IFZ;
         tac.m_arg0 = std::shared_ptr<IrBase>(m_condition->getResult());        
-        tac.m_arg1 = m_labelFalse;
+        tac.m_arg1 = m_falseBlock ? m_labelFalse : m_labelEnd;
         tac.m_arg2 = nullptr;
     
         ctx->append(tac);
@@ -203,14 +203,14 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
         
         ctx->append(jump);
     }
-            
-    IrTacStmt label;
-    label.m_opcode = IrOpcode::LABEL;
-    label.m_arg0 = m_labelFalse;
-    ctx->append(label);
     
     if (m_falseBlock)
-    {              
+    {                          
+        IrTacStmt label;
+        label.m_opcode = IrOpcode::LABEL;
+        label.m_arg0 = m_labelFalse;
+        ctx->append(label);
+    
         if (!m_falseBlock->codegen(ctx))
             valid = false;
     }
@@ -218,7 +218,6 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
     IrTacStmt elabel;
     elabel.m_opcode = IrOpcode::LABEL;
     elabel.m_arg0 = m_labelEnd;
-    
     ctx->append(elabel);
 
     ctx->popParent();

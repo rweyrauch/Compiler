@@ -38,10 +38,17 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
     
     for (auto it : statements)
     {
+        // start a new block when a leader statement is found
+        if (isLeader(it))
+        {
+            curBlock = std::shared_ptr<IrBasicBlock>(new IrBasicBlock());
+            m_blocks.push_back(curBlock);
+        }
+        
         curBlock->append(it);
         
         // start a new block when a leader statement is found
-        if (isLeader(it))
+        if (isLeaderPost(it))
         {
             curBlock = std::shared_ptr<IrBasicBlock>(new IrBasicBlock());
             m_blocks.push_back(curBlock);
@@ -53,16 +60,27 @@ void IrOptimizer::globalCommonSubexpressionElimination()
 {
 }
 
-bool IrOptimizer::isLeader(const IrTacStmt& stmt)
+bool IrOptimizer::isLeaderPost(const IrTacStmt& stmt)
 {
     switch (stmt.m_opcode)
     {
         case IrOpcode::CALL:
         case IrOpcode::RETURN:
-        case IrOpcode::LABEL:
         case IrOpcode::JUMP:
         case IrOpcode::IFZ:
         case IrOpcode::IFNZ:
+            return true;
+        default:
+            break;
+    }
+    return false;
+}
+
+bool IrOptimizer::isLeader(const IrTacStmt& stmt)
+{
+    switch (stmt.m_opcode)
+    {
+        case IrOpcode::LABEL:
             return true;
         default:
             break;
