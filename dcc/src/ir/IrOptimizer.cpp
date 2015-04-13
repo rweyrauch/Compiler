@@ -54,6 +54,32 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
             m_blocks.push_back(curBlock);
         }
     }
+    
+    // Generate control flow graph from list of blocks.
+     
+    for (auto it : m_blocks)
+    {
+		const std::vector<IrTacStmt>& stmts = it->getStatements();
+		if (stmts.empty()) continue;
+		
+		// Create a root control graph for each function/procedure in the block list.
+		if (stmts.begin()->m_opcode == IrOpcode::FBEGIN)
+		{
+			ControlFlowNode node;
+			node.first = it.get();
+			node.second.clear();
+			
+			m_control_graph.push_back(node);
+		}
+		else if (stmts.begin()->m_opcode == IrOpcode::LABEL)
+		{
+			// find the parent of this block looking for the LABEL in IFZ, IFNZ and JUMP statements
+		}
+		else
+		{
+			m_control_graph.back().second.push_back(it.get());
+		}
+	}
 }
 
 void IrOptimizer::globalCommonSubexpressionElimination()
@@ -94,6 +120,13 @@ void IrOptimizer::print(std::ostream& stream)
     {
         it->print(stream);
     }
+    
+    stream << "Control graph nodes." << std::endl;
+    for (auto it : m_control_graph)
+    {
+		stream << "Procedure graph." << std::endl;
+		it.first->print(stream);
+	}
 }
 
 } // namespace Decaf

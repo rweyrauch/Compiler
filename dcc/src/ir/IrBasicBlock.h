@@ -46,6 +46,8 @@ public:
         m_statements.push_back(tac);
     }
     
+    const std::vector<IrTacStmt>& getStatements() const { return m_statements; }
+    
     bool commonSubexpressionElimination();
     
     bool codegen(IrTraversalContext* ctx);

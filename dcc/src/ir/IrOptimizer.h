@@ -25,6 +25,7 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <list>
 #include "IrTAC.h"
 
 namespace Decaf
@@ -58,6 +59,11 @@ protected:
     std::vector<std::shared_ptr<IrBasicBlock>> m_blocks;
     std::vector<IrTacStmt> m_statements;
    
+	// A node in the control flow graph, a block and a list of all of its following blocks.
+	typedef std::pair<IrBasicBlock*, std::vector<IrBasicBlock*>> ControlFlowNode;
+	 
+	std::list<ControlFlowNode> m_control_graph;
+	 
 private:
     IrOptimizer(const IrOptimizer& rhs) = delete;
 };
