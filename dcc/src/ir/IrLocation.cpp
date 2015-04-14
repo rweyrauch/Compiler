@@ -30,6 +30,12 @@
 #include "IrSymbolTable.h"
 #include "IrTravCtx.h"
 #include "IrIntLiteral.h"
+#include "IrBlock.h"
+#include "IrBooleanExpr.h"
+#include "IrIfStmt.h"
+#include "IrMethodCall.h"
+#include "IrStringLiteral.h"
+#include "IrExprStmt.h"
 
 namespace Decaf
 {
@@ -146,6 +152,8 @@ bool IrLocation::analyze(IrTraversalContext* ctx)
                 ctx->error(m_result.get(), "Internal compiler error.  Failed to add temporary variable to symbol table.");
                 valid = false;
             } 
+            
+            createRuntimeChecks(ctx);
         }
         else
         {
@@ -168,6 +176,10 @@ bool IrLocation::codegen(IrTraversalContext* ctx)
     
     if (m_index) 
     {
+		// Insert codegen for runtime index bounds checks.
+		if (!codegenRuntimeChecks(ctx))
+			valid = false;
+			
         if (!m_index->codegen(ctx)) 
             valid = false;
 
@@ -205,6 +217,50 @@ bool IrLocation::codegen(IrTraversalContext* ctx)
     ctx->popParent();
     
     return valid;
+}
+ 
+void IrLocation::createRuntimeChecks(IrTraversalContext* ctx)
+{
+	// Range checks...
+	// m_index->getResult() < location_size && m_index->getResult() >= 0
+	m_rangeChecks = std::shared_ptr<IrBlock>(new IrBlock(__LINE__, 0, __FILE__));
+	
+	SVariableSymbol symbol;
+	ctx->lookup(this, symbol);
+	
+	IrIntegerLiteral* maxRangeValue = new IrIntegerLiteral(__LINE__, 0, __FILE__, "0");
+	maxRangeValue->setValue((int)symbol.m_count);
+	IrIntegerLiteral* minRangeValue = new IrIntegerLiteral(__LINE__, 0, __FILE__, "0");
+	
+	IrBooleanExpression* maxCheck = new IrBooleanExpression(__LINE__, 0, __FILE__, m_index.get(), IrBooleanOperator::Less, maxRangeValue);
+	IrBooleanExpression* minCheck = new IrBooleanExpression(__LINE__, 0, __FILE__, m_index.get(), IrBooleanOperator::GreaterEqual, minRangeValue);
+	IrBooleanExpression* boundCheck = new IrBooleanExpression(__LINE__, 0, __FILE__, maxCheck, IrBooleanOperator::LogicalAnd, minCheck);
+	IrBooleanExpression* notCheck = new IrBooleanExpression(__LINE__, 0, __FILE__, nullptr, IrBooleanOperator::Not, boundCheck);
+	IrBlock* failedBlock = new IrBlock(__LINE__, 0, __FILE__);
+	IrStringLiteral* printFunc = new IrStringLiteral(__LINE__, 0, __FILE__, "\"printf\"");
+	IrStringLiteral* abortFunc = new IrStringLiteral(__LINE__, 0, __FILE__, "\"abort\"");
+	IrMethodCall* printError = new IrMethodCall(__LINE__, 0, __FILE__, printFunc, IrType::Integer);
+	IrStringLiteral* errorMessage = new IrStringLiteral(__LINE__, 0, __FILE__, "\"Runtime bounds check failure.\"");
+	printError->addArgument(errorMessage);
+	IrMethodCall* abortStatement = new IrMethodCall(__LINE__, 0, __FILE__, abortFunc, IrType::Integer);
+	failedBlock->addStatement(new IrExpressionStatement(__LINE__, 0, __FILE__, printError));
+	failedBlock->addStatement(new IrExpressionStatement(__LINE__, 0, __FILE__, abortStatement));
+	IrIfStatement* check = new IrIfStatement(__LINE__, 0, __FILE__, notCheck, failedBlock);
+	
+	m_rangeChecks->addStatement(check);
+	
+	m_rangeChecks.get()->analyze(ctx);
+	
+}
+ 
+bool IrLocation::codegenRuntimeChecks(IrTraversalContext* ctx)
+{
+	bool valid = true;
+	if (m_rangeChecks)
+	{
+		valid = m_rangeChecks->codegen(ctx);
+	}
+	return valid;
 }
  
 } // namespace Decaf
