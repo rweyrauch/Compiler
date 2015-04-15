@@ -38,8 +38,16 @@ void IrStringLiteral::print(unsigned int depth)
     
 bool IrStringLiteral::codegen(IrTraversalContext* ctx)
 {
-    m_label = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
-    ctx->addString(m_label.get(), this);
+    SStringSymbol symbol;
+    if (!ctx->lookup(getValue(), symbol))
+    {
+        m_label = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
+        ctx->addString(m_label.get(), this);
+    }
+    else
+    {
+        m_label = symbol.m_name;
+    }
     
     return true;
 }

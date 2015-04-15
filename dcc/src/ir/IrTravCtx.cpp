@@ -92,24 +92,38 @@ bool IrTraversalContext::lookup(IrMethodCall* method, SMethodSymbol& symbol) con
 bool IrTraversalContext::addString(IrIdentifier* identifier, IrStringLiteral* value)
 {
     bool ok = true;
-    if (!m_symbols.empty())
-    {   
-        auto it = m_strings.find(identifier->getIdentifier());
-        if (it == m_strings.end())
-        {
-            SStringSymbol symbol;
-            symbol.m_name = std::shared_ptr<IrIdentifier>(identifier);
-            symbol.m_value = std::shared_ptr<IrStringLiteral>(value);
-            m_strings[identifier->getIdentifier()] = symbol;
-        }
-        else
-        {
-            // Error - duplicate
-            std::cerr << identifier->getFilename() << ":" << identifier->getLineNumber() << ":" << identifier->getColumnNumber() << ": error: string \'" << identifier->getIdentifier() << "\' already declared in scope." << std::endl;                
-            ok = false;
-        }
+    auto it = m_strings.find(identifier->getIdentifier());
+    if (it == m_strings.end())
+    {
+        SStringSymbol symbol;
+        symbol.m_name = std::shared_ptr<IrIdentifier>(identifier);
+        symbol.m_value = std::shared_ptr<IrStringLiteral>(value);
+        m_strings[identifier->getIdentifier()] = symbol;
+    }
+    else
+    {
+        // Error - duplicate
+        std::cerr << identifier->getFilename() << ":" << identifier->getLineNumber() << ":" << identifier->getColumnNumber() << ": error: string \'" << identifier->getIdentifier() << "\' already declared in scope." << std::endl;                
+        ok = false;
     }
     return ok;    
+}
+   
+bool IrTraversalContext::lookup(const std::string& value, SStringSymbol& symbol)
+{
+    bool found = false;
+    
+    for (auto it : m_strings)
+    {
+        if (it.second.m_value->getValue() == value)
+        {
+            found = true;
+            symbol = it.second;
+            break;
+        }
+    }
+    
+    return found;
 }
    
 const std::string& IrTraversalContext::sourceAt(int line_num) const

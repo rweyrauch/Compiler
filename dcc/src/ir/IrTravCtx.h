@@ -65,7 +65,9 @@ public:
     bool lookup(IrIdentifier* variable, SVariableSymbol& symbol) const;
     bool lookup(IrLocation* variable, SVariableSymbol& symbol) const;
     bool lookup(IrMethodCall* method, SMethodSymbol& symbol) const;
+    
     bool addString(IrIdentifier* identifier, IrStringLiteral* value);
+    bool lookup(const std::string& value, SStringSymbol& symbol);
     
     void setSource(std::vector<std::string> const* source) { m_source = source; }
     const std::string& sourceAt(int line_num) const;
