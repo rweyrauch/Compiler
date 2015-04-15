@@ -794,9 +794,9 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         break;
         
     case IrOpcode::GLOBAL:
-        stream << ".comm ";
+        stream << ".lcomm ";	// put global allocations in zero-initialized section (ie bss)
         IrOutputLabel(stmt.m_arg0, stream);
-        stream << "," << stmt.m_info << ",8" << std::endl;
+        stream << "," << stmt.m_info << std::endl;
         break;
         
     default:
