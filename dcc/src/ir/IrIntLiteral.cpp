@@ -22,44 +22,28 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <memory>
-#include "IrCommon.h"
-#include "IrLiteral.h"
+#include <iostream>
+#include <sstream>
+#include "IrIntLiteral.h"
 
 namespace Decaf
 {
- 
-class IrBooleanLiteral : public IrLiteral
+
+std::shared_ptr<IrIntegerLiteral> IrIntegerLiteral::s_zero_literal = std::shared_ptr<IrIntegerLiteral>(new IrIntegerLiteral(__LINE__, 0, __FILE__, "0"));
+std::shared_ptr<IrIntegerLiteral> IrIntegerLiteral::s_one_literal = std::shared_ptr<IrIntegerLiteral>(new IrIntegerLiteral(__LINE__, 0, __FILE__, "1"));
+    
+IrIntegerLiteral::IrIntegerLiteral(int lineNumber, int columnNumber, const std::string& filename, const std::string& value) :
+    IrLiteral(lineNumber, columnNumber, filename, IrType::Integer, value)
 {
-public:
-    IrBooleanLiteral(int lineNumber, int columnNumber, const std::string& filename, const std::string& value);
-    
-    virtual ~IrBooleanLiteral()
-    {}
-    
-    virtual void print(unsigned int depth); 
-   
-    bool getValue() const { return m_value; }
-    void setValue(bool value) 
-    { 
-        m_value = value;
-        if (m_value) m_valueAsString = "true";
-        else m_valueAsString = "false"; 
-    }
-     
-    static std::shared_ptr<IrBooleanLiteral> GetFalse() { return s_false_literal; }
-    static std::shared_ptr<IrBooleanLiteral> GetTrue() { return s_true_literal; }
-     
-protected:
-    
-    bool m_value;
-    
-    static std::shared_ptr<IrBooleanLiteral> s_false_literal;
-    static std::shared_ptr<IrBooleanLiteral> s_true_literal;
-    
-private:
-    IrBooleanLiteral() = delete;
-    IrBooleanLiteral(const IrBooleanLiteral& rhs) = delete;
-};
+    std::stringstream conv(value);
+    conv >> m_value;
+}
+
+void IrIntegerLiteral::print(unsigned int depth) 
+{
+    IRPRINT_INDENT(depth);
+    std::cout << "Integer(" << getLineNumber() << "," << getColumnNumber() << ") = " << getValue() << std::endl;
+}
+
 
 }

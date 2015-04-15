@@ -22,8 +22,7 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <iostream>
-#include <sstream>
+#include <memory>
 #include "IrCommon.h"
 #include "IrLiteral.h"
 
@@ -33,28 +32,25 @@ namespace Decaf
 class IrDoubleLiteral : public IrLiteral
 {
 public:
-    IrDoubleLiteral(int lineNumber, int columnNumber, const std::string& filename, const std::string& value) :
-        IrLiteral(lineNumber, columnNumber, filename, IrType::Double, value)
-    {
-        std::stringstream conv(value);
-        conv >> m_value;
-    }
-    
+    IrDoubleLiteral(int lineNumber, int columnNumber, const std::string& filename, const std::string& value);
+     
     virtual ~IrDoubleLiteral()
     {}
     
-    virtual void print(unsigned int depth) 
-    {
-        IRPRINT_INDENT(depth);
-        std::cout << "Double(" << getLineNumber() << "," << getColumnNumber() << ") = " << getValue() << std::endl;
-    }
-    
+    virtual void print(unsigned int depth);
+     
     double getValue() const { return m_value; }
     void setValue(double value) { m_value = value; }
 
+    static std::shared_ptr<IrDoubleLiteral> GetZero() { return s_zero_literal; }
+    static std::shared_ptr<IrDoubleLiteral> GetOne() { return s_one_literal; }
+    
 protected:
     
     double m_value;
+    
+    static std::shared_ptr<IrDoubleLiteral> s_zero_literal;
+    static std::shared_ptr<IrDoubleLiteral> s_one_literal;
     
 private:
     IrDoubleLiteral() = delete;

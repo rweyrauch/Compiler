@@ -77,7 +77,7 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
 		}
 		else
 		{
-			m_control_graph.back().second.push_back(it.get());
+			//m_control_graph.back().second.push_back(it.get());
 		}
 	}
 }

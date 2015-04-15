@@ -9,12 +9,14 @@ add_library(
     IrBinaryExpr.cpp
     IrBlock.cpp
     IrBooleanExpr.cpp
+    IrBoolLiteral.cpp
     IrBreakStmt.cpp
     IrCaseStmt.cpp
     IrClass.cpp
     IrCommon.cpp
     IrContinueStmt.cpp
     IrDoWhileStmt.cpp
+    IrDoubleLiteral.cpp
     IrExprStmt.cpp
     IrFieldDecl.cpp
     IrForStmt.cpp
@@ -22,6 +24,7 @@ add_library(
     IrIdentifier.cpp
     IrIfStmt.cpp
     IrInterface.cpp
+    IrIntLiteral.cpp
     IrLabelStmt.cpp
     IrLocation.cpp
     IrMethodCall.cpp

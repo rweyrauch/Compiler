@@ -22,8 +22,7 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <iostream>
-#include <sstream>
+#include <memory>
 #include "IrCommon.h"
 #include "IrLiteral.h"
 
@@ -33,28 +32,25 @@ namespace Decaf
 class IrIntegerLiteral : public IrLiteral
 {
 public:
-    IrIntegerLiteral(int lineNumber, int columnNumber, const std::string& filename, const std::string& value) :
-        IrLiteral(lineNumber, columnNumber, filename, IrType::Integer, value)
-    {
-        std::stringstream conv(value);
-        conv >> m_value;
-    }
-    
+    IrIntegerLiteral(int lineNumber, int columnNumber, const std::string& filename, const std::string& value);
+     
     virtual ~IrIntegerLiteral()
     {}
     
-    virtual void print(unsigned int depth) 
-    {
-        IRPRINT_INDENT(depth);
-        std::cout << "Integer(" << getLineNumber() << "," << getColumnNumber() << ") = " << getValue() << std::endl;
-    }
-    
+    virtual void print(unsigned int depth);
+     
     int getValue() const { return m_value; }
     void setValue(int value) { m_value = value; }
 
+    static std::shared_ptr<IrIntegerLiteral> GetZero() { return s_zero_literal; }
+    static std::shared_ptr<IrIntegerLiteral> GetOne() { return s_one_literal; }
+    
 protected:
     
     int m_value;
+    
+    static std::shared_ptr<IrIntegerLiteral> s_zero_literal;
+    static std::shared_ptr<IrIntegerLiteral> s_one_literal;
     
 private:
     IrIntegerLiteral() = delete;

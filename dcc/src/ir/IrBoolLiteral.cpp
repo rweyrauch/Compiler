@@ -21,45 +21,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#pragma once
-#include <memory>
-#include "IrCommon.h"
-#include "IrLiteral.h"
+#include <iostream>
+#include "IrBoolLiteral.h"
 
 namespace Decaf
 {
- 
-class IrBooleanLiteral : public IrLiteral
+
+std::shared_ptr<IrBooleanLiteral> IrBooleanLiteral::s_false_literal = std::shared_ptr<IrBooleanLiteral>(new IrBooleanLiteral(__LINE__, 0, __FILE__, "false"));
+std::shared_ptr<IrBooleanLiteral> IrBooleanLiteral::s_true_literal = std::shared_ptr<IrBooleanLiteral>(new IrBooleanLiteral(__LINE__, 0, __FILE__, "true"));
+    
+IrBooleanLiteral::IrBooleanLiteral(int lineNumber, int columnNumber, const std::string& filename, const std::string& value) :
+    IrLiteral(lineNumber, columnNumber, filename, IrType::Boolean, value)
 {
-public:
-    IrBooleanLiteral(int lineNumber, int columnNumber, const std::string& filename, const std::string& value);
-    
-    virtual ~IrBooleanLiteral()
-    {}
-    
-    virtual void print(unsigned int depth); 
-   
-    bool getValue() const { return m_value; }
-    void setValue(bool value) 
-    { 
-        m_value = value;
-        if (m_value) m_valueAsString = "true";
-        else m_valueAsString = "false"; 
-    }
-     
-    static std::shared_ptr<IrBooleanLiteral> GetFalse() { return s_false_literal; }
-    static std::shared_ptr<IrBooleanLiteral> GetTrue() { return s_true_literal; }
-     
-protected:
-    
-    bool m_value;
-    
-    static std::shared_ptr<IrBooleanLiteral> s_false_literal;
-    static std::shared_ptr<IrBooleanLiteral> s_true_literal;
-    
-private:
-    IrBooleanLiteral() = delete;
-    IrBooleanLiteral(const IrBooleanLiteral& rhs) = delete;
-};
+    if (value == "true")
+        m_value = true;
+    else
+        m_value = false;
+}
+
+void IrBooleanLiteral::print(unsigned int depth) 
+{
+    IRPRINT_INDENT(depth);
+    std::cout << "Boolean(" << getLineNumber() << "," << getColumnNumber() << ") = " << m_valueAsString << std::endl;        
+}
 
 }

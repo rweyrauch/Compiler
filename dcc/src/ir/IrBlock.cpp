@@ -28,6 +28,9 @@
 #include "IrStatement.h"
 #include "IrSymbolTable.h"
 #include "IrTravCtx.h"
+#include "IrIntLiteral.h"
+#include "IrBoolLiteral.h"
+#include "IrDoubleLiteral.h"
 
 namespace Decaf
 {
@@ -105,6 +108,29 @@ bool IrBlock::codegen(IrTraversalContext* ctx)
     {
         if (!it->codegen(ctx)) valid = false;
     }
+    
+    // initialize all variables
+    for (auto it : m_variables)
+    {
+        size_t numVars = it->getNumVariables();
+        for (size_t i = 0; i < numVars; i++)
+        {
+            auto var = it->getVariable(i);
+            IrTacStmt initVar;
+            initVar.m_opcode = IrOpcode::MOV;
+            if (it->getType() == IrType::Integer)
+                initVar.m_arg0 = IrIntegerLiteral::GetZero();
+            else if (it->getType() == IrType::Boolean)
+                initVar.m_arg0 = IrBooleanLiteral::GetFalse();
+            else if (it->getType() == IrType::Double)
+                initVar.m_arg0 = IrDoubleLiteral::GetZero();
+            initVar.m_arg2 = var;
+            
+            if (initVar.m_arg0)
+                ctx->append(initVar);
+        }
+    }
+    
     for (auto it : m_statements)
     {
         if (!it->codegen(ctx)) valid = false;
