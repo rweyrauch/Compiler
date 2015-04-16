@@ -353,7 +353,6 @@ const std::shared_ptr<IrRegister> g_paramRegisters[NUM_ARG_REGS] =
     std::make_shared<IrRegister>(IrReg::Param5),
     std::make_shared<IrRegister>(IrReg::Param6)
 };
-static int g_nextParamRegister = 0;
 
 const int NUM_DOUBLE_ARG_REGS = 8;
 const std::shared_ptr<IrRegister> g_paramDoubleRegisters[NUM_DOUBLE_ARG_REGS] =
@@ -367,7 +366,6 @@ const std::shared_ptr<IrRegister> g_paramDoubleRegisters[NUM_DOUBLE_ARG_REGS] =
     std::make_shared<IrRegister>(IrReg::DoubleParam7, true),
     std::make_shared<IrRegister>(IrReg::DoubleParam8, true)
 };
-static int g_nextDoubleParamRegister = 0;
 
 bool IrIsRegister(const std::shared_ptr<IrBase> value)
 {
@@ -574,12 +572,76 @@ void IrGenComparison(const IrTacStmt& stmt, std::ostream& stream)
     IrGenMov(g_retReg, stmt.m_arg2, stream);      
 }
 
-static std::vector<std::shared_ptr<IrBase>> g_extraParams;
+static std::vector<std::shared_ptr<IrBase>> g_funcCallParams;
+
+void IrGenParamPush(std::ostream& stream)
+{
+	std::vector<std::shared_ptr<IrBase>> extraParams;
+	
+	if (g_ia64)
+	{
+		int nextDoubleRegister = 0;
+		int nextNormalRegister = 0;
+
+		for (auto it : g_funcCallParams)
+		{
+			if (IrIsDouble(it))
+			{
+				if (nextDoubleRegister < NUM_DOUBLE_ARG_REGS)
+				{
+					IrGenMov(it, g_paramDoubleRegisters[nextDoubleRegister], stream);
+					nextDoubleRegister++;
+				}
+				else
+				{
+					extraParams.push_back(it);
+				}
+			}
+			else
+			{
+				if (nextNormalRegister < NUM_ARG_REGS)
+				{
+					IrGenMov(it, g_paramRegisters[nextNormalRegister], stream);
+					nextNormalRegister++;
+				}
+				else
+				{
+					extraParams.push_back(it);
+				}
+			}		
+		}
+	}
+	else
+	{
+		extraParams = g_funcCallParams;
+	}
+	
+	// Pop extra parameters off the param stack
+	if (!extraParams.empty())
+	{
+		// align the stack 16-byte boundary
+		if (extraParams.size() % 2 == 1)
+			stream << "push $0" << std::endl;
+		
+		for (auto it = extraParams.rbegin(); it != extraParams.rend(); ++it)
+		{
+			stream << "push ";
+			IrOutputArg(*it, stream);
+			stream << std::endl;
+		}
+	}	
+		
+	g_funcCallParams.clear();
+}
 
 void IrGenIA32()
 {
     g_ia64 = false;
 }
+
+static int g_nextUsedDoubleParamReg = 0;
+static int g_nextUsedNormalParamReg = 0;
+static int g_nextParamStackLocation = 0;
 
 void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
 {    
@@ -636,23 +698,8 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         break;
          
     case IrOpcode::CALL:       // call arg0 arg1
-    
-        // Pop extra parameters off the param stack
-        if (!g_extraParams.empty())
-        {
-            // align the stack 16-byte boundary
-            if (g_extraParams.size() % 2 == 1)
-                stream << "push $0" << std::endl;
-            
-            for (auto it = g_extraParams.rbegin(); it != g_extraParams.rend(); ++it)
-            {
-                stream << "push ";
-                IrOutputArg(*it, stream);
-                stream << std::endl;
-            }
-            
-            g_extraParams.clear();
-        }
+		IrGenParamPush(stream);
+		
         stream << "call ";
         IrOutputLabel(stmt.m_arg0, stream);
         stream << std::endl;
@@ -670,6 +717,10 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         IrOutputLabel(stmt.m_arg0, stream);
         stream << ":" << std::endl; 
         stream << "enter $" << stmt.m_info << ", $0" << std::endl;
+        
+        g_nextUsedDoubleParamReg = 0;
+        g_nextUsedNormalParamReg = 0;
+        g_nextParamStackLocation = 0;
         break;
         
     case IrOpcode::RETURN:     // return |arg0|
@@ -753,35 +804,71 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         break;
         
     case IrOpcode::PARAM:       // push arg0 -> stack
-        if (g_ia64 && stmt.m_info < NUM_ARG_REGS)
-        {
-            IrGenMov(stmt.m_arg0, g_paramRegisters[stmt.m_info], stream);
-        }
-        else
-        {
-            g_extraParams.push_back(stmt.m_arg0);
-        }
+		g_funcCallParams.push_back(stmt.m_arg0);
         break;
     
     case IrOpcode::GETPARAM:	// stack -> arg0
-        if (g_ia64 && stmt.m_info < NUM_ARG_REGS)
+        if (g_ia64)
         {
-            IrGenMov(g_paramRegisters[stmt.m_info], stmt.m_arg0, stream);
+			bool onStack = false;
+			if (IrIsDouble(stmt.m_arg0))
+			{
+				if (g_nextUsedDoubleParamReg < NUM_DOUBLE_ARG_REGS)
+				{
+					IrGenMov(g_paramDoubleRegisters[g_nextUsedDoubleParamReg], stmt.m_arg0, stream);
+					g_nextUsedDoubleParamReg++;
+				}
+				else
+				{	
+					onStack = true;				
+				}
+			}
+			else
+			{
+				if (g_nextUsedNormalParamReg < NUM_ARG_REGS)
+				{
+					IrGenMov(g_paramRegisters[g_nextUsedNormalParamReg], stmt.m_arg0, stream);
+					g_nextUsedNormalParamReg++;
+				}
+				else
+				{
+					onStack = true;
+				}
+			}
+			if (onStack)
+			{
+				int argOffset = g_nextParamStackLocation;
+            
+				stream << "movq ";
+				stream << (argOffset*8+16) << "(%rbp), ";
+				IrOutputArg(g_tempReg, stream);
+				stream << std::endl;
+
+				stream << "movq ";
+				IrOutputArg(g_tempReg, stream);
+				stream << ", ";
+				IrOutputArg(stmt.m_arg0, stream);
+				stream << std::endl;
+				
+				g_nextParamStackLocation++;			
+			}
         }
         else
         {
-            int argOffset = stmt.m_info - NUM_ARG_REGS;
+            int argOffset = g_nextParamStackLocation;
             
-            stream << (g_ia64 ? "movq " : "movl ");
+            stream << "movl ";
             stream << (argOffset*8+16) << "(%rbp), ";
             IrOutputArg(g_tempReg, stream);
             stream << std::endl;
 
-            stream << (g_ia64 ? "movq " : "movl ");
+            stream << "movl ";
             IrOutputArg(g_tempReg, stream);
             stream << ", ";
             IrOutputArg(stmt.m_arg0, stream);
             stream << std::endl;
+            
+            g_nextParamStackLocation++;
         }
         break;
         
