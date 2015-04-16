@@ -24,6 +24,7 @@
 #pragma once
 #include <map>
 #include "IrCommon.h"
+#include "IrBase.h"
 #include "IrFieldDecl.h"
 #include "IrVarDecl.h"
 
@@ -36,10 +37,11 @@ class IrIdentifier;
 class IrClass;
 class IrInterface;
 
-class IrSymbolTable
+class IrSymbolTable : public IrBase
 {
 public:
     IrSymbolTable() :
+        IrBase(0, 0, __FILE__),
         m_startAddr(0),
         m_variableStackSize(0),
         m_variables(),
@@ -68,7 +70,7 @@ public:
     size_t getAllocationSize() const;
     void setStartAddress(ptrdiff_t addr) { m_startAddr = addr; }
     
-    void print(int depth);
+    virtual void print(unsigned int depth);
     
 protected:
         

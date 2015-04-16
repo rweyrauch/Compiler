@@ -323,7 +323,7 @@ size_t IrSymbolTable::getAllocationSize() const
     return totalSize;
 }
 
-void IrSymbolTable::print(int depth)
+void IrSymbolTable::print(unsigned int depth)
 {
     const size_t table_size = m_variables.size();
     

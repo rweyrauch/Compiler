@@ -41,7 +41,7 @@ class IrTraversalContext
 {
 public:
     IrTraversalContext(bool ia64 = true) :
-		m_ia64(ia64),
+        m_ia64(ia64),
         m_symbols(),
         m_parents(),
         m_source(nullptr),
