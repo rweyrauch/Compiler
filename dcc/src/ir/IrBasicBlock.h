@@ -25,6 +25,7 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <map>
 #include "IrTAC.h"
 
 namespace Decaf
@@ -35,7 +36,8 @@ class IrBasicBlock
 {
 public:
     IrBasicBlock() :
-        m_statements()
+        m_statements(),
+        m_value_numbering_map()
     {}
     
     virtual ~IrBasicBlock() 
@@ -57,6 +59,25 @@ public:
 protected:
      
     std::vector<IrTacStmt> m_statements;
+    
+    struct Key
+    {
+		const IrBase* m_left;
+		IrOpcode m_op;
+		const IrBase* m_right;
+		bool operator<(const Key& lhs) const
+		{
+			if ((size_t)m_left < (size_t)lhs.m_left)
+				return true;
+			else if ((int)m_op < (int)lhs.m_op)
+				return true;
+			else if ((size_t)m_right < (size_t)lhs.m_right)
+				return true;
+			return false;
+		}
+	};
+	
+    std::map<Key, int> m_value_numbering_map;
     
 private:
     IrBasicBlock(const IrBasicBlock& rhs) = delete;

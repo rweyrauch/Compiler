@@ -29,6 +29,36 @@ namespace Decaf
 
 bool IrBasicBlock::commonSubexpressionElimination()
 {
+	int nextValueNumber = 42;
+	
+	m_value_numbering_map.clear();
+		
+	// Statement of form: T <- L op R
+	for (auto it : m_statements)
+	{
+		// Get the value numbers of L and R
+		
+		// Create key from op, L and R.
+		Key key;
+		key.m_left = it.m_arg0.get();
+		key.m_op = it.m_opcode;
+		key.m_right = it.m_arg1.get();
+		
+		// If key exists then
+		auto mip = m_value_numbering_map.find(key);
+		if (mip != m_value_numbering_map.end())
+		{
+			// replace statement, 'it' with the value into T and associate value number with T
+		}
+		else
+		{
+			// insert new value number into table using the key
+			m_value_numbering_map[key] = nextValueNumber++;
+			
+			// record that new value for T.
+		}
+	}
+	
     return false;
 }
    
