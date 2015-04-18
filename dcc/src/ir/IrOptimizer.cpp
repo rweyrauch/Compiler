@@ -72,7 +72,9 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
         }
         else if (stmts.begin()->m_opcode == IrOpcode::LABEL)
         {
-            // find the parent of this block looking for the LABEL in IFZ, IFNZ and JUMP statements
+            // TODO: find the parent of this block looking for the LABEL in IFZ, IFNZ and JUMP statements
+            if (!m_control_graphs.empty())
+                m_control_graphs.back().m_next_blocks.push_back(it.get());
         }
         else
         {
@@ -84,6 +86,14 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
 
 void IrOptimizer::globalCommonSubexpressionElimination()
 {
+    for (auto it : m_control_graphs)
+    {
+        it.m_block->commonSubexpressionElimination();
+        for (auto bit : it.m_next_blocks)
+        {
+            bit->commonSubexpressionElimination();
+        }
+    }
 }
 
 bool IrOptimizer::isLeaderPost(const IrTacStmt& stmt)
@@ -116,15 +126,15 @@ bool IrOptimizer::isLeader(const IrTacStmt& stmt)
 
 void IrOptimizer::print(std::ostream& stream)
 {
-    for (auto it : m_blocks)
-    {
-        it->print(stream);
-    }
+    //for (auto it : m_blocks)
+    //{
+    //    it->print(stream);
+    //}
     
     stream << "Control graph nodes." << std::endl;
     for (auto it : m_control_graphs)
     {
-        stream << "Procedure graph." << std::endl;
+        stream << "Procedure Start" << std::endl;
         it.m_block->print(stream);
         for (auto nit : it.m_next_blocks)
         {

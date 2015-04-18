@@ -21,47 +21,123 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+#include <iostream>
 #include "IrBasicBlock.h"
 #include "IrTAC.h"
+#include "IrIdentifier.h"
+#include "IrLiteral.h"
 
 namespace Decaf
 {
 
-bool IrBasicBlock::commonSubexpressionElimination()
+bool isBinaryOp(IrOpcode opcode)
 {
-	int nextValueNumber = 42;
-	
-	m_value_numbering_map.clear();
-		
-	// Statement of form: T <- L op R
-	for (auto it : m_statements)
-	{
-		// Get the value numbers of L and R
-		
-		// Create key from op, L and R.
-		Key key;
-		key.m_left = it.m_arg0.get();
-		key.m_op = it.m_opcode;
-		key.m_right = it.m_arg1.get();
-		
-		// If key exists then
-		auto mip = m_value_numbering_map.find(key);
-		if (mip != m_value_numbering_map.end())
-		{
-			// replace statement, 'it' with the value into T and associate value number with T
-		}
-		else
-		{
-			// insert new value number into table using the key
-			m_value_numbering_map[key] = nextValueNumber++;
-			
-			// record that new value for T.
-		}
-	}
-	
+    switch (opcode)
+    {
+        case IrOpcode::ADD:
+        case IrOpcode::SUB:
+        case IrOpcode::MUL:
+        case IrOpcode::DIV:
+        case IrOpcode::MOD:
+        case IrOpcode::MOV:
+            return true;
+        default:
+            break;
+    }
     return false;
 }
-   
+
+bool IrBasicBlock::commonSubexpressionElimination()
+{
+    int nextValueNumber = 42;
+    
+    m_value_numbering_map.clear();
+        
+    // Statement of form: T <- L op R
+    for (auto it : m_statements)
+    {
+        if (!isBinaryOp(it.m_opcode))
+            continue;
+        
+        // Get/create the value numbers of T, L and R
+        Key keyL;
+        keyL.m_left = it.m_arg0.get();
+        keyL.m_op = IrOpcode::NOOP;
+        keyL.m_right = nullptr;
+        auto lip = m_value_numbering_map.find(keyL);
+        if (lip == m_value_numbering_map.end())
+        {
+            m_value_numbering_map[keyL] = nextValueNumber++;
+        }
+        
+        if (it.m_arg1 != nullptr)
+        {
+            Key keyR;
+            keyR.m_left = it.m_arg1.get();
+            keyR.m_op = IrOpcode::NOOP;
+            keyR.m_right = nullptr;
+            auto rip = m_value_numbering_map.find(keyR);
+            if (rip == m_value_numbering_map.end())
+            {
+                m_value_numbering_map[keyR] = nextValueNumber++;
+            }
+        }
+        
+        Key keyT;
+        keyT.m_left = it.m_arg2.get();
+        keyT.m_op = IrOpcode::NOOP;
+        keyT.m_right = nullptr;            
+        auto tip = m_value_numbering_map.find(keyT);
+        if (tip == m_value_numbering_map.end())
+        {
+            m_value_numbering_map[keyT] = nextValueNumber++;
+        }
+        
+        // Create key from op, L and R.
+        Key keyExpr;
+        keyExpr.m_left = it.m_arg0.get();
+        keyExpr.m_op = it.m_opcode;
+        keyExpr.m_right = it.m_arg1.get();
+                
+        auto mip = m_value_numbering_map.find(keyExpr);
+        if (mip != m_value_numbering_map.end())
+        {
+            m_value_numbering_map[keyT] = mip->second;
+        }
+        else
+        {
+            // insert new value number into table using the key
+            int value = nextValueNumber++;
+            m_value_numbering_map[keyExpr] = value;
+            
+            // record that new value for T.
+            m_value_numbering_map[keyT] = value;
+        }
+    }
+    
+    std::cout << "Value Map" << std::endl;
+    for (auto it : m_value_numbering_map)
+    {
+        const IrIdentifier* identL = dynamic_cast<const IrIdentifier*>(it.first.m_left);
+        const IrIdentifier* identR = dynamic_cast<const IrIdentifier*>(it.first.m_right);
+        const IrLiteral* litL = dynamic_cast<const IrLiteral*>(it.first.m_left);
+        const IrLiteral* litR = dynamic_cast<const IrLiteral*>(it.first.m_right);
+        std::cout << it.second << " [";
+        if (identL)
+            std::cout << identL->getIdentifier();
+        else if (litL)
+            std::cout << "$" << litL->getValueAsString();
+        std::cout << "," << IrOpcodeToString(it.first.m_op);
+        if (identR)
+            std::cout << "," << identR->getIdentifier();
+        else if (litR) 
+            std::cout << ",$" << litR->getValueAsString();
+        std::cout << "]" << std::endl;
+    }
+    
+    return true;
+}
+
 bool IrBasicBlock::codegen(IrTraversalContext* ctx)
 {
     return false;

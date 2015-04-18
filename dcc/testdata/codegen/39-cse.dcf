@@ -1,0 +1,18 @@
+class Program {
+
+  void main() {
+    int a, b, c, d, e;
+
+    a = 2;
+    b = 3;
+    c = 0; 
+    d = 0; 
+    e = 0;
+
+    c = a + b;
+    d = a + b;
+    e = a + b;
+    
+    callout("printf", "c = %d  d = %d e = %d\n", c, d, e);
+  }
+}
