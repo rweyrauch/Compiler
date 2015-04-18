@@ -60,10 +60,7 @@ bool IrBasicBlock::commonSubexpressionElimination()
             continue;
         
         // Get/create the value numbers of T, L and R
-        Key keyL;
-        keyL.m_left = it.m_arg0.get();
-        keyL.m_op = IrOpcode::NOOP;
-        keyL.m_right = nullptr;
+        Key keyL(it.m_arg0, IrOpcode::NOOP, nullptr);
         auto lip = m_value_numbering_map.find(keyL);
         if (lip == m_value_numbering_map.end())
         {
@@ -72,10 +69,7 @@ bool IrBasicBlock::commonSubexpressionElimination()
         
         if (it.m_arg1 != nullptr)
         {
-            Key keyR;
-            keyR.m_left = it.m_arg1.get();
-            keyR.m_op = IrOpcode::NOOP;
-            keyR.m_right = nullptr;
+            Key keyR(it.m_arg1, IrOpcode::NOOP, nullptr);
             auto rip = m_value_numbering_map.find(keyR);
             if (rip == m_value_numbering_map.end())
             {
@@ -83,10 +77,7 @@ bool IrBasicBlock::commonSubexpressionElimination()
             }
         }
         
-        Key keyT;
-        keyT.m_left = it.m_arg2.get();
-        keyT.m_op = IrOpcode::NOOP;
-        keyT.m_right = nullptr;            
+        Key keyT(it.m_arg2, IrOpcode::NOOP, nullptr);
         auto tip = m_value_numbering_map.find(keyT);
         if (tip == m_value_numbering_map.end())
         {
@@ -94,10 +85,7 @@ bool IrBasicBlock::commonSubexpressionElimination()
         }
         
         // Create key from op, L and R.
-        Key keyExpr;
-        keyExpr.m_left = it.m_arg0.get();
-        keyExpr.m_op = it.m_opcode;
-        keyExpr.m_right = it.m_arg1.get();
+        Key keyExpr(it.m_arg0, it.m_opcode, it.m_arg1);
                 
         auto mip = m_value_numbering_map.find(keyExpr);
         if (mip != m_value_numbering_map.end())
@@ -118,10 +106,10 @@ bool IrBasicBlock::commonSubexpressionElimination()
     std::cout << "Value Map" << std::endl;
     for (auto it : m_value_numbering_map)
     {
-        const IrIdentifier* identL = dynamic_cast<const IrIdentifier*>(it.first.m_left);
-        const IrIdentifier* identR = dynamic_cast<const IrIdentifier*>(it.first.m_right);
-        const IrLiteral* litL = dynamic_cast<const IrLiteral*>(it.first.m_left);
-        const IrLiteral* litR = dynamic_cast<const IrLiteral*>(it.first.m_right);
+        const IrIdentifier* identL = dynamic_cast<const IrIdentifier*>(it.first.m_left.get());
+        const IrIdentifier* identR = dynamic_cast<const IrIdentifier*>(it.first.m_right.get());
+        const IrLiteral* litL = dynamic_cast<const IrLiteral*>(it.first.m_left.get());
+        const IrLiteral* litR = dynamic_cast<const IrLiteral*>(it.first.m_right.get());
         std::cout << it.second << " [";
         if (identL)
             std::cout << identL->getIdentifier();
