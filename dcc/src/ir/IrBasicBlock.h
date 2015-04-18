@@ -62,26 +62,26 @@ protected:
     
     struct Key
     {
-        Key(std::shared_ptr<const IrBase> left, IrOpcode opcode, std::shared_ptr<const IrBase> right) :
+        Key(const std::string& left, IrOpcode opcode, const std::string& right) :
             m_left(left),
             m_op(opcode),
             m_right(right) {}
         Key() :
-            m_left(nullptr),
+            m_left(""),
             m_op(IrOpcode::NOOP),
-            m_right(nullptr) {}
+            m_right("") {}
             
-        std::shared_ptr<const IrBase> m_left;
+        std::string m_left;
         IrOpcode m_op;
-        std::shared_ptr<const IrBase> m_right;
+        std::string m_right;
         
         bool operator<(const Key& lhs) const
         {
-            if ((size_t)m_left.get() < (size_t)lhs.m_left.get())
+            if (m_left < lhs.m_left)
                 return true;
             else if ((int)m_op < (int)lhs.m_op)
                 return true;
-            else if ((size_t)m_right.get() < (size_t)lhs.m_right.get())
+            else if (m_right < lhs.m_right)
                 return true;
             return false;
         }
@@ -99,9 +99,9 @@ protected:
     {
         size_t operator()(const Key& key) const
         {
-            return ((std::hash<size_t>()((size_t)key.m_left.get()) ^
+            return ((std::hash<std::string>()(key.m_left) ^
                     (std::hash<int>()((int)key.m_op) << 1)) >> 1) ^
-                    (std::hash<size_t>()((size_t)key.m_right.get()) << 1);
+                    (std::hash<std::string>()(key.m_right) << 1);
         }
     };
     

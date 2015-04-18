@@ -51,6 +51,7 @@ public:
     
     virtual void print(unsigned int depth);
     virtual bool codegen(IrTraversalContext* ctx);
+    virtual const std::string& asString() const { return getIdentifier(); };
     
     const std::string& getIdentifier() const { return m_identifier; }
     ptrdiff_t getAddress() const { return m_addr; }

@@ -39,6 +39,7 @@ public:
     {}
     
     virtual void print(unsigned int depth) = 0;
+    virtual const std::string& asString() const { return getValueAsString(); };
     
     const std::string& getValueAsString() const { return m_valueAsString; }
     
