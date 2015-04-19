@@ -44,9 +44,11 @@ public:
     virtual void print(unsigned int depth);
     virtual bool analyze(IrTraversalContext* ctx);
     virtual bool codegen(IrTraversalContext* ctx);
+    virtual const std::string& asString() const { return m_goto; }
     
 protected:    
     std::shared_ptr<IrIdentifier> m_label;
+    const std::string m_goto = "goto";
     
 private:
     IrGotoStatement() = delete;

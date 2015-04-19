@@ -47,6 +47,7 @@ public:
     virtual void print(unsigned int depth); 
     virtual bool analyze(IrTraversalContext* ctx);
     virtual bool codegen(IrTraversalContext* ctx);
+    virtual const std::string& asString() const { return m_interface; }
     
     void addMethodDecl(IrMethodDecl* method);
     void addMethodDecl(const std::vector<IrMethodDecl*>& methods);
@@ -56,6 +57,7 @@ protected:
     std::shared_ptr<IrIdentifier> m_identifier;
     
     std::vector<std::shared_ptr<IrMethodDecl>> m_method_decl_list;
+    const std::string m_interface = "interface";
     
 private:
     IrInterface() = delete;

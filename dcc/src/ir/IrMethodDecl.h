@@ -54,6 +54,7 @@ public:
     virtual void print(unsigned int depth);
     virtual bool analyze(IrTraversalContext* ctx);
     virtual bool codegen(IrTraversalContext* ctx);
+    virtual const std::string& asString() const;
      
     void addArgument(IrVariableDecl* arg)
     {

@@ -43,9 +43,11 @@ public:
     virtual void print(unsigned int depth);
     virtual bool analyze(IrTraversalContext* ctx);
     virtual bool codegen(IrTraversalContext* ctx);
+    virtual const std::string& asString() const { return m_break; }
     
 protected:    
     const IrForStatement* m_parentLoop;
+    const std::string m_break = "break";
     
 private:
     IrBreakStatement() = delete;

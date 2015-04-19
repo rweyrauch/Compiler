@@ -207,4 +207,9 @@ bool IrBinaryExpression::codegen(IrTraversalContext* ctx)
     return valid;
 }
 
+const std::string& IrBinaryExpression::asString() const
+{
+    return IrBinaryOperatorToString(m_operator);
+}
+
 } // namespace Decaf

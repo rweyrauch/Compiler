@@ -47,6 +47,7 @@ public:
     virtual void print(unsigned int depth);
     virtual bool analyze(IrTraversalContext* ctx);
     virtual bool codegen(IrTraversalContext* ctx);
+    virtual const std::string& asString() const { return m_for; }
        
     virtual size_t getAllocationSize() const;
     virtual void setSymbolStartAddress(size_t addr);
@@ -71,6 +72,7 @@ protected:
     std::shared_ptr<IrIntegerLiteral> m_loopIncrement;
     std::shared_ptr<IrGotoStatement> m_loopGoto;
     
+    const std::string m_for = "for";
 private:
     IrForStatement() = delete;
     IrForStatement(const IrForStatement& rhs) = delete;

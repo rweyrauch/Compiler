@@ -51,6 +51,7 @@ public:
     virtual void print(unsigned int depth); 
     virtual bool analyze(IrTraversalContext* ctx);
     virtual bool codegen(IrTraversalContext* ctx);
+    virtual const std::string& asString() const { return m_class; }
      
     void addFieldDecl(IrFieldDecl* field);
     void addFieldDecl(const std::vector<IrFieldDecl*>& fields);
@@ -71,6 +72,8 @@ protected:
     std::vector<std::shared_ptr<IrMethodDecl>> m_method_decl_list;
     
     std::unique_ptr<IrSymbolTable> m_symbols;
+    
+    const std::string m_class = "class";
     
 private:
     IrClass() = delete;

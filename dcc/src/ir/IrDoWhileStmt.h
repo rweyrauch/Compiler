@@ -43,6 +43,7 @@ public:
     virtual void print(unsigned int depth);
     virtual bool analyze(IrTraversalContext* ctx);
     virtual bool codegen(IrTraversalContext* ctx);
+    virtual const std::string& asString() const { return m_dowhile; }
        
     virtual size_t getAllocationSize() const;
     virtual void setSymbolStartAddress(size_t addr);
@@ -51,6 +52,8 @@ protected:
     
     std::shared_ptr<IrExpression> m_loopExpr;
     std::shared_ptr<IrBlock> m_body;
+    
+    const std::string m_dowhile = "do-while";
     
 private:
     IrDoWhileStatement() = delete;

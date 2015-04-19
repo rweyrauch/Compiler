@@ -25,8 +25,10 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <map>
 #include <unordered_map>
 #include "IrTAC.h"
+#include "IrCommon.h"
 
 namespace Decaf
 {
@@ -106,6 +108,43 @@ protected:
     };
     
     std::unordered_map<Key, int, KeyHasher> m_value_numbering_map;
+    
+    struct Symbol
+    {
+        std::string m_name;
+        int m_value_number;
+        bool m_isConstants;
+    };
+    
+    std::map<std::string, Symbol> m_symbols;
+    
+    struct Constant
+    {
+        int m_value_number;
+        IrType m_type;
+        int m_value_int;
+        double m_value_double;
+        bool m_value_bool;
+    };
+    
+    struct ValueKey
+    {
+        int m_lhs;
+        int m_op;
+        int m_rhs;
+    };
+    
+    struct Available
+    {
+        int m_lhs;
+        int m_op;
+        int m_rhs;
+        int m_result;
+        IrTacStmt m_stmt;
+    };
+    
+    std::map<ValueKey, Constant> m_constants;  
+    std::map<ValueKey, Available> m_availables;
     
 private:
     IrBasicBlock(const IrBasicBlock& rhs) = delete;

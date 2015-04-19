@@ -198,4 +198,9 @@ bool IrMethodCall::codegen(IrTraversalContext* ctx)
     return valid; 
 }
 
+const std::string& IrMethodCall::asString() const
+{
+    return m_identifier->asString();
+}
+
 } // namespace Decaf

@@ -283,4 +283,9 @@ bool IrBooleanExpression::codegen(IrTraversalContext* ctx)
     return valid;
 }
 
+const std::string& IrBooleanExpression::asString() const
+{
+    return IrBooleanOperatorToString(m_operator);
+}
+
 } // namespace Decaf

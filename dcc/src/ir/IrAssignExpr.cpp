@@ -234,4 +234,9 @@ bool IrAssignExpression::codegen(IrTraversalContext* ctx)
     return valid;
 }
 
+const std::string& IrAssignExpression::asString() const
+{
+    return IrAssignmentOperatorToString(m_operator);
+}
+
 } // namespace Decaf

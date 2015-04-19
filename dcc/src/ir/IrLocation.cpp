@@ -219,6 +219,11 @@ bool IrLocation::codegen(IrTraversalContext* ctx)
     return valid;
 }
  
+const std::string& IrLocation::asString() const
+{
+    return m_identifier->asString();
+}
+ 
 void IrLocation::createRuntimeChecks(IrTraversalContext* ctx)
 {
     // Range checks...

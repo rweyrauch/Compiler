@@ -43,6 +43,7 @@ public:
     virtual void print(unsigned int depth);
     virtual bool analyze(IrTraversalContext* ctx);
     virtual bool codegen(IrTraversalContext* ctx);
+    virtual const std::string& asString() const { return m_if; }
     
     virtual size_t getAllocationSize() const;
     virtual void setSymbolStartAddress(size_t addr);
@@ -59,6 +60,7 @@ protected:
 private:
     static bool isBooleanLiteral(const IrExpression* expr);
     
+    const std::string m_if = "if";
 private:
     IrIfStatement() = delete;
     IrIfStatement(const IrIfStatement& rhs) = delete;

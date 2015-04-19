@@ -180,4 +180,9 @@ bool IrMethodDecl::codegen(IrTraversalContext* ctx)
     return true; 
 }
     
+const std::string& IrMethodDecl::asString() const
+{
+    return m_identifier->asString();
+}
+    
 } // namespace Decaf

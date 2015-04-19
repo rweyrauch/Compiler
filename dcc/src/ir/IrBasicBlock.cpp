@@ -39,6 +39,7 @@ bool isBinaryOp(IrOpcode opcode)
         case IrOpcode::MUL:
         case IrOpcode::DIV:
         case IrOpcode::MOD:
+        case IrOpcode::MOV:
             return true;
         default:
             break;
@@ -110,6 +111,23 @@ bool IrBasicBlock::commonSubexpressionElimination()
         std::cout << "," << IrOpcodeToString(it.first.m_op);
         std::cout << "," << it.first.m_right;
         std::cout << "]" << std::endl;
+    }
+    
+    for (auto it : m_statements)
+    {
+        if (!isBinaryOp(it.m_opcode))
+            continue;
+        
+        Key keyExpr(it.m_arg0->asString(), it.m_opcode, (it.m_arg1 != nullptr) ? it.m_arg1->asString() : "");
+        auto mip = m_value_numbering_map.find(keyExpr);
+        if (mip != m_value_numbering_map.end())
+        {
+            std::cout << "#" << mip->second << std::endl;
+        }
+        else
+        {
+            std::cout << "-" << std::endl;
+        }
     }
     
     return true;

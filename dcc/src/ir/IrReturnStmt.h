@@ -45,6 +45,7 @@ public:
     virtual void print(unsigned int depth);
     virtual bool analyze(IrTraversalContext* ctx);
     virtual bool codegen(IrTraversalContext* ctx);
+    virtual const std::string& asString() const { return m_return; }
  
     IrType getReturnType() const
     {
@@ -58,6 +59,8 @@ public:
 protected:    
     
     std::shared_ptr<IrExpression> m_returnValue;
+    
+    const std::string m_return = "return";
     
 private:
     IrReturnStatement() = delete;

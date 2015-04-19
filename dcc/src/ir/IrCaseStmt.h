@@ -55,6 +55,7 @@ public:
     virtual void print(unsigned int depth);
     virtual bool analyze(IrTraversalContext* ctx);
     virtual bool codegen(IrTraversalContext* ctx);
+    virtual const std::string& asString() const { return m_case; }
     
     void addStatement(IrStatement* stmt)
     {
@@ -76,6 +77,7 @@ protected:
     bool m_isDefault;
     std::shared_ptr<IrLiteral> m_value;
     std::vector<std::shared_ptr<IrStatement>> m_statements;
+    const std::string m_case = "case";
     
 private:
     IrCaseStatement() = delete;

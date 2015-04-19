@@ -65,4 +65,10 @@ bool IrLabelStatement::codegen(IrTraversalContext* ctx)
     return valid;
 }
 
+const std::string& IrLabelStatement::asString() const 
+{ 
+    return m_label->asString(); 
+
+}
+
 } // namespace Decaf
