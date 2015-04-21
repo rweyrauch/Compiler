@@ -35,6 +35,75 @@
 namespace Decaf
 {
 
+IrTacArg::IrTacArg(const IrIdentifier* ident) :
+	IrTacArg()
+{
+	if (ident != nullptr)
+	{
+		if (ident->isLabel())
+			m_usage = IrUsage::Label;
+		else if (ident->isGlobal())
+			m_usage = IrUsage::Global;
+		else
+			m_usage = IrUsage::Identifier;
+			
+		m_type = IrArgType::String;
+		m_value.m_address = ident->getAddress();
+		m_asString = ident->getIdentifier();
+	}
+}
+
+IrTacArg::IrTacArg(const IrIntegerLiteral* literal) :
+	IrTacArg()
+{
+	if (literal != nullptr)
+	{
+		m_usage = IrUsage::Literal;
+		m_isConstant = true;
+		m_type = IrArgType::Integer;
+		m_value.m_int = literal->getValue();
+		m_asString = literal->getValueAsString();
+	}
+}
+
+IrTacArg::IrTacArg(const IrDoubleLiteral* literal) :
+	IrTacArg()
+{
+	if (literal != nullptr)
+	{
+		m_usage = IrUsage::Literal;
+		m_isConstant = true;
+		m_type = IrArgType::Double;
+		m_value.m_double = literal->getValue();
+		m_asString = literal->getValueAsString();
+	}	
+}
+
+IrTacArg::IrTacArg(const IrBooleanLiteral* literal) :
+	IrTacArg()
+{
+	if (literal != nullptr)
+	{
+		m_usage = IrUsage::Literal;
+		m_isConstant = true;
+		m_type = IrArgType::Boolean;
+		m_value.m_int = literal->getValue() ? 1 : 0;
+		m_asString = literal->getValueAsString();
+	}	
+}
+
+IrTacArg::IrTacArg(const IrStringLiteral* literal) :
+	IrTacArg()
+{
+	if (literal != nullptr)
+	{
+		m_usage = IrUsage::Literal;
+		m_isConstant = true;
+		m_type = IrArgType::String;
+		m_asString = literal->getValue();
+	}	
+}
+
 enum class IrReg : int
 {
     Temp,

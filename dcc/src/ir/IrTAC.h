@@ -30,6 +30,11 @@
 namespace Decaf
 {
 class IrIdentifier;
+class IrLiteral;
+class IrIntegerLiteral;
+class IrBooleanLiteral;
+class IrStringLiteral;
+class IrDoubleLiteral;
 
 enum class IrOpcode : int
 {
@@ -98,14 +103,21 @@ struct IrTacArg
         m_isConstant(false),
         m_valueNumber(0)
     {
-        m_value.m_valueInt = 0;
+        m_value.m_int = 0;
     }        
-    
+   
+	IrTacArg(const IrIdentifier* ident);
+	IrTacArg(const IrIntegerLiteral* literal);
+	IrTacArg(const IrDoubleLiteral* literal);
+	IrTacArg(const IrBooleanLiteral* literal);
+	IrTacArg(const IrStringLiteral* literal);
+	
     IrUsage m_usage;
     IrArgType m_type;
     union {
-        long int m_valueInt;
-        double m_valueDouble;
+        long int m_int;
+        double m_double;
+        std::ptrdiff_t m_address;
     } m_value;
     std::string m_asString;
     
