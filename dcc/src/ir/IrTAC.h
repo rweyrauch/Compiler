@@ -68,6 +68,51 @@ enum class IrOpcode : int
 
 const std::string& IrOpcodeToString(IrOpcode opcode);
 
+// Tac src/dst type:
+//   m_use: Label, Identifier, Literal, Global
+//   m_isConstant
+//   m_type: Integer, Boolean, Double, String
+//   m_value { union }
+enum class IrUsage : unsigned char
+{
+    Label,
+    Identifier,
+    Global,
+    Literal,
+    Register
+};
+enum class IrArgType : unsigned char
+{
+    Integer,
+    Boolean,
+    Double,
+    String
+};
+
+struct IrTacArg
+{
+    IrTacArg() :
+        m_usage(IrUsage::Identifier),
+        m_type(IrArgType::String),
+        m_asString(""),
+        m_isConstant(false),
+        m_valueNumber(0)
+    {
+        m_value.m_valueInt = 0;
+    }        
+    
+    IrUsage m_usage;
+    IrArgType m_type;
+    union {
+        long int m_valueInt;
+        double m_valueDouble;
+    } m_value;
+    std::string m_asString;
+    
+    bool m_isConstant;
+    int m_valueNumber;
+};
+
 struct IrTacStmt
 {
     IrTacStmt() :
