@@ -190,12 +190,12 @@ bool IrLocation::codegen(IrTraversalContext* ctx)
         {
             IrTacStmt store;
             store.m_opcode = IrOpcode::STORE;
-            store.m_arg0 = m_result;        // source of the the store is in the m_result identifier
-            store.m_arg1 = m_identifier;
+            store.m_src0 = m_result;        // source of the the store is in the m_result identifier
+            store.m_src1 = m_identifier;
             if (m_index->getResult())
-                store.m_arg2 = m_index->getResult();
+                store.m_dst = m_index->getResult();
             else
-                store.m_arg2 = m_index;
+                store.m_dst = m_index;
             
             ctx->append(store);
         }
@@ -203,12 +203,12 @@ bool IrLocation::codegen(IrTraversalContext* ctx)
         {
             IrTacStmt load;
             load.m_opcode = IrOpcode::LOAD;
-            load.m_arg0 = m_identifier;
+            load.m_src0 = m_identifier;
             if (m_index->getResult())
-                load.m_arg1 = m_index->getResult();
+                load.m_src1 = m_index->getResult();
             else
-                load.m_arg1 = m_index;
-            load.m_arg2 = m_result;
+                load.m_src1 = m_index;
+            load.m_dst = m_result;
             
             ctx->append(load);
         }

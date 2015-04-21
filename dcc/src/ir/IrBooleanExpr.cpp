@@ -255,11 +255,11 @@ bool IrBooleanExpression::codegen(IrTraversalContext* ctx)
             IrLiteral* literal = dynamic_cast<IrLiteral*>(m_lhs.get());
             if (literal)
             {
-                tac.m_arg0 = m_lhs;
+                tac.m_src0 = m_lhs;
             }
             else
             {
-                tac.m_arg0 = std::shared_ptr<IrBase>(m_lhs->getResult());
+                tac.m_src0 = std::shared_ptr<IrBase>(m_lhs->getResult());
             }
         }
         if (m_rhs != nullptr)
@@ -267,14 +267,14 @@ bool IrBooleanExpression::codegen(IrTraversalContext* ctx)
             IrLiteral* literal = dynamic_cast<IrLiteral*>(m_rhs.get());
             if (literal)
             {
-                tac.m_arg1 = m_rhs;
+                tac.m_src1 = m_rhs;
             }
             else
             {
-                tac.m_arg1 = std::shared_ptr<IrBase>(m_rhs->getResult());
+                tac.m_src1 = std::shared_ptr<IrBase>(m_rhs->getResult());
             }
         }       
-        tac.m_arg2 = std::shared_ptr<IrBase>(getResult());
+        tac.m_dst = std::shared_ptr<IrBase>(getResult());
         
         ctx->append(tac);
     }

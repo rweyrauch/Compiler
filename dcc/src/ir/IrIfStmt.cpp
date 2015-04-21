@@ -135,14 +135,14 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
             tac.m_opcode = IrOpcode::IFZ;
             if (isBooleanLiteral(boolexpr->getLeftHandSide().get()))
             {
-                tac.m_arg0 = boolexpr->getLeftHandSide();
+                tac.m_src0 = boolexpr->getLeftHandSide();
             }
             else
             {
-                tac.m_arg0 = boolexpr->getLeftHandSide()->getResult();        
+                tac.m_src0 = boolexpr->getLeftHandSide()->getResult();        
             }
-            tac.m_arg1 = m_falseBlock ? m_labelFalse : m_labelEnd;
-            tac.m_arg2 = nullptr;
+            tac.m_src1 = m_falseBlock ? m_labelFalse : m_labelEnd;
+            tac.m_dst = nullptr;
     
             ctx->append(tac);
         }
@@ -154,14 +154,14 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
             tac.m_opcode = IrOpcode::IFZ;
             if (isBooleanLiteral(boolexpr->getRightHandSide().get()))
             {
-                tac.m_arg0 = boolexpr->getRightHandSide();
+                tac.m_src0 = boolexpr->getRightHandSide();
             }
             else
             {
-                tac.m_arg0 = boolexpr->getRightHandSide()->getResult();        
+                tac.m_src0 = boolexpr->getRightHandSide()->getResult();        
             }
-            tac.m_arg1 = m_falseBlock ? m_labelFalse : m_labelEnd;
-            tac.m_arg2 = nullptr;
+            tac.m_src1 = m_falseBlock ? m_labelFalse : m_labelEnd;
+            tac.m_dst = nullptr;
     
             ctx->append(tac);
         }
@@ -173,9 +173,9 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
             valid = false;
         
         tac.m_opcode = IrOpcode::IFZ;
-        tac.m_arg0 = m_condition;        
-        tac.m_arg1 = m_falseBlock ? m_labelFalse : m_labelEnd;
-        tac.m_arg2 = nullptr;
+        tac.m_src0 = m_condition;        
+        tac.m_src1 = m_falseBlock ? m_labelFalse : m_labelEnd;
+        tac.m_dst = nullptr;
     
         ctx->append(tac);
     }
@@ -185,9 +185,9 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
             valid = false;
         
         tac.m_opcode = IrOpcode::IFZ;
-        tac.m_arg0 = std::shared_ptr<IrBase>(m_condition->getResult());        
-        tac.m_arg1 = m_falseBlock ? m_labelFalse : m_labelEnd;
-        tac.m_arg2 = nullptr;
+        tac.m_src0 = std::shared_ptr<IrBase>(m_condition->getResult());        
+        tac.m_src1 = m_falseBlock ? m_labelFalse : m_labelEnd;
+        tac.m_dst = nullptr;
     
         ctx->append(tac);
     }
@@ -199,7 +199,7 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
         
         IrTacStmt jump;
         jump.m_opcode = IrOpcode::JUMP;
-        jump.m_arg0 = m_labelEnd;
+        jump.m_src0 = m_labelEnd;
         
         ctx->append(jump);
     }
@@ -208,7 +208,7 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
     {                          
         IrTacStmt label;
         label.m_opcode = IrOpcode::LABEL;
-        label.m_arg0 = m_labelFalse;
+        label.m_src0 = m_labelFalse;
         ctx->append(label);
     
         if (!m_falseBlock->codegen(ctx))
@@ -217,7 +217,7 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
     
     IrTacStmt elabel;
     elabel.m_opcode = IrOpcode::LABEL;
-    elabel.m_arg0 = m_labelEnd;
+    elabel.m_src0 = m_labelEnd;
     ctx->append(elabel);
 
     ctx->popParent();

@@ -174,8 +174,8 @@ void IrTraversalContext::genStrings()
     {
         IrTacStmt tac;
         tac.m_opcode = IrOpcode::STRING;
-        tac.m_arg0 = it->second.m_name;
-        tac.m_arg1 = it->second.m_value;
+        tac.m_src0 = it->second.m_name;
+        tac.m_src1 = it->second.m_value;
         
         append(tac);
     }

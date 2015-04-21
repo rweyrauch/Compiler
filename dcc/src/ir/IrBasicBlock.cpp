@@ -49,44 +49,41 @@ bool isBinaryOp(IrOpcode opcode)
 
 bool IrBasicBlock::commonSubexpressionElimination()
 {
-    int nextValueNumber = 42;
-    
     m_value_numbering_map.clear();
-    
+        
     // Statement of form: T <- L op R
     for (auto it : m_statements)
     {
         if (!isBinaryOp(it.m_opcode))
             continue;
         
-        // Get/create the value numbers of T, L and R
-   
-        Key keyL(it.m_arg0->asString(), IrOpcode::NOOP, "");
+        // Get/create the value numbers of T, L and R      
+        Key keyL(it.m_src0->asString(), IrOpcode::NOOP, "");
         auto lip = m_value_numbering_map.find(keyL);
         if (lip == m_value_numbering_map.end())
         {
-            m_value_numbering_map[keyL] = nextValueNumber++;
+            m_value_numbering_map[keyL] = m_next_value_number++;
         }
         
-        if (it.m_arg1 != nullptr)
+        if (it.m_src1 != nullptr)
         {
-            Key keyR(it.m_arg1->asString(), IrOpcode::NOOP, "");
+            Key keyR(it.m_src1->asString(), IrOpcode::NOOP, "");
             auto rip = m_value_numbering_map.find(keyR);
             if (rip == m_value_numbering_map.end())
             {
-                m_value_numbering_map[keyR] = nextValueNumber++;
+                m_value_numbering_map[keyR] = m_next_value_number++;
             }
         }
         
-        Key keyT(it.m_arg2->asString(), IrOpcode::NOOP, "");
+        Key keyT(it.m_dst->asString(), IrOpcode::NOOP, "");
         auto tip = m_value_numbering_map.find(keyT);
         if (tip == m_value_numbering_map.end())
         {
-            m_value_numbering_map[keyT] = nextValueNumber++;
+            m_value_numbering_map[keyT] = m_next_value_number++;
         }
         
         // Create key from op, L and R.
-        Key keyExpr(it.m_arg0->asString(), it.m_opcode, (it.m_arg1 != nullptr) ? it.m_arg1->asString() : "");
+        Key keyExpr(it.m_src0->asString(), it.m_opcode, (it.m_src1 != nullptr) ? it.m_src1->asString() : "");
                 
         auto mip = m_value_numbering_map.find(keyExpr);
         if (mip != m_value_numbering_map.end())
@@ -96,7 +93,7 @@ bool IrBasicBlock::commonSubexpressionElimination()
         else
         {
             // insert new value number into table using the key
-            int value = nextValueNumber++;
+            int value = m_next_value_number++;
             m_value_numbering_map[keyExpr] = value;
             
             // record that new value for T.
@@ -113,12 +110,13 @@ bool IrBasicBlock::commonSubexpressionElimination()
         std::cout << "]" << std::endl;
     }
     
+/*    
     for (auto it : m_statements)
     {
         if (!isBinaryOp(it.m_opcode))
             continue;
         
-        Key keyExpr(it.m_arg0->asString(), it.m_opcode, (it.m_arg1 != nullptr) ? it.m_arg1->asString() : "");
+        Key keyExpr(it.m_src0->asString(), it.m_opcode, (it.m_src1 != nullptr) ? it.m_src1->asString() : "");
         auto mip = m_value_numbering_map.find(keyExpr);
         if (mip != m_value_numbering_map.end())
         {
@@ -129,7 +127,125 @@ bool IrBasicBlock::commonSubexpressionElimination()
             std::cout << "-" << std::endl;
         }
     }
+*/
+/*
+    for i ← 1 to n
+        r ← value number for rhs[i]
+        l ← value number for lhs[i]
+        if op[i] is a store then
+            SYMBOLS[result[i]].val ← r
+            if r is constant then
+                SYMBOLS[lhs[i]].isConstant ← true
+        else // an expression
+            if l is constant then replace lhs[i] with constant
+            if r is constant then replace rhs[i] with constant
+            if l and r are both constant then
+                create CONSTANTS(l, op[i], r)
+                CONSTANTS(l, op[i], r).bits ← eval(l op[i] r)
+                CONSTANTS(l, op[i], r).val ← new value number
+                replace (lhs op[i] rhs) with “ constant (l op[i] r)”
+            else if (l, op[i], r) ∈ AVAIL then
+                replace (lhs op[i] rhs) with “AVAIL(l, op[i], r).result[j]”
+            else create AVAIL(l, op[i], r)
+                AVAIL(l, op[i], r).val ← new value number
+            endif
+            SYMBOLS[result[i]].val ← value number of expression
+        endif
+        for all AVAIL(l, op[ j], r)
+            if result[i].val = l or r or result[ j].val, ( j < i)
+                remove (l, op[ j], r) from AVAIL
+        endfor
+    endfor
+*/
+#if 0
+    // Statement of form: T <- L op R
+    for (auto it = m_statements.begin(); it != m_statements.end(); ++it)
+    {
+        if (!isBinaryOp(it->m_opcode))
+            continue;
+        
+        int l = getValueNumber(it->m_src0);
+        int r = getValueNumber(it->m_src1);
+        int res = getValueNumber(it->m_dst);
+        
+        if (it->m_opcode == IrOpcode::MOV)
+        {
+            // dst = arg0 (arg0 is lhs)
+            m_symbols[it->m_dst->asString()].m_value_number = l;
+            m_symbols[it->m_dst->asString()].m_isConstant = m_symbols[it->m_src0->asString()].m_isConstant;
+        }
+        else // expression of form: result = lhs op rhs
+        {
+            //if (m_symbols[it.m_src0->asString()].m_isConstant)
+            //{
+            //}
+            //if (m_symbols[it.m_src1->asString()].m_isConstant)
+            //{
+            //}
+            if (m_symbols[it->m_src0->asString()].m_isConstant && m_symbols[it->m_src1->asString()].m_isConstant)
+            {
+                // create a new constant C = src0 op src1
+            }
+            else
+            {
+                ValueKey key;
+                key.m_lhs = l;
+                key.m_op = (int)it->m_opcode;
+                key.m_rhs = r;
+                
+                auto ait = m_availables.find(key);
+                if (ait != m_availables.end())
+                {
+                    // replace (lhs op[i] rhs) with “AVAIL(l, op[i], r).result[j]”
+                    it->m_src0 = ait->second.m_stmt.m_dst;
+                    it->m_opcode = IrOpcode::MOV;
+                    it->m_src1 = nullptr;
+                }
+                else
+                {
+                    Available avail;
+                    avail.m_lhs = key.m_lhs;
+                    avail.m_op = key.m_op;
+                    avail.m_rhs = key.m_rhs;
+                    avail.m_result = res;
+                    avail.m_stmt = *it;
+                    
+                    m_availables[key] = avail;
+                }
+            }
+            
+            // Create key from op, L and R.
+            std::string exprKey = it->m_src0->asString() + IrOpcodeToString(it->m_opcode) + it->m_src1->asString();                
+            auto mip = m_symbols.find(exprKey);
+            if (mip == m_symbols.end())
+            {
+                // insert new value number into table using the key
+                Symbol symbol;
+                symbol.m_name = exprKey;
+                symbol.m_value_number = m_next_value_number++;
+                symbol.m_isConstant = false;
+                
+                m_symbols[exprKey] = symbol;
+            }
+        }
+        /*
+        for all AVAIL(l, op[ j], r)
+            if result[i].val = l or r or result[ j].val, ( j < i)
+                remove (l, op[ j], r) from AVAIL
+        endfor
+        */
+        for (auto iit = m_statements.begin(); iit != it; ++iit)
+        {
+            
+        }
+    }
+#endif
     
+    for (auto it : m_statements)
+    {
+        IrPrintTac(it, std::cout);
+    }
+
     return true;
 }
 
@@ -151,6 +267,31 @@ void IrBasicBlock::print(std::ostream& stream)
         
         stream << "----End----" << std::endl;
     }
+}
+
+int IrBasicBlock::getValueNumber(const std::shared_ptr<IrBase>& arg)
+{
+    if (arg == nullptr)
+        return 0;
+    
+    auto it = m_symbols.find(arg->asString());
+    if (it != m_symbols.end())
+    {
+        return it->second.m_value_number;
+    }
+    
+    Symbol symbol;
+    symbol.m_name = arg->asString();
+    symbol.m_value_number = m_next_value_number++;
+    symbol.m_isConstant = false;
+    
+    const IrLiteral* literal = dynamic_cast<const IrLiteral*>(arg.get());
+    if (literal != nullptr)
+        symbol.m_isConstant = true;
+    
+    m_symbols[symbol.m_name] = symbol;
+    
+    return symbol.m_value_number;
 }
 
 } // namespace Decaf

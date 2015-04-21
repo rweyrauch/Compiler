@@ -39,7 +39,8 @@ class IrBasicBlock
 public:
     IrBasicBlock() :
         m_statements(),
-        m_value_numbering_map()
+        m_value_numbering_map(),
+        m_next_value_number(42)
     {}
     
     virtual ~IrBasicBlock() 
@@ -107,33 +108,6 @@ protected:
         }
     };
     
-    std::unordered_map<Key, int, KeyHasher> m_value_numbering_map;
-    
-    struct Symbol
-    {
-        std::string m_name;
-        int m_value_number;
-        bool m_isConstants;
-    };
-    
-    std::map<std::string, Symbol> m_symbols;
-    
-    struct Constant
-    {
-        int m_value_number;
-        IrType m_type;
-        int m_value_int;
-        double m_value_double;
-        bool m_value_bool;
-    };
-    
-    struct ValueKey
-    {
-        int m_lhs;
-        int m_op;
-        int m_rhs;
-    };
-    
     struct Available
     {
         int m_lhs;
@@ -143,8 +117,52 @@ protected:
         IrTacStmt m_stmt;
     };
     
+    std::unordered_map<Key, int, KeyHasher> m_value_numbering_map;
+    
+    struct Symbol
+    {
+        std::string m_name;
+        int m_value_number;
+        bool m_isConstant;
+    };
+    
+    std::map<std::string, Symbol> m_symbols;
+    
+    struct Constant
+    {
+        int m_value_number;
+        IrType m_type;
+        union
+        {
+            int m_value_int;
+            double m_value_double;
+            bool m_value_bool;
+        };
+    };
+    
+    struct ValueKey
+    {
+        int m_lhs;
+        int m_op;
+        int m_rhs;
+        
+       bool operator<(const ValueKey& lhs) const
+       {
+            if (m_lhs < lhs.m_lhs)
+                return true;
+            else if (m_op < lhs.m_op)
+                return true;
+            else if (m_rhs < lhs.m_rhs)
+                return true;
+            return false;
+        }      
+    };
+        
     std::map<ValueKey, Constant> m_constants;  
     std::map<ValueKey, Available> m_availables;
+    int m_next_value_number;
+    
+    int getValueNumber(const std::shared_ptr<IrBase>& arg);
     
 private:
     IrBasicBlock(const IrBasicBlock& rhs) = delete;

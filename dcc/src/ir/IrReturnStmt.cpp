@@ -76,11 +76,11 @@ bool IrReturnStatement::codegen(IrTraversalContext* ctx)
         IrLiteral* literal = dynamic_cast<IrLiteral*>(m_returnValue.get());
         if (literal)
         {
-            tac.m_arg0 = m_returnValue;
+            tac.m_src0 = m_returnValue;
         }
         else
         {
-            tac.m_arg0 = std::shared_ptr<IrBase>(m_returnValue->getResult());
+            tac.m_src0 = std::shared_ptr<IrBase>(m_returnValue->getResult());
         }
     }
     ctx->append(tac);

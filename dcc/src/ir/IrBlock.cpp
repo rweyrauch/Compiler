@@ -119,14 +119,14 @@ bool IrBlock::codegen(IrTraversalContext* ctx)
             IrTacStmt initVar;
             initVar.m_opcode = IrOpcode::MOV;
             if (it->getType() == IrType::Integer)
-                initVar.m_arg0 = IrIntegerLiteral::GetZero();
+                initVar.m_src0 = IrIntegerLiteral::GetZero();
             else if (it->getType() == IrType::Boolean)
-                initVar.m_arg0 = IrBooleanLiteral::GetFalse();
+                initVar.m_src0 = IrBooleanLiteral::GetFalse();
             else if (it->getType() == IrType::Double)
-                initVar.m_arg0 = IrDoubleLiteral::GetZero();
-            initVar.m_arg2 = var;
+                initVar.m_src0 = IrDoubleLiteral::GetZero();
+            initVar.m_dst = var;
             
-            if (initVar.m_arg0)
+            if (initVar.m_src0)
                 ctx->append(initVar);
         }
     }

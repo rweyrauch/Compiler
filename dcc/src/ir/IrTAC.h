@@ -34,26 +34,26 @@ class IrIdentifier;
 enum class IrOpcode : int
 {
     NOOP = 0,
-    MOV,        // arg0 -> arg2
-    LOAD,       // *[arg0 + arg1] -> arg2
-    STORE,      // arg0 -> *[arg1 + arg2]
-    ADD,        // arg0 + arg1 -> arg2
-    SUB,        // arg0 - arg1 -> arg2
-    MUL,        // arg0 * arg1 -> arg2
-    DIV,        // arg0 / arg1 -> arg2
-    MOD,        // arg0 % arg1 -> arg2
+    MOV,        // arg0 -> dst
+    LOAD,       // *[arg0 + arg1] -> dst
+    STORE,      // arg0 -> *[arg1 + dst]
+    ADD,        // arg0 + arg1 -> dst
+    SUB,        // arg0 - arg1 -> dst
+    MUL,        // arg0 * arg1 -> dst
+    DIV,        // arg0 / arg1 -> dst
+    MOD,        // arg0 % arg1 -> dst
     CALL,       // call arg0 arg1
     FBEGIN,     // begin function
     RETURN,     // return |arg0|
-    EQUAL,      // arg0 == arg1 -> arg2 (0 or 1)
-    NOTEQUAL,   // arg0 != arg1 -> arg2 (0 or 1)
-    LESS,       // arg0 < arg1 -> arg2 (0 or 1)
-    LESSEQUAL,  // arg0 <= arg1 -> arg2 (0 or 1)
-    GREATER,    // arg0 > arg1 -> arg2 (0 or 1)
-    GREATEREQUAL, // arg0 >= arg1 -> arg2 (0 or 1)
-    AND,        // arg0 && arg1 -> arg2 (0 or 1)
-    OR,         // arg0 || arg1 -> arg2 (0 or 1)
-    NOT,        // !arg0 -> arg2 (0 or 1)
+    EQUAL,      // arg0 == arg1 -> dst (0 or 1)
+    NOTEQUAL,   // arg0 != arg1 -> dst (0 or 1)
+    LESS,       // arg0 < arg1 -> dst (0 or 1)
+    LESSEQUAL,  // arg0 <= arg1 -> dst (0 or 1)
+    GREATER,    // arg0 > arg1 -> dst (0 or 1)
+    GREATEREQUAL, // arg0 >= arg1 -> dst (0 or 1)
+    AND,        // arg0 && arg1 -> dst (0 or 1)
+    OR,         // arg0 || arg1 -> dst (0 or 1)
+    NOT,        // !arg0 -> dst (0 or 1)
     LABEL,      // arg0:
     JUMP,       // jump arg0
     IFZ,        // branch arg0 == 0 to arg1
@@ -72,14 +72,14 @@ struct IrTacStmt
 {
     IrTacStmt() :
         m_opcode(IrOpcode::NOOP),
-        m_arg0(nullptr),
-        m_arg1(nullptr),
-        m_arg2(nullptr),
+        m_src0(nullptr),
+        m_src1(nullptr),
+        m_dst(nullptr),
         m_info(0)
     {}
         
     IrOpcode m_opcode;
-    std::shared_ptr<IrBase> m_arg0, m_arg1, m_arg2;
+    std::shared_ptr<IrBase> m_src0, m_src1, m_dst;
     int m_info;
 };
 

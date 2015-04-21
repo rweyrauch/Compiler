@@ -251,25 +251,25 @@ void IrPrintTac(const IrTacStmt& stmt, std::ostream& stream)
     
     if (stmt.m_opcode != IrOpcode::LABEL)
     {
-        if (stmt.m_arg0)
+        if (stmt.m_src0)
         {
-            IrPrintTacArg(stmt.m_arg0, stream);
+            IrPrintTacArg(stmt.m_src0, stream);
         }
-        if (stmt.m_arg1)
+        if (stmt.m_src1)
         {
-            if (stmt.m_arg0) stream << ", ";
+            if (stmt.m_src0) stream << ", ";
             
-            IrPrintTacArg(stmt.m_arg1, stream);
+            IrPrintTacArg(stmt.m_src1, stream);
         }
-        if (stmt.m_arg2)
+        if (stmt.m_dst)
         {
             stream << ", ";
-            IrPrintTacArg(stmt.m_arg2, stream);
+            IrPrintTacArg(stmt.m_dst, stream);
         }
     }
     else
     {
-        IrPrintTacLabel(stmt.m_arg0, stream); stream << " ";
+        IrPrintTacLabel(stmt.m_src0, stream); stream << " ";
     }
     
     stream << "\t// " << stmt.m_info << std::endl;
@@ -523,10 +523,10 @@ void IrGenComparison(const IrTacStmt& stmt, std::ostream& stream)
     stream << std::endl;
     
     // make sure the second arg is not an immediate nor a memory access
-    IrGenMov(stmt.m_arg0, g_tempReg, stream);
+    IrGenMov(stmt.m_src0, g_tempReg, stream);
     
     stream << "cmp ";
-    IrOutputArg(stmt.m_arg1, stream);
+    IrOutputArg(stmt.m_src1, stream);
     stream << ", ";
     IrOutputArg(g_tempReg, stream);
     stream << std::endl;  
@@ -569,7 +569,7 @@ void IrGenComparison(const IrTacStmt& stmt, std::ostream& stream)
     IrOutputArg(g_retReg, stream);
     stream << std::endl;
     
-    IrGenMov(g_retReg, stmt.m_arg2, stream);      
+    IrGenMov(g_retReg, stmt.m_dst, stream);      
 }
 
 static std::vector<std::shared_ptr<IrBase>> g_funcCallParams;
@@ -648,28 +648,28 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
     switch(stmt.m_opcode)
     {
     case IrOpcode::MOV:        // arg0 -> arg2
-        IrGenMov(stmt.m_arg0, stmt.m_arg2, stream);
+        IrGenMov(stmt.m_src0, stmt.m_dst, stream);
         break;
         
     case IrOpcode::LOAD:       // *[arg0 + arg1] -> arg2
-        IrGenLoad(stmt.m_arg0, stmt.m_arg1, stmt.m_arg2, stream);
+        IrGenLoad(stmt.m_src0, stmt.m_src1, stmt.m_dst, stream);
         break;
         
     case IrOpcode::STORE:      // arg0 -> *[arg1 + arg2]
-        IrGenStore(stmt.m_arg0, stmt.m_arg1, stmt.m_arg2, stream);
+        IrGenStore(stmt.m_src0, stmt.m_src1, stmt.m_dst, stream);
         break;
         
     case IrOpcode::ADD:        // arg0 + arg1 -> arg2
     case IrOpcode::SUB:        // arg0 - arg1 -> arg2
-        IrGenMov(stmt.m_arg0, g_tempReg, stream);
+        IrGenMov(stmt.m_src0, g_tempReg, stream);
         
         stream << (stmt.m_opcode == IrOpcode::ADD ? "add " : "sub ");
-        IrOutputArg(stmt.m_arg1, stream);
+        IrOutputArg(stmt.m_src1, stream);
         stream << ", ";
         IrOutputArg(g_tempReg, stream);
         stream << std::endl;
         
-        IrGenMov(g_tempReg, stmt.m_arg2, stream);
+        IrGenMov(g_tempReg, stmt.m_dst, stream);
         break;
         
     case IrOpcode::MUL:        // arg0 * arg1 -> arg2
@@ -682,39 +682,39 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         IrOutputArg(g_outReg, stream);
         stream << std::endl;
         
-        IrGenMov(stmt.m_arg0, g_retReg, stream); // arg0 => %rax
+        IrGenMov(stmt.m_src0, g_retReg, stream); // arg0 => %rax
         
         // make sure the second arg is not an immediate nor a memory access
-        IrGenMov(stmt.m_arg1, g_tempReg, stream);
+        IrGenMov(stmt.m_src1, g_tempReg, stream);
         
         stream << (stmt.m_opcode == IrOpcode::MUL ? "imul " : "idiv ");
         IrOutputArg(g_tempReg, stream);
         stream << std::endl;
         
         if (stmt.m_opcode == IrOpcode::MOD)
-            IrGenMov(g_outReg, stmt.m_arg2, stream); // %rdx => arg2            
+            IrGenMov(g_outReg, stmt.m_dst, stream); // %rdx => arg2            
         else
-            IrGenMov(g_retReg, stmt.m_arg2, stream); // %rax => arg2
+            IrGenMov(g_retReg, stmt.m_dst, stream); // %rax => arg2
         break;
          
     case IrOpcode::CALL:       // call arg0 arg1
 		IrGenParamPush(stream);
 		
         stream << "call ";
-        IrOutputLabel(stmt.m_arg0, stream);
+        IrOutputLabel(stmt.m_src0, stream);
         stream << std::endl;
         
-        if (stmt.m_arg1 != nullptr)
+        if (stmt.m_src1 != nullptr)
         {
-            IrGenMov(g_retReg, stmt.m_arg1, stream);
+            IrGenMov(g_retReg, stmt.m_src1, stream);
         }
         break;
         
     case IrOpcode::FBEGIN:     // begin function
         stream << ".global ";
-        IrOutputLabel(stmt.m_arg0, stream);
+        IrOutputLabel(stmt.m_src0, stream);
         stream << std::endl;
-        IrOutputLabel(stmt.m_arg0, stream);
+        IrOutputLabel(stmt.m_src0, stream);
         stream << ":" << std::endl; 
         stream << "enter $" << stmt.m_info << ", $0" << std::endl;
         
@@ -724,9 +724,9 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         break;
         
     case IrOpcode::RETURN:     // return |arg0|
-        if (stmt.m_arg0 != nullptr)
+        if (stmt.m_src0 != nullptr)
         {
-            IrGenMov(stmt.m_arg0, g_retReg, stream);
+            IrGenMov(stmt.m_src0, g_retReg, stream);
         }
         stream << "leave" << std::endl;
         stream << "ret" << std::endl;
@@ -744,20 +744,20 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
     case IrOpcode::AND:        // arg0 && arg1 -> arg2 (0 or 1)
     case IrOpcode::OR:         // arg0 || arg1 -> arg2 (0 or 1)
         // make sure the second arg is not an immediate nor a memory access
-        IrGenMov(stmt.m_arg1, g_tempReg, stream);
+        IrGenMov(stmt.m_src1, g_tempReg, stream);
     
         stream << (stmt.m_opcode == IrOpcode::AND ? "and " : "or ");
-        IrOutputArg(stmt.m_arg0, stream);
+        IrOutputArg(stmt.m_src0, stream);
         stream << ", ";
         IrOutputArg(g_tempReg, stream);
         stream << std::endl;
     
-        IrGenMov(g_tempReg, stmt.m_arg2, stream);        
+        IrGenMov(g_tempReg, stmt.m_dst, stream);        
         break;
         
     case IrOpcode::NOT:        // !arg1 -> arg2 (0 or 1)
         // make sure the arg is not an immediate 
-        IrGenMov(stmt.m_arg1, g_tempReg, stream);
+        IrGenMov(stmt.m_src1, g_tempReg, stream);
         
         // 'not' is a bit-wise invert 
         stream << "not ";
@@ -769,53 +769,53 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         IrOutputArg(g_tempReg, stream);
         stream << std::endl;
         
-        IrGenMov(g_tempReg, stmt.m_arg2, stream);        
+        IrGenMov(g_tempReg, stmt.m_dst, stream);        
         break;
         
     case IrOpcode::LABEL:      // arg0:
-        IrOutputLabel(stmt.m_arg0, stream);
+        IrOutputLabel(stmt.m_src0, stream);
         stream << ":" << std::endl;
         break;
         
     case IrOpcode::JUMP:       // jump arg0
         stream << "jmp ";
-        IrOutputLabel(stmt.m_arg0, stream);
+        IrOutputLabel(stmt.m_src0, stream);
         stream << std::endl;
         break;
         
     case IrOpcode::IFZ:        // branch arg0 == 0 to arg1
         stream << "cmp $0, ";       
-        IrOutputArg(stmt.m_arg0, stream);
+        IrOutputArg(stmt.m_src0, stream);
         stream << std::endl;
         
         stream << "je ";        // jump if cmp == 0
-        IrOutputLabel(stmt.m_arg1, stream);
+        IrOutputLabel(stmt.m_src1, stream);
         stream << std::endl;
         break;
         
     case IrOpcode::IFNZ:        // jump if cmp != 0
         stream << "cmp $0, ";       
-        IrOutputArg(stmt.m_arg0, stream);
+        IrOutputArg(stmt.m_src0, stream);
         stream << std::endl;
         
         stream << "jne ";        // jump if cmp != 0
-        IrOutputLabel(stmt.m_arg1, stream);
+        IrOutputLabel(stmt.m_src1, stream);
         stream << std::endl;
         break;
         
     case IrOpcode::PARAM:       // push arg0 -> stack
-		g_funcCallParams.push_back(stmt.m_arg0);
+		g_funcCallParams.push_back(stmt.m_src0);
         break;
     
     case IrOpcode::GETPARAM:	// stack -> arg0
         if (g_ia64)
         {
 			bool onStack = false;
-			if (IrIsDouble(stmt.m_arg0))
+			if (IrIsDouble(stmt.m_src0))
 			{
 				if (g_nextUsedDoubleParamReg < NUM_DOUBLE_ARG_REGS)
 				{
-					IrGenMov(g_paramDoubleRegisters[g_nextUsedDoubleParamReg], stmt.m_arg0, stream);
+					IrGenMov(g_paramDoubleRegisters[g_nextUsedDoubleParamReg], stmt.m_src0, stream);
 					g_nextUsedDoubleParamReg++;
 				}
 				else
@@ -827,7 +827,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
 			{
 				if (g_nextUsedNormalParamReg < NUM_ARG_REGS)
 				{
-					IrGenMov(g_paramRegisters[g_nextUsedNormalParamReg], stmt.m_arg0, stream);
+					IrGenMov(g_paramRegisters[g_nextUsedNormalParamReg], stmt.m_src0, stream);
 					g_nextUsedNormalParamReg++;
 				}
 				else
@@ -847,7 +847,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
 				stream << "movq ";
 				IrOutputArg(g_tempReg, stream);
 				stream << ", ";
-				IrOutputArg(stmt.m_arg0, stream);
+				IrOutputArg(stmt.m_src0, stream);
 				stream << std::endl;
 				
 				g_nextParamStackLocation++;			
@@ -865,7 +865,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
             stream << "movl ";
             IrOutputArg(g_tempReg, stream);
             stream << ", ";
-            IrOutputArg(stmt.m_arg0, stream);
+            IrOutputArg(stmt.m_src0, stream);
             stream << std::endl;
             
             g_nextParamStackLocation++;
@@ -873,16 +873,16 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         break;
         
     case IrOpcode::STRING:     // string label -> arg0 value -> arg1
-        IrOutputLabel(stmt.m_arg0, stream);
+        IrOutputLabel(stmt.m_src0, stream);
         stream << ":" << std::endl;
         stream << ".string ";
-        IrOutputLabel(stmt.m_arg1, stream);
+        IrOutputLabel(stmt.m_src1, stream);
         stream << std::endl;
         break;
         
     case IrOpcode::GLOBAL:
         stream << ".lcomm ";	// put global allocations in zero-initialized section (ie bss)
-        IrOutputLabel(stmt.m_arg0, stream);
+        IrOutputLabel(stmt.m_src0, stream);
         stream << "," << stmt.m_info << std::endl;
         break;
         

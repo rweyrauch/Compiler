@@ -56,7 +56,7 @@ bool IrGotoStatement::codegen(IrTraversalContext* ctx)
     
     IrTacStmt tac;
     tac.m_opcode = IrOpcode::JUMP;
-    tac.m_arg0 = m_label;
+    tac.m_src0 = m_label;
 
     ctx->append(tac);
     
