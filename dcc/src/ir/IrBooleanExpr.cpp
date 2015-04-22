@@ -256,10 +256,12 @@ bool IrBooleanExpression::codegen(IrTraversalContext* ctx)
             if (literal)
             {
                 tac.m_src0 = m_lhs;
+                tac.m_src00.build(literal);
             }
             else
             {
                 tac.m_src0 = std::shared_ptr<IrBase>(m_lhs->getResult());
+                tac.m_src00.build(m_lhs->getResult().get());
             }
         }
         if (m_rhs != nullptr)
@@ -268,13 +270,16 @@ bool IrBooleanExpression::codegen(IrTraversalContext* ctx)
             if (literal)
             {
                 tac.m_src1 = m_rhs;
+                tac.m_src01.build(literal);
             }
             else
             {
                 tac.m_src1 = std::shared_ptr<IrBase>(m_rhs->getResult());
+                tac.m_src01.build(m_rhs->getResult().get());
             }
         }       
         tac.m_dst = std::shared_ptr<IrBase>(getResult());
+        tac.m_dst00.build(getResult().get());
         
         ctx->append(tac);
     }

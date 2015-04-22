@@ -84,6 +84,7 @@ enum class IrUsage : unsigned char
     Identifier,
     Global,
     Literal,
+    Argument,
     Register
 };
 enum class IrArgType : unsigned char
@@ -106,12 +107,13 @@ struct IrTacArg
         m_value.m_int = 0;
     }        
    
-	IrTacArg(const IrIdentifier* ident);
-	IrTacArg(const IrIntegerLiteral* literal);
-	IrTacArg(const IrDoubleLiteral* literal);
-	IrTacArg(const IrBooleanLiteral* literal);
-	IrTacArg(const IrStringLiteral* literal);
-	
+    void build(const IrIdentifier* ident);
+    void build(const IrLiteral* literal);
+    void build(const IrIntegerLiteral* literal);
+    void build(const IrDoubleLiteral* literal);
+    void build(const IrBooleanLiteral* literal);
+    void build(const IrStringLiteral* literal);
+
     IrUsage m_usage;
     IrArgType m_type;
     union {
@@ -129,6 +131,9 @@ struct IrTacStmt
 {
     IrTacStmt() :
         m_opcode(IrOpcode::NOOP),
+        m_src00(),
+        m_src01(),
+        m_dst00(),
         m_src0(nullptr),
         m_src1(nullptr),
         m_dst(nullptr),
@@ -136,6 +141,7 @@ struct IrTacStmt
     {}
         
     IrOpcode m_opcode;
+    IrTacArg m_src00, m_src01, m_dst00;
     std::shared_ptr<IrBase> m_src0, m_src1, m_dst;
     int m_info;
 };

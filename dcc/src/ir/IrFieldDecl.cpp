@@ -78,6 +78,7 @@ bool IrFieldDecl::codegen(IrTraversalContext* ctx)
         tac.m_opcode = IrOpcode::GLOBAL;
         tac.m_src0 = m_location->getIdentifier();
         tac.m_info = symbol.m_count * 8;
+        tac.m_src00.build(m_location->getIdentifier().get());
         ctx->append(tac);
     }
     

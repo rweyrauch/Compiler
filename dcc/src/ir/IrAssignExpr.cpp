@@ -198,10 +198,12 @@ bool IrAssignExpression::codegen(IrTraversalContext* ctx)
             if (literal)
             {
                 tac.m_src0 = m_rhs;
+                tac.m_src00.build(literal);
             }
             else
             {
                 tac.m_src0 = std::shared_ptr<IrBase>(m_rhs->getResult());
+                tac.m_src00.build(m_rhs->getResult().get());
             }
         }       
         if (m_lhs != nullptr)
@@ -210,15 +212,18 @@ bool IrAssignExpression::codegen(IrTraversalContext* ctx)
             if (literal)
             {
                 tac.m_dst = m_lhs;
+                tac.m_dst00.build(literal);
             }
             else
             {
                 tac.m_dst = std::shared_ptr<IrBase>(m_lhs->getResult());
+                tac.m_dst00.build(m_lhs->getResult().get());
             }
             
             if (m_operator != IrAssignmentOperator::Assign)
             {
                 tac.m_src1 = tac.m_dst;
+                tac.m_src01 = tac.m_dst00;
             }
         }
         ctx->append(tac);

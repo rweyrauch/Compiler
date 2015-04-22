@@ -35,73 +35,84 @@
 namespace Decaf
 {
 
-IrTacArg::IrTacArg(const IrIdentifier* ident) :
-	IrTacArg()
+void IrTacArg::build(const IrIdentifier* ident)
 {
-	if (ident != nullptr)
-	{
-		if (ident->isLabel())
-			m_usage = IrUsage::Label;
-		else if (ident->isGlobal())
-			m_usage = IrUsage::Global;
-		else
-			m_usage = IrUsage::Identifier;
-			
-		m_type = IrArgType::String;
-		m_value.m_address = ident->getAddress();
-		m_asString = ident->getIdentifier();
-	}
+    if (ident != nullptr)
+    {
+        if (ident->isLabel())
+            m_usage = IrUsage::Label;
+        else if (ident->isGlobal())
+            m_usage = IrUsage::Global;
+        else
+            m_usage = IrUsage::Identifier;
+            
+        m_type = IrArgType::String;
+        m_value.m_address = ident->getAddress();
+        m_asString = ident->getIdentifier();
+    }
 }
 
-IrTacArg::IrTacArg(const IrIntegerLiteral* literal) :
-	IrTacArg()
+void IrTacArg::build(const IrLiteral* literal)
 {
-	if (literal != nullptr)
-	{
-		m_usage = IrUsage::Literal;
-		m_isConstant = true;
-		m_type = IrArgType::Integer;
-		m_value.m_int = literal->getValue();
-		m_asString = literal->getValueAsString();
-	}
+    const IrIntegerLiteral* iliteral = dynamic_cast<const IrIntegerLiteral*>(literal);
+    const IrDoubleLiteral* dliteral = dynamic_cast<const IrDoubleLiteral*>(literal);
+    const IrBooleanLiteral* bliteral = dynamic_cast<const IrBooleanLiteral*>(literal);
+    const IrStringLiteral* sliteral = dynamic_cast<const IrStringLiteral*>(literal);
+    if (iliteral)
+        build(iliteral);
+    else if (dliteral)
+        build(dliteral);
+    else if (bliteral)
+        build(bliteral);
+    else if (sliteral)
+        build(sliteral);
 }
 
-IrTacArg::IrTacArg(const IrDoubleLiteral* literal) :
-	IrTacArg()
+void IrTacArg::build(const IrIntegerLiteral* literal)
 {
-	if (literal != nullptr)
-	{
-		m_usage = IrUsage::Literal;
-		m_isConstant = true;
-		m_type = IrArgType::Double;
-		m_value.m_double = literal->getValue();
-		m_asString = literal->getValueAsString();
-	}	
+    if (literal != nullptr)
+    {
+        m_usage = IrUsage::Literal;
+        m_isConstant = true;
+        m_type = IrArgType::Integer;
+        m_value.m_int = literal->getValue();
+        m_asString = literal->getValueAsString();
+    }
 }
 
-IrTacArg::IrTacArg(const IrBooleanLiteral* literal) :
-	IrTacArg()
+void IrTacArg::build(const IrDoubleLiteral* literal)
 {
-	if (literal != nullptr)
-	{
-		m_usage = IrUsage::Literal;
-		m_isConstant = true;
-		m_type = IrArgType::Boolean;
-		m_value.m_int = literal->getValue() ? 1 : 0;
-		m_asString = literal->getValueAsString();
-	}	
+    if (literal != nullptr)
+    {
+        m_usage = IrUsage::Literal;
+        m_isConstant = true;
+        m_type = IrArgType::Double;
+        m_value.m_double = literal->getValue();
+        m_asString = literal->getValueAsString();
+    }
 }
 
-IrTacArg::IrTacArg(const IrStringLiteral* literal) :
-	IrTacArg()
+void IrTacArg::build(const IrBooleanLiteral* literal)
 {
-	if (literal != nullptr)
-	{
-		m_usage = IrUsage::Literal;
-		m_isConstant = true;
-		m_type = IrArgType::String;
-		m_asString = literal->getValue();
-	}	
+    if (literal != nullptr)
+    {
+        m_usage = IrUsage::Literal;
+        m_isConstant = true;
+        m_type = IrArgType::Boolean;
+        m_value.m_int = literal->getValue() ? 1 : 0;
+        m_asString = literal->getValueAsString();
+    }
+}
+
+void IrTacArg::build(const IrStringLiteral* literal)
+{
+    if (literal != nullptr)
+    {
+        m_usage = IrUsage::Literal;
+        m_isConstant = true;
+        m_type = IrArgType::String;
+        m_asString = literal->getValue();
+    }
 }
 
 enum class IrReg : int

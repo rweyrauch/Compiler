@@ -74,6 +74,7 @@ bool IrBreakStatement::codegen(IrTraversalContext* ctx)
         IrTacStmt jump;
         jump.m_opcode = IrOpcode::JUMP;
         jump.m_src0 = m_parentLoop->getLoopEnd();
+        jump.m_src00.build(m_parentLoop->getLoopEnd().get());
         ctx->append(jump);
     }
     

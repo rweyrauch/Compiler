@@ -136,12 +136,19 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
             if (isBooleanLiteral(boolexpr->getLeftHandSide().get()))
             {
                 tac.m_src0 = boolexpr->getLeftHandSide();
+                tac.m_src00.build(dynamic_cast<IrBooleanLiteral*>(boolexpr->getLeftHandSide().get()));
             }
             else
             {
-                tac.m_src0 = boolexpr->getLeftHandSide()->getResult();        
+                tac.m_src0 = boolexpr->getLeftHandSide()->getResult(); 
+                tac.m_src00.build(boolexpr->getLeftHandSide()->getResult().get());
             }
             tac.m_src1 = m_falseBlock ? m_labelFalse : m_labelEnd;
+            if (m_falseBlock)
+                tac.m_src01.build(m_labelFalse.get());
+            else
+                tac.m_src01.build(m_labelEnd.get());
+            
             tac.m_dst = nullptr;
     
             ctx->append(tac);
@@ -155,12 +162,18 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
             if (isBooleanLiteral(boolexpr->getRightHandSide().get()))
             {
                 tac.m_src0 = boolexpr->getRightHandSide();
+                tac.m_src00.build(dynamic_cast<IrBooleanLiteral*>(boolexpr->getRightHandSide().get()));
             }
             else
             {
                 tac.m_src0 = boolexpr->getRightHandSide()->getResult();        
+                tac.m_src00.build(boolexpr->getRightHandSide()->getResult().get());
             }
             tac.m_src1 = m_falseBlock ? m_labelFalse : m_labelEnd;
+            if (m_falseBlock)
+                tac.m_src01.build(m_labelFalse.get());
+            else
+                tac.m_src01.build(m_labelEnd.get());
             tac.m_dst = nullptr;
     
             ctx->append(tac);
@@ -173,8 +186,13 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
             valid = false;
         
         tac.m_opcode = IrOpcode::IFZ;
-        tac.m_src0 = m_condition;        
+        tac.m_src0 = m_condition;  
+        tac.m_src00.build(literal);
         tac.m_src1 = m_falseBlock ? m_labelFalse : m_labelEnd;
+        if (m_falseBlock)
+            tac.m_src01.build(m_labelFalse.get());
+        else
+            tac.m_src01.build(m_labelEnd.get());
         tac.m_dst = nullptr;
     
         ctx->append(tac);
@@ -185,8 +203,13 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
             valid = false;
         
         tac.m_opcode = IrOpcode::IFZ;
-        tac.m_src0 = std::shared_ptr<IrBase>(m_condition->getResult());        
+        tac.m_src0 = std::shared_ptr<IrBase>(m_condition->getResult());
+        tac.m_src00.build(m_condition->getResult().get());
         tac.m_src1 = m_falseBlock ? m_labelFalse : m_labelEnd;
+        if (m_falseBlock)
+            tac.m_src01.build(m_labelFalse.get());
+        else
+            tac.m_src01.build(m_labelEnd.get());
         tac.m_dst = nullptr;
     
         ctx->append(tac);
@@ -200,7 +223,7 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
         IrTacStmt jump;
         jump.m_opcode = IrOpcode::JUMP;
         jump.m_src0 = m_labelEnd;
-        
+        jump.m_src00.build(m_labelEnd.get());
         ctx->append(jump);
     }
     
@@ -209,6 +232,7 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
         IrTacStmt label;
         label.m_opcode = IrOpcode::LABEL;
         label.m_src0 = m_labelFalse;
+        label.m_src00.build(m_labelFalse.get());
         ctx->append(label);
     
         if (!m_falseBlock->codegen(ctx))
@@ -218,6 +242,7 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
     IrTacStmt elabel;
     elabel.m_opcode = IrOpcode::LABEL;
     elabel.m_src0 = m_labelEnd;
+    elabel.m_src00.build(m_labelEnd.get());
     ctx->append(elabel);
 
     ctx->popParent();
