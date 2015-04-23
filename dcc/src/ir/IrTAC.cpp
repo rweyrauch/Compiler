@@ -397,6 +397,35 @@ void IrOutputArg(const std::shared_ptr<IrBase> arg, std::ostream& stream)
     }
 }
 
+void IrOutputArg(const IrTacArg& arg, std::ostream& stream)
+{
+    switch (arg.m_usage)
+    {
+    case IrUsage::Label:
+        stream << "$" << arg.m_asString;
+        break;
+    case IrUsage::Global:
+        stream << arg.m_asString;
+        break;
+    case IrUsage::Identifier:
+    case IrUsage::Argument:
+        stream << "-" << arg.m_value.m_address+8 << (g_ia64 ? "(%rbp)" : "(%ebp)");       
+        break;
+    case IrUsage::Literal:
+        stream << "$" << arg.m_asString;
+        break;
+    case IrUsage::Register:
+        if (g_ia64)
+            stream << g_registerNames[arg.m_value.m_int];
+        else
+            stream << g_registerNames_ia32[arg.m_value.m_int];
+        break;
+    default:
+        // Unexpected.
+        break;
+    }
+}
+
 void IrOutputLabel(const std::shared_ptr<IrBase> arg, std::ostream& stream)
 {
     if (arg == nullptr) return;
@@ -412,6 +441,13 @@ void IrOutputLabel(const std::shared_ptr<IrBase> arg, std::ostream& stream)
     {
         stream << sliteral->getValue();
     }
+}
+void IrOutputLabel(const IrTacArg& arg, std::ostream& stream)
+{
+    if (arg.m_usage == IrUsage::Label)
+        stream << arg.m_asString;
+    else if (arg.m_usage == IrUsage::Literal)
+        stream << arg.m_asString;
 }
 
 const std::shared_ptr<IrRegister> g_tempReg = std::make_shared<IrRegister>(IrReg::Temp);
@@ -452,11 +488,18 @@ bool IrIsRegister(const std::shared_ptr<IrBase> value)
     const IrRegister* reg = dynamic_cast<const IrRegister*>(value.get());
     return (reg != nullptr);
 }
-
+bool IrIsRegister(const IrTacArg& arg)
+{
+    return (arg.m_usage == IrUsage::Register);
+}
 bool IrIsMemory(const std::shared_ptr<IrBase> value)
 {
     const IrIdentifier* ident = dynamic_cast<const IrIdentifier*>(value.get());
     return (ident != nullptr);
+}
+bool IrIsMemory(const IrTacArg& arg)
+{
+    return (arg.m_usage == IrUsage::Identifier) || (arg.m_usage == IrUsage::Global);
 }
 
 bool IrIsDouble(const std::shared_ptr<IrBase> value)
@@ -481,8 +524,38 @@ bool IrIsDouble(const std::shared_ptr<IrBase> value)
     }
     return isDouble;
 }
+bool IrIsDouble(const IrTacArg& arg)
+{
+    return (arg.m_type == IrArgType::Double);
+}
 
 void IrGenMov(const std::shared_ptr<IrBase> src, const std::shared_ptr<IrBase> dst, std::ostream& stream)
+{
+    if (IrIsMemory(src) && IrIsMemory(dst))
+    {
+        stream << (g_ia64 ? "movq " : "movl ");
+        IrOutputArg(src, stream);
+        stream << ", ";
+        IrOutputArg(g_tempReg, stream);
+        stream << std::endl;
+        
+        stream << (g_ia64 ? "movq " : "movl ");
+        IrOutputArg(g_tempReg, stream);
+        stream << ", ";
+        IrOutputArg(dst, stream);
+        stream << std::endl;      
+    }
+    else
+    {
+        stream << (g_ia64 ? "movq " : "movl ");
+        IrOutputArg(src, stream);
+        stream << ", ";
+        IrOutputArg(dst, stream);
+        stream << std::endl;
+    }
+}
+
+void IrGenMov(const IrTacArg& src, const IrTacArg& dst, std::ostream& stream)
 {
     if (IrIsMemory(src) && IrIsMemory(dst))
     {
@@ -548,6 +621,46 @@ void IrGenLoad(const std::shared_ptr<IrBase> baseAddr, const std::shared_ptr<IrB
     IrOutputArg(dst, stream);
     stream << std::endl;      
 }
+
+/*
+void IrGenLoad(const IrTacArg& baseAddr, const IrTacArg& offset, const IrTacArg& dst, std::ostream& stream)
+{
+
+    if (offsetIdent != nullptr)
+    {
+        // load offset value into rsi/esi register
+        IrGenMov(offset, g_indexRegister, stream);
+    }
+    
+    stream << (g_ia64 ? "movq " : "movl ");
+    
+    if (baseIdent->isLabel())
+    {
+        stream << "$" << baseIdent->getIdentifier();
+    }
+    else if (baseIdent->isGlobal())
+    {
+        stream << baseIdent->getIdentifier();
+    }
+    
+    if (offsetLiteral != nullptr)
+    {
+        stream << "+(" << offsetLiteral->getValue() << "*8), "; 
+    }
+    else if (offsetIdent != nullptr)
+    {
+        stream << (g_ia64 ? "(,%rsi,8), " : "(,%esi,4), ");
+    }
+    IrOutputArg(g_tempReg, stream); 
+    stream << std::endl;
+    
+    stream << (g_ia64 ? "movq " : "movl ");
+    IrOutputArg(g_tempReg, stream);
+    stream << ", ";
+    IrOutputArg(dst, stream);
+    stream << std::endl;      
+}
+*/
 
 void IrGenStore(const std::shared_ptr<IrBase> src, const std::shared_ptr<IrBase> baseAddr, const std::shared_ptr<IrBase> offset, std::ostream& stream)
 {
