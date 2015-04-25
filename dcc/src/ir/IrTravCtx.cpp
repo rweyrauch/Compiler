@@ -156,15 +156,16 @@ void IrTraversalContext::highlightError(int line, int column, int length) const
     }    
 }
   
-void IrTraversalContext::codegen(std::ostream& stream)
+void IrTraversalContext::codegen(std::ostream& stream, std::ostream& stream2)
 {
     if (!m_ia64)
         IrGenIA32();
 
     stream << ".text" << std::endl;
+    stream2 << ".text" << std::endl;
     for (auto it : m_statements)
     {
-        IrTacGenCode(it, stream);
+        IrTacGenCode(it, stream, stream2);
     }
 }
   
@@ -176,7 +177,8 @@ void IrTraversalContext::genStrings()
         tac.m_opcode = IrOpcode::STRING;
         tac.m_src0 = it->second.m_name;
         tac.m_src1 = it->second.m_value;
-        
+        tac.m_src00.build(it->second.m_name.get());
+        tac.m_src01.build(it->second.m_value.get());
         append(tac);
     }
 }

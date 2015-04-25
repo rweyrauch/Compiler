@@ -146,10 +146,10 @@ struct IrTacStmt
     int m_info;
 };
 
-void IrPrintTac(const IrTacStmt& stmt, std::ostream& stream = std::cout);
+void IrPrintTac(const IrTacStmt& stmt, std::ostream& stream = std::cout, std::ostream& stream2 = std::cerr);
 
 void IrGenIA32();
 
-void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream = std::cout);
+void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream = std::cout, std::ostream& stream2 = std::cerr);
 
 } // namespace Decaf
