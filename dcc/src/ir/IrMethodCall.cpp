@@ -169,18 +169,15 @@ bool IrMethodCall::codegen(IrTraversalContext* ctx)
         IrLiteral* literal = dynamic_cast<IrLiteral*>(it.get());
         if (sliteral)
         {
-            tac.m_src0 = sliteral->getIdentifier();
-            tac.m_src00.build(sliteral->getIdentifier().get());
+            tac.m_src0.build(sliteral->getIdentifier().get());
         }
         else if (literal)
         {
-             tac.m_src0 = it;
-             tac.m_src00.build(literal);
+             tac.m_src0.build(literal);
         }
         else
         {
-            tac.m_src0 = std::shared_ptr<IrBase>(it->getResult());
-            tac.m_src00.build(it->getResult().get());
+            tac.m_src0.build(it->getResult().get());
         }
         tac.m_info = argCount++;
         ctx->append(tac);
@@ -192,10 +189,8 @@ bool IrMethodCall::codegen(IrTraversalContext* ctx)
     
     IrTacStmt callStmt;
     callStmt.m_opcode = IrOpcode::CALL;
-    callStmt.m_src0 = m_identifier;
-    callStmt.m_src00.build(m_identifier.get());
-    callStmt.m_src1 = std::shared_ptr<IrBase>(m_result);
-    callStmt.m_src01.build(m_result.get());
+    callStmt.m_src0.build(m_identifier.get());
+    callStmt.m_src1.build(m_result.get());
     ctx->append(callStmt);
     
     ctx->popParent();

@@ -81,7 +81,7 @@ public:
     }
     const std::vector<IrTacStmt>& getStatements() const { return m_statements; }
     
-    void codegen(std::ostream& stream, std::ostream& stream2 = std::cerr);
+    void codegen(std::ostream& stream);
     
     void genStrings();
     

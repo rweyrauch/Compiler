@@ -190,19 +190,15 @@ bool IrLocation::codegen(IrTraversalContext* ctx)
         {
             IrTacStmt store;
             store.m_opcode = IrOpcode::STORE;
-            store.m_src0 = m_result;        // source of the the store is in the m_result identifier
-            store.m_src00.build(m_result.get());
-            store.m_src1 = m_identifier;
-            store.m_src01.build(m_identifier.get());
+            store.m_src0.build(m_result.get()); // source of the the store is in the m_result identifier
+            store.m_src1.build(m_identifier.get());
             if (m_index->getResult())
             {
-                store.m_dst = m_index->getResult();
-                store.m_dst00.build(m_index->getResult().get());
+                store.m_dst.build(m_index->getResult().get());
             }
             else
             {
-                store.m_dst = m_index;
-                store.m_dst00.build(dynamic_cast<IrLiteral*>(m_index.get()));
+                store.m_dst.build(dynamic_cast<IrLiteral*>(m_index.get()));
             }
             ctx->append(store);
         }
@@ -210,20 +206,16 @@ bool IrLocation::codegen(IrTraversalContext* ctx)
         {
             IrTacStmt load;
             load.m_opcode = IrOpcode::LOAD;
-            load.m_src0 = m_identifier;
-            load.m_src00.build(m_identifier.get());
+            load.m_src0.build(m_identifier.get());
             if (m_index->getResult())
             {
-                load.m_src1 = m_index->getResult();
-                load.m_src01.build(m_index->getResult().get());
+                load.m_src1.build(m_index->getResult().get());
             }
             else
             {
-                load.m_src1 = m_index;
-                load.m_src01.build(dynamic_cast<IrLiteral*>(m_index.get()));
+                load.m_src1.build(dynamic_cast<IrLiteral*>(m_index.get()));
             }
-            load.m_dst = m_result;
-            load.m_dst00.build(m_result.get());
+            load.m_dst.build(m_result.get());
             
             ctx->append(load);
         }

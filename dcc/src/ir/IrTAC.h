@@ -131,25 +131,25 @@ struct IrTacStmt
 {
     IrTacStmt() :
         m_opcode(IrOpcode::NOOP),
-        m_src00(),
-        m_src01(),
-        m_dst00(),
-        m_src0(nullptr),
-        m_src1(nullptr),
-        m_dst(nullptr),
+        m_src0(),
+        m_src1(),
+        m_dst(),
         m_info(0)
     {}
         
     IrOpcode m_opcode;
-    IrTacArg m_src00, m_src01, m_dst00;
-    std::shared_ptr<IrBase> m_src0, m_src1, m_dst;
+    IrTacArg m_src0, m_src1, m_dst;
     int m_info;
+    
+    bool hasSrc0() const;
+    bool hasSrc1() const;
+    bool hasDst() const;
 };
 
-void IrPrintTac(const IrTacStmt& stmt, std::ostream& stream = std::cout, std::ostream& stream2 = std::cerr);
+void IrPrintTac(const IrTacStmt& stmt, std::ostream& stream = std::cout);
 
 void IrGenIA32();
 
-void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream = std::cout, std::ostream& stream2 = std::cerr);
+void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream = std::cout);
 
 } // namespace Decaf

@@ -171,27 +171,22 @@ bool IrForStatement::codegen(IrTraversalContext* ctx)
     
     IrTacStmt label;
     label.m_opcode = IrOpcode::LABEL;
-    label.m_src0 = m_labelTop;
-    label.m_src00.build(m_labelTop.get());
+    label.m_src0.build(m_labelTop.get());
     ctx->append(label);
      
     m_terminatingExpr->codegen(ctx);
     
     IrTacStmt tac;
     tac.m_opcode = IrOpcode::IFZ;
-    tac.m_src0 = std::shared_ptr<IrBase>(m_terminatingExpr->getResult());
-    tac.m_src00.build(m_terminatingExpr->getResult().get());
-    tac.m_src1 = m_labelEnd;
-    tac.m_src01.build(m_labelEnd.get());
-    tac.m_dst = nullptr;
+    tac.m_src0.build(m_terminatingExpr->getResult().get());
+    tac.m_src1.build(m_labelEnd.get());
     
     ctx->append(tac);
       
     if (m_body) m_body->codegen(ctx);
     m_labelContinue->codegen(ctx);
     label.m_opcode = IrOpcode::LABEL;
-    label.m_src0 = m_labelContinue;
-    label.m_src00.build(m_labelContinue.get());
+    label.m_src0.build(m_labelContinue.get());
     ctx->append(label);
     
     m_incrementLoop->codegen(ctx);
@@ -199,8 +194,7 @@ bool IrForStatement::codegen(IrTraversalContext* ctx)
     
     m_labelEnd->codegen(ctx);
     label.m_opcode = IrOpcode::LABEL;
-    label.m_src0 = m_labelEnd;
-    label.m_src00.build(m_labelEnd.get());
+    label.m_src0.build(m_labelEnd.get());
     ctx->append(label);
      
     ctx->popParent();

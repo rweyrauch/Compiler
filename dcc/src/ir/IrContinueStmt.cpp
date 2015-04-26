@@ -74,8 +74,7 @@ bool IrContinueStatement::codegen(IrTraversalContext* ctx)
     {
         IrTacStmt jump;
         jump.m_opcode = IrOpcode::JUMP;
-        jump.m_src0 = m_parentLoop->getLoopContinue();
-        jump.m_src00.build(m_parentLoop->getLoopContinue().get());
+        jump.m_src0.build(m_parentLoop->getLoopContinue().get());
         ctx->append(jump);
     }
     

@@ -58,16 +58,16 @@ bool IrBasicBlock::commonSubexpressionElimination()
             continue;
         
         // Get/create the value numbers of T, L and R      
-        Key keyL(it.m_src0->asString(), IrOpcode::NOOP, "");
+        Key keyL(it.m_src0.m_asString, IrOpcode::NOOP, "");
         auto lip = m_value_numbering_map.find(keyL);
         if (lip == m_value_numbering_map.end())
         {
             m_value_numbering_map[keyL] = m_next_value_number++;
         }
         
-        if (it.m_src1 != nullptr)
+        if (it.hasSrc1())
         {
-            Key keyR(it.m_src1->asString(), IrOpcode::NOOP, "");
+            Key keyR(it.m_src1.m_asString, IrOpcode::NOOP, "");
             auto rip = m_value_numbering_map.find(keyR);
             if (rip == m_value_numbering_map.end())
             {
@@ -75,7 +75,7 @@ bool IrBasicBlock::commonSubexpressionElimination()
             }
         }
         
-        Key keyT(it.m_dst->asString(), IrOpcode::NOOP, "");
+        Key keyT(it.m_dst.m_asString, IrOpcode::NOOP, "");
         auto tip = m_value_numbering_map.find(keyT);
         if (tip == m_value_numbering_map.end())
         {
@@ -83,7 +83,7 @@ bool IrBasicBlock::commonSubexpressionElimination()
         }
         
         // Create key from op, L and R.
-        Key keyExpr(it.m_src0->asString(), it.m_opcode, (it.m_src1 != nullptr) ? it.m_src1->asString() : "");
+        Key keyExpr(it.m_src0.m_asString, it.m_opcode, it.hasSrc1() ? it.m_src1.m_asString : "");
                 
         auto mip = m_value_numbering_map.find(keyExpr);
         if (mip != m_value_numbering_map.end())
