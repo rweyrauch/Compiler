@@ -21,7 +21,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#pragma once
 #include <iostream>
 #include <sstream>
 #include "IrIntLiteral.h"
@@ -45,5 +44,12 @@ void IrIntegerLiteral::print(unsigned int depth)
     std::cout << "Integer(" << getLineNumber() << "," << getColumnNumber() << ") = " << getValue() << std::endl;
 }
 
+void IrIntegerLiteral::setValue(int value)
+{ 
+    m_value = value; 
+    std::stringstream conv;
+    conv << m_value;
+    m_valueAsString = conv.str();
+}
 
 }

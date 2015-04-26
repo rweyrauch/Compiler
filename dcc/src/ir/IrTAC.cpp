@@ -46,7 +46,21 @@ void IrTacArg::build(const IrIdentifier* ident)
         else
             m_usage = IrUsage::Identifier;
             
-        m_type = IrArgType::String;
+        switch (ident->getType())
+        {
+            case IrType::Integer:
+                m_type = IrArgType::Integer;
+                break;
+            case IrType::Double:
+                m_type = IrArgType::Double;
+                break;
+            case IrType::Boolean:
+                m_type = IrArgType::Boolean;
+                break;
+            default:
+                m_type = IrArgType::String;
+                break;
+        }
         m_value.m_address = ident->getAddress();
         m_asString = ident->getIdentifier();
     }
@@ -100,7 +114,7 @@ void IrTacArg::build(const IrBooleanLiteral* literal)
         m_isConstant = true;
         m_type = IrArgType::Boolean;
         m_value.m_int = literal->getValue() ? 1 : 0;
-        m_asString = literal->getValueAsString();
+        m_asString = literal->getValue() ? "1" : "0";
     }
 }
 
@@ -630,11 +644,11 @@ void IrGenMov(const IrTacArg& src, const IrTacArg& dst, std::ostream& stream)
         stream << (g_ia64 ? "movq " : "movl ");
         IrOutputArg(src, stream);
         stream << ", ";
-        IrOutputArg(g_tempReg, stream);
+        IrOutputArg(g_tempReg_, stream);
         stream << std::endl;
         
         stream << (g_ia64 ? "movq " : "movl ");
-        IrOutputArg(g_tempReg, stream);
+        IrOutputArg(g_tempReg_, stream);
         stream << ", ";
         IrOutputArg(dst, stream);
         stream << std::endl;      
@@ -692,12 +706,9 @@ void IrGenLoad(const std::shared_ptr<IrBase> baseAddr, const std::shared_ptr<IrB
 
 void IrGenLoad(const IrTacArg& baseAddr, const IrTacArg& offset, const IrTacArg& dst, std::ostream& stream)
 {
-    if (offset.m_value.m_address != 0)
-    {
-        // load offset value into rsi/esi register
-        IrGenMov(offset, g_indexRegister_, stream);
-    }
-    
+    // load offset value into rsi/esi register
+    IrGenMov(offset, g_indexRegister_, stream);
+
     stream << (g_ia64 ? "movq " : "movl ");
     
     if (baseAddr.m_usage == IrUsage::Label)
@@ -717,11 +728,11 @@ void IrGenLoad(const IrTacArg& baseAddr, const IrTacArg& offset, const IrTacArg&
     {
         stream << (g_ia64 ? "(,%rsi,8), " : "(,%esi,4), ");
     }
-    IrOutputArg(g_tempReg, stream); 
+    IrOutputArg(g_tempReg_, stream); 
     stream << std::endl;
     
     stream << (g_ia64 ? "movq " : "movl ");
-    IrOutputArg(g_tempReg, stream);
+    IrOutputArg(g_tempReg_, stream);
     stream << ", ";
     IrOutputArg(dst, stream);
     stream << std::endl;      
@@ -777,18 +788,15 @@ void IrGenStore(const IrTacArg& src, const IrTacArg& baseAddr, const IrTacArg& o
     stream << (g_ia64 ? "movq " : "movl ");
     IrOutputArg(src, stream);
     stream << ", ";
-    IrOutputArg(g_tempReg, stream);
+    IrOutputArg(g_tempReg_, stream);
     stream << std::endl;
 
-    if (offset.m_value.m_address != 0)
-    {
-        // load offset value into rsi/esi register
-        IrGenMov(offset, g_indexRegister_, stream);
-    }
+    // load offset value into rsi/esi register
+    IrGenMov(offset, g_indexRegister_, stream);
 
     stream << (g_ia64 ? "movq " : "movl ");
     
-    IrOutputArg(g_tempReg, stream); 
+    IrOutputArg(g_tempReg_, stream); 
     stream << ",";
     
     if (baseAddr.m_usage == IrUsage::Label)
@@ -1114,7 +1122,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream, std::ostream& str
         stream2 << "xor ";
         IrOutputArg(g_outReg_, stream2);
         stream2 << ", ";
-        IrOutputArg(g_outReg, stream2);
+        IrOutputArg(g_outReg_, stream2);
         stream2 << std::endl;
         
         IrGenMov(stmt.m_src0, g_retReg, stream); // arg0 => %rax
@@ -1326,11 +1334,11 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream, std::ostream& str
                 if (g_nextUsedDoubleParamReg < NUM_DOUBLE_ARG_REGS)
                 {
                     IrGenMov(g_paramDoubleRegisters[g_nextUsedDoubleParamReg], stmt.m_src0, stream);
-                    IrGenMov(g_paramDoubleRegisters_[g_nextUsedDoubleParamReg], stmt.m_src00, stream);
+                    IrGenMov(g_paramDoubleRegisters_[g_nextUsedDoubleParamReg], stmt.m_src00, stream2);
                     g_nextUsedDoubleParamReg++;
                 }
                 else
-                {	
+                {
                     onStack = true;
                 }
             }
@@ -1339,7 +1347,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream, std::ostream& str
                 if (g_nextUsedNormalParamReg < NUM_ARG_REGS)
                 {
                     IrGenMov(g_paramRegisters[g_nextUsedNormalParamReg], stmt.m_src0, stream);
-                    IrGenMov(g_paramRegisters_[g_nextUsedNormalParamReg], stmt.m_src00, stream);
+                    IrGenMov(g_paramRegisters_[g_nextUsedNormalParamReg], stmt.m_src00, stream2);
                     g_nextUsedNormalParamReg++;
                 }
                 else

@@ -54,8 +54,15 @@ void IrIdentifier::print(unsigned int depth)
     std::cout << "Identifier(" << getLineNumber() << "," << getColumnNumber() << ") = \"" << m_identifier << "\"" << std::endl;
 }
 
+bool IrIdentifier::analyze(IrTraversalContext* ctx)
+{
+    return true;
+}
+
 bool IrIdentifier::codegen(IrTraversalContext* ctx)
 {
+    if (m_isLabel) return true;
+    
     bool ok = false;
     SVariableSymbol symbol;
     
@@ -68,7 +75,7 @@ bool IrIdentifier::codegen(IrTraversalContext* ctx)
         ok = true;
     }
     
-    return ok;
+    return ok;    
 }
 
 } // namespace Decaf

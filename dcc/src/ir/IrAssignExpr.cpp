@@ -175,17 +175,17 @@ bool IrAssignExpression::codegen(IrTraversalContext* ctx)
     
     ctx->pushParent(this);
     
-    if (m_lhs && !m_lhs->usedAsWrite()) 
-    {
-        valid = m_lhs->codegen(ctx);
-    }
     if (m_rhs) 
     {
         valid = m_rhs->codegen(ctx);
     }
+    if (m_lhs && m_lhs->usedAsWrite()) 
+    {
+        valid = m_lhs->codegen(ctx);
+    }
     
     if (valid)
-    {             
+    {        
         // TAC:
         // MOV rhs lhs ||
         // ADD rhs lhs lhs ||
@@ -227,11 +227,6 @@ bool IrAssignExpression::codegen(IrTraversalContext* ctx)
             }
         }
         ctx->append(tac);
-    
-        if (m_lhs && m_lhs->usedAsWrite()) 
-        {
-            valid = m_lhs->codegen(ctx);
-        }
     }
     
     ctx->popParent();

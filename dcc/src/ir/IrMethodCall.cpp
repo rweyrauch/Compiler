@@ -170,7 +170,7 @@ bool IrMethodCall::codegen(IrTraversalContext* ctx)
         if (sliteral)
         {
             tac.m_src0 = sliteral->getIdentifier();
-            tac.m_src00.build(sliteral);
+            tac.m_src00.build(sliteral->getIdentifier().get());
         }
         else if (literal)
         {

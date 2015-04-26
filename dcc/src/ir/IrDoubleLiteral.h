@@ -40,7 +40,7 @@ public:
     virtual void print(unsigned int depth);
      
     double getValue() const { return m_value; }
-    void setValue(double value) { m_value = value; }
+    void setValue(double value);
 
     static std::shared_ptr<IrDoubleLiteral> GetZero() { return s_zero_literal; }
     static std::shared_ptr<IrDoubleLiteral> GetOne() { return s_one_literal; }

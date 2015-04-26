@@ -44,4 +44,12 @@ void IrDoubleLiteral::print(unsigned int depth)
     std::cout << "Double(" << getLineNumber() << "," << getColumnNumber() << ") = " << getValue() << std::endl;
 }
 
+void IrDoubleLiteral::setValue(double value)
+{ 
+    m_value = value; 
+    std::stringstream conv;
+    conv << m_value;
+    m_valueAsString = conv.str();
+}
+
 }
