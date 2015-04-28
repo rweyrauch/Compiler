@@ -34,6 +34,7 @@
 
 namespace Decaf
 {
+    
 const bool gIrOpcodeHasArg1[(int)IrOpcode::NUM_OPCODES] =
 {
     false, // NOOP
@@ -67,6 +68,40 @@ const bool gIrOpcodeHasArg1[(int)IrOpcode::NUM_OPCODES] =
     false, // GLOBAL
 };
 static_assert(sizeof(gIrOpcodeHasArg1)/sizeof(bool) == (size_t)IrOpcode::NUM_OPCODES, "Unexpected number of IrOpcode arg1 flags.");
+
+const bool gIrOpcodeHasDst[(int)IrOpcode::NUM_OPCODES] =
+{
+    false, // NOOP
+    true,  // MOV
+    true,  // LOAD
+    true,  // STORE
+    true,  // ADD
+    true,  // SUB
+    true,  // MUL
+    true,  // DIV
+    true,  // MOD
+    false, // CALL
+    false, // FBEGIN
+    false, // RETURN
+    true,  // EQUAL
+    true,  // NOTEQUAL
+    true,  // LESS
+    true,  // LESSEQUAL
+    true,  // GREATER
+    true,  // GREATEREQUAL
+    true,  // AND
+    true,  // OR
+    true,  // NOT
+    false, // LABEL
+    false, // JUMP
+    false, // IFZ
+    false, // IFNZ
+    false, // PARAM
+    false, // GETPARAM
+    false, // STRING
+    false, // GLOBAL
+};
+static_assert(sizeof(gIrOpcodeHasDst)/sizeof(bool) == (size_t)IrOpcode::NUM_OPCODES, "Unexpected number of IrOpcode dst flags.");
 
 const std::string gIrOpcodeStrings[(int)IrOpcode::NUM_OPCODES] =
 {
@@ -213,7 +248,7 @@ bool IrTacStmt::hasSrc1() const
 
 bool IrTacStmt::hasDst() const
 {
-    return true;
+    return gIrOpcodeHasDst[(int)m_opcode];
 }
 
 enum class IrReg : int
