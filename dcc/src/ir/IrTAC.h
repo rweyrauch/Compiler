@@ -80,6 +80,7 @@ const std::string& IrOpcodeToString(IrOpcode opcode);
 //   m_value { union }
 enum class IrUsage : unsigned char
 {
+    Unused,
     Label,
     Identifier,
     Global,
@@ -98,7 +99,7 @@ enum class IrArgType : unsigned char
 struct IrTacArg
 {
     IrTacArg() :
-        m_usage(IrUsage::Identifier),
+        m_usage(IrUsage::Unused),
         m_type(IrArgType::String),
         m_asString(""),
         m_isConstant(false),

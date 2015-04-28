@@ -35,74 +35,6 @@
 namespace Decaf
 {
     
-const bool gIrOpcodeHasArg1[(int)IrOpcode::NUM_OPCODES] =
-{
-    false, // NOOP
-    false, // MOV
-    true,  // LOAD
-    true,  // STORE
-    true,  // ADD
-    true,  // SUB
-    true,  // MUL
-    true,  // DIV
-    true,  // MOD
-    true,  // CALL
-    false, // FBEGIN
-    false, // RETURN
-    true,  // EQUAL
-    true,  // NOTEQUAL
-    true,  // LESS
-    true,  // LESSEQUAL
-    true,  // GREATER
-    true,  // GREATEREQUAL
-    true,  // AND
-    true,  // OR
-    false, // NOT
-    false, // LABEL
-    false, // JUMP
-    true,  // IFZ
-    true,  // IFNZ
-    false, // PARAM
-    false, // GETPARAM
-    true,  // STRING
-    false, // GLOBAL
-};
-static_assert(sizeof(gIrOpcodeHasArg1)/sizeof(bool) == (size_t)IrOpcode::NUM_OPCODES, "Unexpected number of IrOpcode arg1 flags.");
-
-const bool gIrOpcodeHasDst[(int)IrOpcode::NUM_OPCODES] =
-{
-    false, // NOOP
-    true,  // MOV
-    true,  // LOAD
-    true,  // STORE
-    true,  // ADD
-    true,  // SUB
-    true,  // MUL
-    true,  // DIV
-    true,  // MOD
-    false, // CALL
-    false, // FBEGIN
-    false, // RETURN
-    true,  // EQUAL
-    true,  // NOTEQUAL
-    true,  // LESS
-    true,  // LESSEQUAL
-    true,  // GREATER
-    true,  // GREATEREQUAL
-    true,  // AND
-    true,  // OR
-    true,  // NOT
-    false, // LABEL
-    false, // JUMP
-    false, // IFZ
-    false, // IFNZ
-    false, // PARAM
-    false, // GETPARAM
-    false, // STRING
-    false, // GLOBAL
-};
-static_assert(sizeof(gIrOpcodeHasDst)/sizeof(bool) == (size_t)IrOpcode::NUM_OPCODES, "Unexpected number of IrOpcode dst flags.");
-
 const std::string gIrOpcodeStrings[(int)IrOpcode::NUM_OPCODES] =
 {
     "NOOP",
@@ -238,17 +170,17 @@ void IrTacArg::build(const IrStringLiteral* literal)
 
 bool IrTacStmt::hasSrc0() const
 {
-    return true;
+    return (m_src0.m_usage != IrUsage::Unused);
 }
 
 bool IrTacStmt::hasSrc1() const
 {
-    return gIrOpcodeHasArg1[(int)m_opcode];
+    return (m_src1.m_usage != IrUsage::Unused);
 }
 
 bool IrTacStmt::hasDst() const
 {
-    return gIrOpcodeHasDst[(int)m_opcode];
+    return (m_dst.m_usage != IrUsage::Unused);
 }
 
 enum class IrReg : int
@@ -374,13 +306,16 @@ const IrTacArg g_indexRegister = makeRegister(IrArgType::Integer, IrReg::Index);
 
 void IrPrintTacArg(const IrTacArg& arg, std::ostream& stream)
 {
-    if (arg.m_usage == IrUsage::Identifier)
+    if ((arg.m_usage == IrUsage::Identifier) ||
+        (arg.m_usage == IrUsage::Literal) ||
+        (arg.m_usage == IrUsage::Global) ||
+        (arg.m_usage == IrUsage::Label))
     {
         stream << "$" << arg.m_asString;
     }
-    else if (arg.m_usage == IrUsage::Literal)
+    else
     {
-        stream << "$" << arg.m_asString;
+	stream << "Unexpected arg usage " << (int)arg.m_usage << "  " << arg.m_asString;
     }
 }
 
