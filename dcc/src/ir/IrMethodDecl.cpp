@@ -136,6 +136,35 @@ bool IrMethodDecl::analyze(IrTraversalContext* ctx)
     return valid;
 }
     
+bool IrMethodDecl::allocate(IrTraversalContext* ctx) 
+{ 
+    ctx->pushSymbols(m_symbols.get());
+    ctx->pushParent(this);
+
+    m_identifier->allocate(ctx);
+    
+    // determine the stack storage requirements for the argument and body
+    m_stackSize = m_symbols->getAllocationSize();
+    if (m_block != nullptr) 
+        m_stackSize += m_block->getAllocationSize();
+    // round stack size to multiple of 16 (assuming already a multiple of 8)
+    if (m_stackSize % 16 != 0)
+        m_stackSize += 8;
+     
+    int argNum = 0;
+    for (auto it : m_argument_list)
+    {
+        it->allocate(ctx);
+    }
+    
+    if (m_block) m_block->allocate(ctx);
+   
+    ctx->popParent();
+    ctx->popSymbols();
+    
+    return true; 
+}
+    
 bool IrMethodDecl::codegen(IrTraversalContext* ctx) 
 { 
     ctx->pushSymbols(m_symbols.get());
@@ -143,18 +172,10 @@ bool IrMethodDecl::codegen(IrTraversalContext* ctx)
 
     m_identifier->codegen(ctx);
     
-    // determine the stack storage requirements for the argument and body
-    size_t stackSize = m_symbols->getAllocationSize();
-    if (m_block != nullptr) 
-        stackSize += m_block->getAllocationSize();
-    // round stack size to multiple of 16 (assuming already a multiple of 8)
-    if (stackSize % 16 != 0)
-        stackSize += 8;
-    
     IrTacStmt beginTac;
     beginTac.m_opcode = IrOpcode::FBEGIN;
     beginTac.m_src0.build(m_identifier.get());
-    beginTac.m_info = (int)stackSize;
+    beginTac.m_info = (int)m_stackSize;
     
     ctx->append(beginTac);
     

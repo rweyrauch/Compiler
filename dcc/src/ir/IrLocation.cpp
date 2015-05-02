@@ -139,30 +139,46 @@ bool IrLocation::analyze(IrTraversalContext* ctx)
                 }
             }
         }
-    }
-      
-    if (valid)
-    {
-        if (m_index)
-        {
-            // allocate a temporary variable for the result of this expression
-            m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());
-            if (!ctx->addTempVariable(m_result.get(), m_type))
-            {
-                ctx->error(m_result.get(), "Internal compiler error.  Failed to add temporary variable to symbol table.");
-                valid = false;
-            } 
-            
-            createRuntimeChecks(ctx);
-        }
-        else
-        {
-            m_result = m_identifier;
-        }
+        
+        createRuntimeChecks(ctx);  
     }
     
     ctx->popParent();
        
+    return valid;
+}
+
+bool IrLocation::allocate(IrTraversalContext* ctx)
+{
+    bool valid = true;
+    ctx->pushParent(this);
+    
+    if (!m_identifier->allocate(ctx)) 
+        valid = false;
+    
+    if (m_index) 
+    {
+        if (m_rangeChecks)
+            m_rangeChecks->allocate(ctx);
+        
+        if (!m_index->allocate(ctx)) 
+            valid = false;
+
+        // allocate a temporary variable for the result of this expression
+        m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());
+        if (!ctx->addTempVariable(m_result.get(), m_type))
+        {
+            ctx->error(m_result.get(), "Internal compiler error.  Failed to add temporary variable to symbol table.");
+            valid = false;
+        } 
+    }
+    else
+    {
+        m_result = m_identifier;
+    }
+        
+    ctx->popParent();
+    
     return valid;
 }
 

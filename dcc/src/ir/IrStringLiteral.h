@@ -44,6 +44,8 @@ public:
     {}
     
     virtual void print(unsigned int depth);
+    virtual bool analyze(IrTraversalContext* ctx) { return true; }
+    virtual bool allocate(IrTraversalContext* ctx) { return true; }
     virtual bool codegen(IrTraversalContext* ctx);
     
     const std::string& getValue() const { return m_valueAsString; }

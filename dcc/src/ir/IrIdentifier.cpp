@@ -59,7 +59,7 @@ bool IrIdentifier::analyze(IrTraversalContext* ctx)
     return true;
 }
 
-bool IrIdentifier::codegen(IrTraversalContext* ctx)
+bool IrIdentifier::allocate(IrTraversalContext* ctx)
 {
     if (m_isLabel) return true;
     
@@ -76,6 +76,11 @@ bool IrIdentifier::codegen(IrTraversalContext* ctx)
     }
     
     return ok;    
+}
+
+bool IrIdentifier::codegen(IrTraversalContext* ctx)
+{
+    return true;
 }
 
 } // namespace Decaf

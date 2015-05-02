@@ -38,6 +38,8 @@ public:
     {}
     
     virtual void print(unsigned int depth);
+    virtual bool analyze(IrTraversalContext* ctx) { return true; }
+    virtual bool allocate(IrTraversalContext* ctx) { return true; }
      
     double getValue() const { return m_value; }
     void setValue(double value);

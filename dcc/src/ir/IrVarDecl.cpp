@@ -83,6 +83,23 @@ std::shared_ptr<IrIdentifier> IrVariableDecl::getVariable(size_t which) const
     return nullptr;
 }
 
+bool IrVariableDecl::allocate(IrTraversalContext* ctx)
+{
+    bool valid = true;
+    
+    ctx->pushParent(this);
+    
+    for (auto it : m_identifiers)
+    {
+        if (!it->allocate(ctx))
+            valid = false;
+    }
+    
+    ctx->popParent();
+    
+    return valid;
+}
+
 bool IrVariableDecl::codegen(IrTraversalContext* ctx)
 {
     bool valid = true;

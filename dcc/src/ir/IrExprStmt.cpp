@@ -62,6 +62,23 @@ bool IrExpressionStatement::analyze(IrTraversalContext* ctx)
     return valid;
 }
 
+bool IrExpressionStatement::allocate(IrTraversalContext* ctx)
+{
+    bool valid = true;
+    
+    ctx->pushParent(this);
+    
+    if (m_expression) 
+    {
+        if (!m_expression->allocate(ctx))
+            valid = false;
+    }
+    
+    ctx->popParent();
+    
+    return valid;
+}
+
 bool IrExpressionStatement::codegen(IrTraversalContext* ctx)
 {
     bool valid = true;

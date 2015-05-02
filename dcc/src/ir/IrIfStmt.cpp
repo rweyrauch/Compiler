@@ -104,6 +104,31 @@ bool IrIfStatement::analyze(IrTraversalContext* ctx)
     return valid;
 }
 
+bool IrIfStatement::allocate(IrTraversalContext* ctx)
+{
+    bool valid = true;
+    
+    ctx->pushParent(this);
+    
+    if (!m_condition->allocate(ctx))
+        valid = false;
+    
+    if (m_trueBlock)
+    {
+        if (!m_trueBlock->allocate(ctx))
+            valid = false;
+    }
+    if (m_falseBlock)
+    {
+        if (!m_falseBlock->allocate(ctx))
+            valid = false;
+    }
+    
+    ctx->popParent();
+    
+    return valid;
+}
+
 bool IrIfStatement::codegen(IrTraversalContext* ctx)
 {
     bool valid = true;

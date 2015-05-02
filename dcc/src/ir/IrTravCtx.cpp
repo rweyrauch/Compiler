@@ -47,7 +47,7 @@ bool IrTraversalContext::addTempVariable(IrIdentifier* variable, IrType type)
     {
         if (m_symbols.front()->addVariable(variable, type))
         {
-            return variable->analyze(this);
+            return variable->allocate(this);
         }
     }
     return false;

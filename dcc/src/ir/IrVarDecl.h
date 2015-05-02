@@ -59,6 +59,7 @@ public:
     virtual void propagateTypes(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth);
     virtual bool analyze(IrTraversalContext* ctx);
+    virtual bool allocate(IrTraversalContext* ctx);       
     virtual bool codegen(IrTraversalContext* ctx);
         
     size_t getNumVariables() const { return m_identifiers.size(); }

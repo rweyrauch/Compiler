@@ -225,6 +225,39 @@ bool IrBooleanExpression::analyze(IrTraversalContext* ctx)
     return valid;
 }
 
+bool IrBooleanExpression::allocate(IrTraversalContext* ctx)
+{
+    bool valid = true;
+    
+    ctx->pushParent(this);
+    
+    if (m_lhs) 
+    {
+        if (!m_lhs->allocate(ctx))
+            valid = false;
+    }
+    if (m_rhs) 
+    {
+        if (!m_rhs->allocate(ctx))
+            valid = false;
+    }
+    
+    if (valid)
+    {
+        // allocate a temporary variable for the result of this expression
+        m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());
+        if (!ctx->addTempVariable(m_result.get(), m_type))
+        {
+            ctx->error(m_result.get(), "Internal compiler error.  Failed to add temporary variable to symbol table.");
+            valid = false;
+        }
+    }
+    
+    ctx->popParent();
+    
+    return valid;
+}
+
 bool IrBooleanExpression::codegen(IrTraversalContext* ctx)
 { 
     bool valid = true;

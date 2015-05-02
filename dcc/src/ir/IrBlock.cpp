@@ -97,7 +97,31 @@ bool IrBlock::analyze(IrTraversalContext* ctx)
     
     return valid;
 }
+
+bool IrBlock::allocate(IrTraversalContext* ctx)
+{
+    bool valid = true;
     
+    ctx->pushSymbols(m_symbols.get());
+    ctx->pushParent(this);
+    
+    for (auto it : m_variables)
+    {
+        if (!it->allocate(ctx))
+            valid = false;
+    }
+    for (auto it : m_statements)
+    {
+        if (!it->allocate(ctx))
+            valid = false;
+    }   
+    
+    ctx->popParent();
+    ctx->popSymbols();
+    
+    return valid;
+}
+
 bool IrBlock::codegen(IrTraversalContext* ctx) 
 {
     bool valid = true;

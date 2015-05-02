@@ -114,14 +114,6 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
             ctx->error(this, msg.str());
             valid = false;
         }
-        else
-        {
-            if (symbol.m_type == IrType::Integer || symbol.m_type == IrType::Boolean)
-            {
-                m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());
-                ctx->addTempVariable(m_result.get(), symbol.m_type);
-            }
-        }
     }
     else
     {
@@ -133,15 +125,34 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
             ctx->error(this, msg.str());
             valid = false;
         }
-        
-        // External methods always return an integer.
-        if (valid)
-        {
-            m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());
-            ctx->addTempVariable(m_result.get(), IrType::Integer);
-        }
     }
    
+    ctx->popParent();
+    
+    return valid;
+}
+
+bool IrMethodCall::allocate(IrTraversalContext* ctx)
+{
+    bool valid = true;
+    
+    ctx->pushParent(this);
+    
+    if (!m_identifier->allocate(ctx))
+        valid = false;
+    
+    for (auto it : m_arguments)
+    {
+        if (!it->allocate(ctx))
+            valid = false;
+    }
+    
+    if (getType() != IrType::Void)
+    {
+        m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());      
+        ctx->addTempVariable(m_result.get(), getType());
+    }
+    
     ctx->popParent();
     
     return valid;

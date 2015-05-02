@@ -44,7 +44,8 @@ public:
         m_returnType(returnType),
         m_argument_list(),
         m_block(nullptr),
-        m_symbols(new IrSymbolTable())
+        m_symbols(new IrSymbolTable()),
+        m_stackSize(0)
     {
     }
     
@@ -53,6 +54,7 @@ public:
     virtual void propagateTypes(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth);
     virtual bool analyze(IrTraversalContext* ctx);
+    virtual bool allocate(IrTraversalContext* ctx);       
     virtual bool codegen(IrTraversalContext* ctx);
     virtual const std::string& asString() const;
      
@@ -78,6 +80,7 @@ protected:
     std::vector<std::shared_ptr<IrVariableDecl>> m_argument_list;
     std::shared_ptr<IrBlock> m_block;
     std::unique_ptr<IrSymbolTable> m_symbols;
+    size_t m_stackSize;
  
 private:
     IrMethodDecl() = delete;

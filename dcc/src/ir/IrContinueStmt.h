@@ -42,6 +42,7 @@ public:
     virtual void propagateTypes(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth);
     virtual bool analyze(IrTraversalContext* ctx);
+    virtual bool allocate(IrTraversalContext* ctx) { return true; }
     virtual bool codegen(IrTraversalContext* ctx);
     virtual const std::string& asString() const { return m_continue; }
     

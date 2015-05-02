@@ -60,6 +60,20 @@ bool IrReturnStatement::analyze(IrTraversalContext* ctx)
     return valid;
 }
 
+bool IrReturnStatement::allocate(IrTraversalContext* ctx)
+{
+    bool valid = true;
+    
+    ctx->pushParent(this);
+    
+    if (m_returnValue)
+        valid = m_returnValue->allocate(ctx);
+    
+    ctx->popParent();
+    
+    return valid;
+}
+
 bool IrReturnStatement::codegen(IrTraversalContext* ctx)
 {
     bool valid = true;

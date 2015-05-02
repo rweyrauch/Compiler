@@ -125,6 +125,28 @@ bool IrClass::analyze(IrTraversalContext* ctx)
     return valid;
 }
 
+bool IrClass::allocate(IrTraversalContext* ctx) 
+{ 
+    ctx->pushSymbols(m_symbols.get());
+    ctx->pushParent(this);
+    
+    m_identifier->allocate(ctx);
+    for (auto it : m_field_decl_list)
+    {
+        it->allocate(ctx);
+    }
+     
+    for (auto it : m_method_decl_list)
+    {
+        it->allocate(ctx);
+    }
+    
+    ctx->popParent();
+    ctx->popSymbols();
+    
+    return true; 
+}
+
 bool IrClass::codegen(IrTraversalContext* ctx) 
 { 
     ctx->pushSymbols(m_symbols.get());

@@ -148,6 +148,39 @@ bool IrForStatement::analyze(IrTraversalContext* ctx)
     return valid;
 }
 
+bool IrForStatement::allocate(IrTraversalContext* ctx)
+{
+    bool valid = true;
+    
+    ctx->pushParent(this);
+    
+    if (!m_loopVar->allocate(ctx))
+        valid = false;
+    if (!m_initialValue->allocate(ctx))
+        valid = false;
+    if (!m_terminatingValue->allocate(ctx))
+        valid = false;
+        
+    if (m_body) 
+    {
+        if (!m_body->allocate(ctx))
+            valid = false;
+    }
+
+    m_labelTop->allocate(ctx);
+    m_labelContinue->allocate(ctx);
+    m_labelEnd->allocate(ctx);
+    m_initLoopAuto->allocate(ctx);
+    m_terminatingExpr->allocate(ctx);
+    m_loopIncrement->allocate(ctx);
+    m_incrementLoop->allocate(ctx);
+    m_loopGoto->allocate(ctx);
+        
+    ctx->popParent();
+    
+    return valid;
+}
+
 bool IrForStatement::codegen(IrTraversalContext* ctx)
 {
     bool valid = true;

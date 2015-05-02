@@ -46,6 +46,8 @@ public:
         IRPRINT_INDENT(depth);
         std::cout << "Null(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
     }
+    virtual bool analyze(IrTraversalContext* ctx) { return true; }
+    virtual bool allocate(IrTraversalContext* ctx) { return true; }
     
 private:
     IrNullLiteral() = delete;

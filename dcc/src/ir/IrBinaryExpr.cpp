@@ -132,6 +132,28 @@ bool IrBinaryExpression::analyze(IrTraversalContext* ctx)
             valid = false;            
         }
     }
+    
+    ctx->popParent();
+    
+    return valid;
+}
+
+bool IrBinaryExpression::allocate(IrTraversalContext* ctx)
+{
+    ctx->pushParent(this);
+
+    bool valid = true;
+    
+    if (m_lhs) 
+    {
+        if (!m_lhs->allocate(ctx))
+            valid = false;
+    }
+    if (m_rhs) 
+    {
+        if (!m_rhs->allocate(ctx))
+            valid = false;
+    }
 
     if (valid)
     {
