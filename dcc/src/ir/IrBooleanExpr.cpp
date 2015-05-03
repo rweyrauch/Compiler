@@ -213,11 +213,6 @@ bool IrBooleanExpression::analyze(IrTraversalContext* ctx)
     {
         // allocate a temporary variable for the result of this expression
         m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());
-        if (!ctx->addTempVariable(m_result.get(), m_type))
-        {
-            ctx->error(m_result.get(), "Internal compiler error.  Failed to add temporary variable to symbol table.");
-            valid = false;
-        }
     }
     
     ctx->popParent();

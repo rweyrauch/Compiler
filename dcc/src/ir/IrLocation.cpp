@@ -140,7 +140,14 @@ bool IrLocation::analyze(IrTraversalContext* ctx)
             }
         }
         
+        // allocate a temporary variable for the result of this expression
+        m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());
+        
         createRuntimeChecks(ctx);  
+    }
+    else
+    {
+        m_result = m_identifier;
     }
     
     ctx->popParent();
@@ -164,17 +171,11 @@ bool IrLocation::allocate(IrTraversalContext* ctx)
         if (!m_index->allocate(ctx)) 
             valid = false;
 
-        // allocate a temporary variable for the result of this expression
-        m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());
         if (!ctx->addTempVariable(m_result.get(), m_type))
         {
             ctx->error(m_result.get(), "Internal compiler error.  Failed to add temporary variable to symbol table.");
             valid = false;
         } 
-    }
-    else
-    {
-        m_result = m_identifier;
     }
         
     ctx->popParent();

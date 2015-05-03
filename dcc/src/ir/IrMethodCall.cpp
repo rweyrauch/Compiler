@@ -126,6 +126,11 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
             valid = false;
         }
     }
+     
+    if (getType() != IrType::Void)
+    {
+        m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());      
+    }
    
     ctx->popParent();
     
@@ -147,9 +152,8 @@ bool IrMethodCall::allocate(IrTraversalContext* ctx)
             valid = false;
     }
     
-    if (getType() != IrType::Void)
+    if (m_result)
     {
-        m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());      
         ctx->addTempVariable(m_result.get(), getType());
     }
     
@@ -163,6 +167,9 @@ bool IrMethodCall::codegen(IrTraversalContext* ctx)
     bool valid = true;
     
     ctx->pushParent(this);
+    
+    if (!m_identifier->codegen(ctx))
+        valid = false;
     
     for (auto it : m_arguments)
     {
