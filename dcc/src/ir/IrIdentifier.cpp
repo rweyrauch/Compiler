@@ -36,7 +36,7 @@ IrIdentifier* IrIdentifier::CreateTemporary()
 {
     std::stringstream tempName;
     tempName << ".LC" << s_tempCounter++;
-    IrIdentifier* tempId = new IrIdentifier(0, 0, "temp", tempName.str());
+    IrIdentifier* tempId = new IrIdentifier(__LINE__, 0, __FILE__, tempName.str());
     return tempId;
 }
 
@@ -44,7 +44,7 @@ IrIdentifier* IrIdentifier::CreateLabel()
 {
     std::stringstream tempName;
     tempName << ".L" << s_tempCounter++;
-    IrIdentifier* tempId = new IrIdentifier(0, 0, "label", tempName.str(), true);
+    IrIdentifier* tempId = new IrIdentifier(__LINE__, 0, __FILE__, tempName.str(), true);
     return tempId;
 }
 
