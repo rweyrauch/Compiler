@@ -1,0 +1,7 @@
+1 < 2 is correct
+1 <= 2 is correct
+2 <= 2 is correct
+2 >= 2 is correct
+1 == 1 is correct
+1 != 2 is correct
+1 != 2 is correct

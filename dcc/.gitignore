@@ -1,6 +1,5 @@
 *.o
 *.output
-*.out
 *.s
 build
 

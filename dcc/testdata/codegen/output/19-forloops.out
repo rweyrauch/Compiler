@@ -1,0 +1,10 @@
+sum = 9
+j = 0
+j = 1
+j = 2
+j = 3
+j = 4
+Breaking when j == 5(5).
+sum = 15
+Continue when j == 2(2).
+sum = 8
