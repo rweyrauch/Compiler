@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #include <iostream>
+#include <cassert>
 #include "IrCommon.h"
 #include "IrBooleanExpr.h"
 #include "IrLiteral.h"
@@ -211,6 +212,7 @@ bool IrBooleanExpression::analyze(IrTraversalContext* ctx)
     
     if (valid)
     {
+        assert(m_result == nullptr);
         // allocate a temporary variable for the result of this expression
         m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());
     }

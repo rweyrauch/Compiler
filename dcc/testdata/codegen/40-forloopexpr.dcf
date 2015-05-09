@@ -1,0 +1,11 @@
+class Program
+{
+    void main() 
+    {
+        int z;        
+        for z = 0, 4 * 4
+        {
+            callout("printf", "Z = %d\n", z);
+        }
+    }
+}

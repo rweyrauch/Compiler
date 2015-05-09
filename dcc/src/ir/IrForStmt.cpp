@@ -105,13 +105,6 @@ bool IrForStatement::analyze(IrTraversalContext* ctx)
     
     ctx->pushParent(this);
     
-    if (!m_loopVar->analyze(ctx))
-        valid = false;
-    if (!m_initialValue->analyze(ctx))
-        valid = false;
-    if (!m_terminatingValue->analyze(ctx))
-        valid = false;
-        
     if (m_body) 
     {
         if (!m_body->analyze(ctx))
@@ -139,7 +132,6 @@ bool IrForStatement::analyze(IrTraversalContext* ctx)
     m_labelEnd->analyze(ctx);
     m_initLoopAuto->analyze(ctx);
     m_terminatingExpr->analyze(ctx);
-    m_loopIncrement->analyze(ctx);
     m_incrementLoop->analyze(ctx);
     m_loopGoto->analyze(ctx);
         
@@ -153,13 +145,6 @@ bool IrForStatement::allocate(IrTraversalContext* ctx)
     bool valid = true;
     
     ctx->pushParent(this);
-    
-    if (!m_loopVar->allocate(ctx))
-        valid = false;
-    if (!m_initialValue->allocate(ctx))
-        valid = false;
-    if (!m_terminatingValue->allocate(ctx))
-        valid = false;
         
     if (m_body) 
     {
@@ -172,7 +157,6 @@ bool IrForStatement::allocate(IrTraversalContext* ctx)
     m_labelEnd->allocate(ctx);
     m_initLoopAuto->allocate(ctx);
     m_terminatingExpr->allocate(ctx);
-    m_loopIncrement->allocate(ctx);
     m_incrementLoop->allocate(ctx);
     m_loopGoto->allocate(ctx);
         

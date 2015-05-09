@@ -23,6 +23,7 @@
 //
 #include <iostream>
 #include <sstream>
+#include <cassert>
 #include "IrCommon.h"
 #include "IrMethodCall.h"
 #include "IrIdentifier.h"
@@ -129,6 +130,7 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
      
     if (getType() != IrType::Void)
     {
+        assert(m_result == nullptr);
         m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());      
     }
    
