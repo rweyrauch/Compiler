@@ -53,13 +53,12 @@ public:
     virtual size_t getAllocationSize() const;
     virtual void setSymbolStartAddress(size_t addr);
         
-    std::shared_ptr<IrIdentifier> getLoopBegin() const { return m_labelTop; }
     std::shared_ptr<IrIdentifier> getLoopContinue() const { return m_labelContinue; }
     std::shared_ptr<IrIdentifier> getLoopEnd() const { return m_labelEnd; }
     
 protected:    
     
-    std::shared_ptr<IrLocation> m_loopVar;
+    std::shared_ptr<IrIdentifier> m_loopVar;
     std::shared_ptr<IrExpression> m_initialValue;
     std::shared_ptr<IrExpression> m_terminatingValue;
     std::shared_ptr<IrBlock> m_body;
@@ -70,7 +69,6 @@ protected:
     std::shared_ptr<IrExpression> m_initLoopAuto;
     std::shared_ptr<IrExpression> m_terminatingExpr;
     std::shared_ptr<IrExpression> m_incrementLoop;
-    std::shared_ptr<IrIntegerLiteral> m_loopIncrement;
     std::shared_ptr<IrGotoStatement> m_loopGoto;
     
     const std::string m_for = "for";

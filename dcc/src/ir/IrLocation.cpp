@@ -144,6 +144,8 @@ bool IrLocation::analyze(IrTraversalContext* ctx)
         assert(m_result == nullptr);
         // allocate a temporary variable for the result of this expression
         m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());
+                     
+        //createRuntimeChecks(ctx);                          
     }
     else
     {
@@ -174,7 +176,8 @@ bool IrLocation::allocate(IrTraversalContext* ctx)
             valid = false;
         } 
         
-        //createRuntimeChecks(ctx);          
+        if (m_rangeChecks)
+            valid = m_rangeChecks->allocate(ctx);
     }
         
     ctx->popParent();
@@ -249,6 +252,8 @@ const std::string& IrLocation::asString() const
  
 void IrLocation::createRuntimeChecks(IrTraversalContext* ctx)
 {
+    assert(m_index != nullptr);
+    
     // Range checks...
     // m_index->getResult() < location_size && m_index->getResult() >= 0
     m_rangeChecks = std::shared_ptr<IrBlock>(new IrBlock(__LINE__, 0, __FILE__));
@@ -260,8 +265,22 @@ void IrLocation::createRuntimeChecks(IrTraversalContext* ctx)
     maxRangeValue->setValue((int)symbol.m_count);
     IrIntegerLiteral* minRangeValue = new IrIntegerLiteral(__LINE__, 0, __FILE__, "0");
     
-    IrBooleanExpression* maxCheck = new IrBooleanExpression(__LINE__, 0, __FILE__, m_index.get(), IrBooleanOperator::Less, maxRangeValue);
-    IrBooleanExpression* minCheck = new IrBooleanExpression(__LINE__, 0, __FILE__, m_index.get(), IrBooleanOperator::GreaterEqual, minRangeValue);
+    IrBooleanExpression* maxCheck = nullptr;
+    IrBooleanExpression* minCheck = nullptr;
+    
+    if (m_index->getResult() != nullptr)
+    {
+        IrLocation* indexMaxCheck = new IrLocation(__LINE__, 0, __FILE__, m_index->getResult().get(), m_index->getType());
+        IrLocation* indexMinCheck = new IrLocation(__LINE__, 0, __FILE__, m_index->getResult().get(), m_index->getType());     
+        maxCheck = new IrBooleanExpression(__LINE__, 0, __FILE__, indexMaxCheck, IrBooleanOperator::Less, maxRangeValue);
+        minCheck = new IrBooleanExpression(__LINE__, 0, __FILE__, indexMinCheck, IrBooleanOperator::GreaterEqual, minRangeValue);
+    }
+    else
+    {
+        maxCheck = new IrBooleanExpression(__LINE__, 0, __FILE__, m_index.get(), IrBooleanOperator::Less, maxRangeValue);
+        minCheck = new IrBooleanExpression(__LINE__, 0, __FILE__, m_index.get(), IrBooleanOperator::GreaterEqual, minRangeValue);        
+    }
+    
     IrBooleanExpression* boundCheck = new IrBooleanExpression(__LINE__, 0, __FILE__, maxCheck, IrBooleanOperator::LogicalAnd, minCheck);
     IrBooleanExpression* notCheck = new IrBooleanExpression(__LINE__, 0, __FILE__, nullptr, IrBooleanOperator::Not, boundCheck);
     IrBlock* failedBlock = new IrBlock(__LINE__, 0, __FILE__);
@@ -276,9 +295,7 @@ void IrLocation::createRuntimeChecks(IrTraversalContext* ctx)
     IrIfStatement* check = new IrIfStatement(__LINE__, 0, __FILE__, notCheck, failedBlock);
     
     m_rangeChecks->addStatement(check);
-    
-    m_rangeChecks.get()->analyze(ctx);
-    m_rangeChecks.get()->allocate(ctx);    
+    m_rangeChecks->analyze(ctx);
 }
 
 bool IrLocation::codegenRuntimeChecks(IrTraversalContext* ctx)

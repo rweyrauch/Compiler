@@ -66,7 +66,8 @@ class Parser: public ParserBase
             d_optimizer = new IrOptimizer();
         }
         virtual ~Parser() 
-        {}
+        {
+        }
         void enableOpt(Optimization which)
         {
             m_optimizations.push_back(which);

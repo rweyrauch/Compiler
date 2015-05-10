@@ -38,25 +38,38 @@
 
 namespace Decaf
 {
+// Template:
+//
+// int loop_var = <initial value>
+// LABEL_TOP:
+// if (loop_var < <terminate expr>)
+// {
+//     <body>
+// LABEL_CONTINUE:
+//     loop_var += 1;
+//     goto LABEL_TOP;
+// }
+// LABEL_END:
 
 IrForStatement::IrForStatement(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* loopVar, IrExpression* initialExpr, IrExpression* endExpr, IrBlock* block) :
     IrStatement(lineNumber, columnNumber, filename),
-    m_loopVar(nullptr),
+    m_loopVar(std::shared_ptr<IrIdentifier>(loopVar)),
     m_initialValue(std::shared_ptr<IrExpression>(initialExpr)),
     m_terminatingValue(std::shared_ptr<IrExpression>(endExpr)),
     m_body(std::shared_ptr<IrBlock>(block))
-{
-    m_loopVar = std::shared_ptr<IrLocation>(new IrLocation(lineNumber, columnNumber, filename, loopVar, IrType::Integer));
-
-    m_initLoopAuto = std::shared_ptr<IrExpression>(new IrAssignExpression(lineNumber, columnNumber, filename, m_loopVar.get(), IrAssignmentOperator::Assign, m_initialValue.get()));
+{   
+    IrLocation* loopVar0 = new IrLocation(lineNumber, columnNumber, filename, loopVar, IrType::Integer);
+    m_initLoopAuto = std::shared_ptr<IrExpression>(new IrAssignExpression(lineNumber, columnNumber, filename, loopVar0, IrAssignmentOperator::Assign, initialExpr));
+    
     m_labelTop = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
     m_labelContinue = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
     m_labelEnd = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
     
-    m_terminatingExpr = std::shared_ptr<IrExpression>(new IrBooleanExpression(lineNumber, columnNumber, filename, m_loopVar.get(), IrBooleanOperator::Less, m_terminatingValue.get()));
+    IrLocation* loopVar1 = new IrLocation(lineNumber, columnNumber, filename, loopVar, IrType::Integer);
+    m_terminatingExpr = std::shared_ptr<IrExpression>(new IrBooleanExpression(lineNumber, columnNumber, filename, loopVar1, IrBooleanOperator::Less, endExpr));
 
-    m_loopIncrement = std::shared_ptr<IrIntegerLiteral>(new IrIntegerLiteral(lineNumber, columnNumber, filename, "1"));
-    m_incrementLoop = std::shared_ptr<IrExpression>(new IrAssignExpression(lineNumber, columnNumber, filename, m_loopVar.get(), IrAssignmentOperator::IncrementAssign, m_loopIncrement.get()));
+    IrLocation* loopVar2 = new IrLocation(lineNumber, columnNumber, filename, loopVar, IrType::Integer);
+    m_incrementLoop = std::shared_ptr<IrExpression>(new IrAssignExpression(lineNumber, columnNumber, filename, loopVar2, IrAssignmentOperator::IncrementAssign, IrIntegerLiteral::GetOne().get()));
 
     m_loopGoto = std::shared_ptr<IrGotoStatement>(new IrGotoStatement(lineNumber, columnNumber, filename, m_labelTop.get()));
 }
@@ -80,7 +93,6 @@ void IrForStatement::propagateTypes(IrTraversalContext* ctx)
     m_labelEnd->propagateTypes(ctx);
     m_initLoopAuto->propagateTypes(ctx);
     m_terminatingExpr->propagateTypes(ctx);
-    m_loopIncrement->propagateTypes(ctx);
     m_incrementLoop->propagateTypes(ctx);
     m_loopGoto->propagateTypes(ctx);
     
@@ -168,19 +180,7 @@ bool IrForStatement::allocate(IrTraversalContext* ctx)
 bool IrForStatement::codegen(IrTraversalContext* ctx)
 {
     bool valid = true;
-    
-    // int loop_var = <initial value>
-    // LABEL_TOP:
-    // if (loop_var < term_var)
-    // {
-    //     <body>
-    // LABEL_CONTINUE:
-    //     loop_var += 1;
-    //     goto LABEL_TOP;
-    // }
-    // LABEL_END:
-    //
-    
+        
     ctx->pushParent(this);
     
     m_initLoopAuto->codegen(ctx);
@@ -197,7 +197,6 @@ bool IrForStatement::codegen(IrTraversalContext* ctx)
     tac.m_opcode = IrOpcode::IFZ;
     tac.m_src0.build(m_terminatingExpr->getResult().get());
     tac.m_src1.build(m_labelEnd.get());
-    
     ctx->append(tac);
       
     if (m_body) m_body->codegen(ctx);
