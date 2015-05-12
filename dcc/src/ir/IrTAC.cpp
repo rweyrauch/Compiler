@@ -813,7 +813,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         IrOutputArg(stmt.m_src0, stream);
         stream << std::endl;
         
-        stream << "je ";        // jump if cmp == 0
+        stream << "jz ";        // jump if cmp == 0
         IrOutputLabel(stmt.m_src1, stream);
         stream << std::endl;
         
@@ -824,7 +824,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         IrOutputArg(stmt.m_src0, stream);
         stream << std::endl;
         
-        stream << "jne ";        // jump if cmp != 0
+        stream << "jnz ";        // jump if cmp != 0
         IrOutputLabel(stmt.m_src1, stream);
         stream << std::endl;
         break;

@@ -55,6 +55,7 @@ protected:
     std::shared_ptr<IrBlock> m_trueBlock;
     std::shared_ptr<IrBlock> m_falseBlock;
     
+    std::shared_ptr<IrIdentifier> m_labelTrue;
     std::shared_ptr<IrIdentifier> m_labelFalse;
     std::shared_ptr<IrIdentifier> m_labelEnd;
     
