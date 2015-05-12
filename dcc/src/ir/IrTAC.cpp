@@ -22,6 +22,8 @@
 // THE SOFTWARE.
 //
 #include <iostream>
+#include <sstream>
+#include <cassert>
 #include <vector>
 #include "IrTAC.h"
 #include "IrBase.h"
@@ -463,12 +465,43 @@ void IrGenMov(const IrTacArg& src, const IrTacArg& dst, std::ostream& stream)
     }
 }
 
-void IrGenLoad(const IrTacArg& baseAddr, const IrTacArg& offset, const IrTacArg& dst, std::ostream& stream)
+static int s_boundsCounter = 0;
+
+void IrGenBoundsCheck(const IrTacArg& offsetReg, int limit, std::ostream& stream)
+{
+    assert(IrIsRegister(offsetReg));
+   
+    std::stringstream tempName;
+    tempName << ".LB" << s_boundsCounter++;
+	
+    stream << "cmp $" << limit << ",";
+    IrOutputArg(offsetReg, stream);
+    stream << std::endl;  
+    stream << "jl " << tempName.str() << std::endl;
+    
+    stream << "cmp $0,";
+    IrOutputArg(offsetReg, stream);
+    stream << std::endl;  
+    stream << "jge " << tempName.str() << std::endl;
+    
+    // puts
+    stream << "mov $.BOUNDSMSG, %rdi" << std::endl;
+    stream << "call puts" << std::endl;
+     
+    // exit(-1) 
+    stream << "mov $60, %rax" << std::endl;
+    stream << "mov $-1, %rdi" << std::endl;
+    stream << "syscall" << std::endl;
+    stream << tempName.str() << ":" << std::endl;
+}
+
+void IrGenLoad(const IrTacArg& baseAddr, const IrTacArg& offset, const IrTacArg& dst, int limit, std::ostream& stream)
 {
     // load offset value into rsi/esi register
     IrGenMov(offset, g_indexRegister, stream);
 
-    // TODO: add bounds check to offset argument, range in offset.m_info
+    // add bounds check to offset argument, range in offset.m_info
+    IrGenBoundsCheck(g_indexRegister, limit, stream); 
         
     stream << (g_ia64 ? "movq " : "movl ");
     
@@ -499,7 +532,7 @@ void IrGenLoad(const IrTacArg& baseAddr, const IrTacArg& offset, const IrTacArg&
     stream << std::endl;      
 }
 
-void IrGenStore(const IrTacArg& src, const IrTacArg& baseAddr, const IrTacArg& offset, std::ostream& stream)
+void IrGenStore(const IrTacArg& src, const IrTacArg& baseAddr, const IrTacArg& offset, int limit, std::ostream& stream)
 {
     // Load source value into a register.
     stream << (g_ia64 ? "movq " : "movl ");
@@ -511,7 +544,8 @@ void IrGenStore(const IrTacArg& src, const IrTacArg& baseAddr, const IrTacArg& o
     // load offset value into rsi/esi register
     IrGenMov(offset, g_indexRegister, stream);
 
-    // TODO: add bounds check to offset argument, range in offset.m_info
+    // add bounds check to offset argument, range in offset.m_info
+    IrGenBoundsCheck(g_indexRegister, limit, stream); 
         
     stream << (g_ia64 ? "movq " : "movl ");
     
@@ -677,11 +711,11 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         break;
         
     case IrOpcode::LOAD:       // *[arg0 + arg1] -> arg2
-        IrGenLoad(stmt.m_src0, stmt.m_src1, stmt.m_dst, stream);
+        IrGenLoad(stmt.m_src0, stmt.m_src1, stmt.m_dst, stmt.m_info, stream);
         break;
         
     case IrOpcode::STORE:      // arg0 -> *[arg1 + arg2]
-        IrGenStore(stmt.m_src0, stmt.m_src1, stmt.m_dst, stream);
+        IrGenStore(stmt.m_src0, stmt.m_src1, stmt.m_dst, stmt.m_info, stream);
         break;
         
     case IrOpcode::ADD:        // arg0 + arg1 -> arg2

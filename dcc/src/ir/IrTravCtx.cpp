@@ -177,6 +177,14 @@ void IrTraversalContext::genStrings()
         tac.m_src1.build(it->second.m_value.get());
         append(tac);
     }
+    
+    std::shared_ptr<IrIdentifier> label = std::shared_ptr<IrIdentifier>(new IrIdentifier(__LINE__, 0, __FILE__, ".BOUNDSMSG", true));
+    std::shared_ptr<IrStringLiteral> value = std::shared_ptr<IrStringLiteral>(new IrStringLiteral(__LINE__, 0, __FILE__, "\"Bounds check failed.\n\""));
+    IrTacStmt rtc;
+    rtc.m_opcode = IrOpcode::STRING;
+    rtc.m_src0.build(label.get());
+    rtc.m_src1.build(value.get());
+    append(rtc);
 }
   
 } // namespace Decaf
