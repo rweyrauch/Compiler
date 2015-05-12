@@ -468,6 +468,8 @@ void IrGenLoad(const IrTacArg& baseAddr, const IrTacArg& offset, const IrTacArg&
     // load offset value into rsi/esi register
     IrGenMov(offset, g_indexRegister, stream);
 
+    // TODO: add bounds check to offset argument, range in offset.m_info
+        
     stream << (g_ia64 ? "movq " : "movl ");
     
     if (baseAddr.m_usage == IrUsage::Label)
@@ -509,6 +511,8 @@ void IrGenStore(const IrTacArg& src, const IrTacArg& baseAddr, const IrTacArg& o
     // load offset value into rsi/esi register
     IrGenMov(offset, g_indexRegister, stream);
 
+    // TODO: add bounds check to offset argument, range in offset.m_info
+        
     stream << (g_ia64 ? "movq " : "movl ");
     
     IrOutputArg(g_tempReg, stream); 

@@ -144,8 +144,6 @@ bool IrLocation::analyze(IrTraversalContext* ctx)
         assert(m_result == nullptr);
         // allocate a temporary variable for the result of this expression
         m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());
-                     
-        //createRuntimeChecks(ctx);                          
     }
     else
     {
@@ -175,9 +173,6 @@ bool IrLocation::allocate(IrTraversalContext* ctx)
             ctx->error(m_result.get(), "Internal compiler error.  Failed to add temporary variable to symbol table.");
             valid = false;
         } 
-        
-        if (m_rangeChecks)
-            valid = m_rangeChecks->allocate(ctx);
     }
         
     ctx->popParent();
@@ -194,23 +189,24 @@ bool IrLocation::codegen(IrTraversalContext* ctx)
         valid = false;
     
     if (m_index) 
-    {
-        // Insert codegen for runtime index bounds checks.
-        if (!codegenRuntimeChecks(ctx))
-            valid = false;
-            
+    {                                 
         if (!m_index->codegen(ctx)) 
             valid = false;
-
+                
         if (!m_result->codegen(ctx)) 
             valid = false;
-            
+        
+        SVariableSymbol symbol;
+        bool found = ctx->lookup(m_identifier.get(), symbol);
+        assert(found);
+        
         if (usedAsWrite())
         {
             IrTacStmt store;
             store.m_opcode = IrOpcode::STORE;
             store.m_src0.build(m_result.get()); // source of the the store is in the m_result identifier
             store.m_src1.build(m_identifier.get());
+            store.m_info = symbol.m_count;
             if (m_index->getResult())
             {
                 store.m_dst.build(m_index->getResult().get());
@@ -234,6 +230,7 @@ bool IrLocation::codegen(IrTraversalContext* ctx)
             {
                 load.m_src1.build(dynamic_cast<IrLiteral*>(m_index.get()));
             }
+            load.m_info = symbol.m_count;
             load.m_dst.build(m_result.get());
             
             ctx->append(load);
@@ -249,63 +246,5 @@ const std::string& IrLocation::asString() const
 {
     return m_identifier->asString();
 }
- 
-void IrLocation::createRuntimeChecks(IrTraversalContext* ctx)
-{
-    assert(m_index != nullptr);
-    
-    // Range checks...
-    // m_index->getResult() < location_size && m_index->getResult() >= 0
-    m_rangeChecks = std::shared_ptr<IrBlock>(new IrBlock(__LINE__, 0, __FILE__));
-    
-    SVariableSymbol symbol;
-    ctx->lookup(this, symbol);
-    
-    IrIntegerLiteral* maxRangeValue = new IrIntegerLiteral(__LINE__, 0, __FILE__, "0");
-    maxRangeValue->setValue((int)symbol.m_count);
-    IrIntegerLiteral* minRangeValue = new IrIntegerLiteral(__LINE__, 0, __FILE__, "0");
-    
-    IrBooleanExpression* maxCheck = nullptr;
-    IrBooleanExpression* minCheck = nullptr;
-    
-    if (m_index->getResult() != nullptr)
-    {
-        IrLocation* indexMaxCheck = new IrLocation(__LINE__, 0, __FILE__, m_index->getResult().get(), m_index->getType());
-        IrLocation* indexMinCheck = new IrLocation(__LINE__, 0, __FILE__, m_index->getResult().get(), m_index->getType());     
-        maxCheck = new IrBooleanExpression(__LINE__, 0, __FILE__, indexMaxCheck, IrBooleanOperator::Less, maxRangeValue);
-        minCheck = new IrBooleanExpression(__LINE__, 0, __FILE__, indexMinCheck, IrBooleanOperator::GreaterEqual, minRangeValue);
-    }
-    else
-    {
-        maxCheck = new IrBooleanExpression(__LINE__, 0, __FILE__, m_index.get(), IrBooleanOperator::Less, maxRangeValue);
-        minCheck = new IrBooleanExpression(__LINE__, 0, __FILE__, m_index.get(), IrBooleanOperator::GreaterEqual, minRangeValue);        
-    }
-    
-    IrBooleanExpression* boundCheck = new IrBooleanExpression(__LINE__, 0, __FILE__, maxCheck, IrBooleanOperator::LogicalAnd, minCheck);
-    IrBooleanExpression* notCheck = new IrBooleanExpression(__LINE__, 0, __FILE__, nullptr, IrBooleanOperator::Not, boundCheck);
-    IrBlock* failedBlock = new IrBlock(__LINE__, 0, __FILE__);
-    IrStringLiteral* printFunc = new IrStringLiteral(__LINE__, 0, __FILE__, "\"printf\"");
-    IrStringLiteral* abortFunc = new IrStringLiteral(__LINE__, 0, __FILE__, "\"abort\"");
-    IrMethodCall* printError = new IrMethodCall(__LINE__, 0, __FILE__, printFunc, IrType::Integer);
-    IrStringLiteral* errorMessage = new IrStringLiteral(__LINE__, 0, __FILE__, "\"Runtime bounds check failure.\"");
-    printError->addArgument(errorMessage);
-    IrMethodCall* abortStatement = new IrMethodCall(__LINE__, 0, __FILE__, abortFunc, IrType::Integer);
-    failedBlock->addStatement(new IrExpressionStatement(__LINE__, 0, __FILE__, printError));
-    failedBlock->addStatement(new IrExpressionStatement(__LINE__, 0, __FILE__, abortStatement));
-    IrIfStatement* check = new IrIfStatement(__LINE__, 0, __FILE__, notCheck, failedBlock);
-    
-    m_rangeChecks->addStatement(check);
-    m_rangeChecks->analyze(ctx);
-}
 
-bool IrLocation::codegenRuntimeChecks(IrTraversalContext* ctx)
-{
-    bool valid = true;
-    if (m_rangeChecks)
-    {
-        valid = m_rangeChecks->codegen(ctx);
-    }
-    return valid;
-}
- 
 } // namespace Decaf

@@ -38,16 +38,14 @@ public:
         IrExpression(lineNumber, columnNumber, filename, type),
         m_identifier(std::shared_ptr<IrIdentifier>(ident)),
         m_index(nullptr),
-        m_asDeclaration(false),
-        m_rangeChecks(nullptr)
+        m_asDeclaration(false)
     {}
 
     IrLocation(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType type, IrExpression* index) :
         IrExpression(lineNumber, columnNumber, filename, type),
         m_identifier(std::shared_ptr<IrIdentifier>(ident)),
         m_index(index),
-        m_asDeclaration(false),
-        m_rangeChecks(nullptr)
+        m_asDeclaration(false)
     {}
     
     virtual ~IrLocation()
@@ -73,11 +71,6 @@ protected:
     bool m_asDeclaration;
     
     static int s_tempLocationCounter;
-    
-    void createRuntimeChecks(IrTraversalContext* ctx);
-	bool codegenRuntimeChecks(IrTraversalContext* ctx);
-    
-    std::shared_ptr<IrBlock> m_rangeChecks;
     
 private:
     IrLocation() = delete;
