@@ -5,39 +5,38 @@ class Program
         callout("printf", "short-circuit failed\n");
         return ok;
     }
-    
-	void main()
-	{
-		boolean a, b, c;
-		a = true;
-		b = false;
+
+    void main()
+    {
+        boolean a, b, c;
+        a = true;
+        b = false;
         c = true;
-       
-		if (b && !a && fail(false)) {
-			callout("printf", "INCORRECT\n");
-		} else {
-			callout("printf", "correct\n");
-		}
+        
+        if (b && !a && fail(false)) {
+            callout("printf", "INCORRECT\n");
+        } else {
+            callout("printf", "correct\n");
+        }
        
         if (false && fail(false)) {
-			callout("printf", "INCORRECT\n");
-		} else {
-			callout("printf", "correct\n");
-		}
+            callout("printf", "INCORRECT\n");
+        } else {
+            callout("printf", "correct\n");
+        }
         
-        if (false || fail(false)) {
-			callout("printf", "INCORRECT\n");
-		} else {
-			callout("printf", "correct\n");
-		}
-
-		c = ! ! a;
-		if (!a != c) {
-			callout("printf", "correct\n");
-		} else {
-			callout("printf", "INCORRECT\n");
-		}
+        if (true || fail(false)) {
+            callout("printf", "correct\n");
+        } else {
+            callout("printf", "INCORRECT\n");
+        }
         
- 	}
+        c = ! ! a;
+        if (!a != c) {
+            callout("printf", "correct\n");
+        } else {
+            callout("printf", "INCORRECT\n");
+        }       
+    }
 }
 

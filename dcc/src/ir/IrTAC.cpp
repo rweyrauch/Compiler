@@ -809,20 +809,40 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         break;
         
     case IrOpcode::IFZ:        // branch arg0 == 0 to arg1
-        stream << "cmp $0, ";       
-        IrOutputArg(stmt.m_src0, stream);
-        stream << std::endl;
-        
+        if (stmt.m_src0.m_usage != IrUsage::Literal)
+        {    
+            stream << "cmp $0, ";       
+            IrOutputArg(stmt.m_src0, stream);
+            stream << std::endl;           
+         }
+        else // literal
+        {
+            IrGenMov(stmt.m_src0, g_tempReg, stream);
+            
+            stream << "cmp $0, ";       
+            IrOutputArg(g_tempReg, stream);
+            stream << std::endl;                       
+        }
         stream << "jz ";        // jump if cmp == 0
         IrOutputLabel(stmt.m_src1, stream);
         stream << std::endl;
-        
-        break;
+       break;
         
     case IrOpcode::IFNZ:        // jump if cmp != 0
-        stream << "cmp $0, ";       
-        IrOutputArg(stmt.m_src0, stream);
-        stream << std::endl;
+        if (stmt.m_src0.m_usage != IrUsage::Literal)
+        {    
+            stream << "cmp $0, ";       
+            IrOutputArg(stmt.m_src0, stream);
+            stream << std::endl;
+        }
+        else
+        {
+            IrGenMov(stmt.m_src0, g_tempReg, stream);
+            
+            stream << "cmp $0, ";       
+            IrOutputArg(g_tempReg, stream);
+            stream << std::endl;                       
+        }
         
         stream << "jnz ";        // jump if cmp != 0
         IrOutputLabel(stmt.m_src1, stream);
