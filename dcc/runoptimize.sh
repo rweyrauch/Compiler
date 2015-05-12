@@ -65,10 +65,12 @@ do
     ${DCC} -o out/$dcfinput.s $input
     if [ -e out/$dcfinput.s ]
     then    
-        gcc out/$dcfinput.s out/6035.o -o out/$dcfinput.out 2> out/$dcfinput.log
+        gcc out/$dcfinput.s out/6035.o -o out/$dcfinput 2> out/$dcfinput.log
         if [ -e out/$dcfinput ]
         then
-            out/$dcfinput > out/$dcfinput.output        
+            cd out
+            ./$dcfinput > $dcfinput.output
+            cd ..
         else
             echo "FAIL: Failed to link ${input}."
         fi        
