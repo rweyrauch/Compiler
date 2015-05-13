@@ -91,6 +91,9 @@ class Parser: public ParserBase
                 // convert generated TAC into basic blocks and optimize
                 std::vector<IrTacStmt> statements = optimize(d_ctx->getStatements());
                 
+                // write string table
+                d_ctx->genStrings();
+		
                 if (m_enableIrOutput)
                 {
                     for (auto it : statements)
@@ -98,9 +101,6 @@ class Parser: public ParserBase
                         IrPrintTac(it);
                     }
                 }
-                
-                // write string table
-                d_ctx->genStrings();
     
                 // convert TAC into x86_64 assembly
                 d_ctx->codegen(d_scanner.outStream());
