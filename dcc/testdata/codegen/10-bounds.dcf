@@ -5,7 +5,7 @@ class Program {
   void main() {
 	int i;
 	i = 100;
-    callout("printf", "expecting an error next:\n\n");
+    callout("printf", "expecting an error next:\n");
     a[i] = 0;
   }
 }

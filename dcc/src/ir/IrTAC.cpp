@@ -473,17 +473,19 @@ void IrGenBoundsCheck(const IrTacArg& offsetReg, int limit, std::ostream& stream
    
     std::stringstream tempName;
     tempName << ".LB" << s_boundsCounter++;
-	
+
     stream << "cmp $" << limit << ",";
     IrOutputArg(offsetReg, stream);
     stream << std::endl;  
     stream << "jl " << tempName.str() << std::endl;
     
+    // TODO: this second compare breaks the first check - why????
+/*    
     stream << "cmp $0,";
     IrOutputArg(offsetReg, stream);
     stream << std::endl;  
     stream << "jge " << tempName.str() << std::endl;
-    
+*/    
     // puts
     stream << "mov $.BOUNDSMSG, %rdi" << std::endl;
     stream << "call puts" << std::endl;
@@ -492,7 +494,8 @@ void IrGenBoundsCheck(const IrTacArg& offsetReg, int limit, std::ostream& stream
     stream << "mov $60, %rax" << std::endl;
     stream << "mov $-1, %rdi" << std::endl;
     stream << "syscall" << std::endl;
-    stream << tempName.str() << ":" << std::endl;
+
+    stream << tempName.str() << ":" << std::endl;    
 }
 
 void IrGenLoad(const IrTacArg& baseAddr, const IrTacArg& offset, const IrTacArg& dst, int limit, std::ostream& stream)
