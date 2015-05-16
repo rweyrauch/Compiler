@@ -276,8 +276,7 @@ bool IrBooleanExpression::codegen(IrTraversalContext* ctx)
     {        
         // TAC:
         // tempResult = lhs operator rhs
-        IrTacStmt tac;
-        tac.m_opcode = opcodeFor(m_operator);
+        IrTacStmt tac(opcodeFor(m_operator), getLineNumber());
         if (m_lhs != nullptr)
         {
             IrLiteral* literal = dynamic_cast<IrLiteral*>(m_lhs.get());

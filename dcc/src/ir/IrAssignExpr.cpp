@@ -211,8 +211,7 @@ bool IrAssignExpression::codegen(IrTraversalContext* ctx)
         // MOV rhs lhs ||
         // ADD rhs lhs lhs ||
         // SUB rhs lhs lhs
-        IrTacStmt tac;
-        tac.m_opcode = opcodeFor(m_operator);
+        IrTacStmt tac(opcodeFor(m_operator), getLineNumber());
         if (m_rhs != nullptr)
         {
             IrLiteral* literal = dynamic_cast<IrLiteral*>(m_rhs.get());

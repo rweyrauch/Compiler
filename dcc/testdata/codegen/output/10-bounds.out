@@ -1,2 +1,2 @@
 expecting an error next:
-*** RUNTIME ERROR ***: Array out of Bounds access in method "main"
+*** RUNTIME ERROR ***: Array out of bounds access in file "testdata/codegen/10-bounds.dcf" at line 9.

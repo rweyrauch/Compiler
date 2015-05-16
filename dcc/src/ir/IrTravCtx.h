@@ -44,6 +44,7 @@ public:
         m_ia64(ia64),
         m_symbols(),
         m_parents(),
+        m_sourceFilename(""),
         m_source(nullptr),
         m_blank("")
     {}
@@ -66,11 +67,12 @@ public:
     bool lookup(IrLocation* variable, SVariableSymbol& symbol) const;
     bool lookup(IrMethodCall* method, SMethodSymbol& symbol) const;
     
-    bool addString(IrIdentifier* identifier, IrStringLiteral* value);
+    bool addString(IrIdentifier* identifier, const std::string& value);
     bool lookup(const std::string& value, SStringSymbol& symbol);
     
-    void setSource(std::vector<std::string> const* source) { m_source = source; }
+    void setSource(const std::string& filename, std::vector<std::string> const* source) { m_sourceFilename = filename; m_source = source; }
     const std::string& sourceAt(int line_num) const;
+    const std::string& sourceFilename() const { return m_sourceFilename; }
     
     void error(const IrBase* node, const std::string& message) const;
     void highlightError(int line, int column, int length = 1) const;
@@ -92,6 +94,7 @@ protected:
     std::list<IrSymbolTable*> m_symbols;
     std::vector<IrBase*> m_parents;
     
+    std::string m_sourceFilename;
     std::vector<std::string> const* m_source;
     std::string m_blank;
     

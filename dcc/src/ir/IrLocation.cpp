@@ -202,8 +202,7 @@ bool IrLocation::codegen(IrTraversalContext* ctx)
         
         if (usedAsWrite())
         {
-            IrTacStmt store;
-            store.m_opcode = IrOpcode::STORE;
+            IrTacStmt store(IrOpcode::STORE, getLineNumber());
             store.m_src0.build(m_result.get()); // source of the the store is in the m_result identifier
             store.m_src1.build(m_identifier.get());
             store.m_info = symbol.m_count;
@@ -219,8 +218,7 @@ bool IrLocation::codegen(IrTraversalContext* ctx)
         }
         else
         {
-            IrTacStmt load;
-            load.m_opcode = IrOpcode::LOAD;
+            IrTacStmt load(IrOpcode::LOAD, getLineNumber());
             load.m_src0.build(m_identifier.get());
             if (m_index->getResult())
             {

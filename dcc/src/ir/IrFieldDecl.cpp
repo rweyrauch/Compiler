@@ -88,8 +88,7 @@ bool IrFieldDecl::codegen(IrTraversalContext* ctx)
     SVariableSymbol symbol;
     if (ctx->lookup(m_location.get(), symbol))
     {
-        IrTacStmt tac;
-        tac.m_opcode = IrOpcode::GLOBAL;
+        IrTacStmt tac(IrOpcode::GLOBAL, getLineNumber());
         tac.m_info = symbol.m_count * 8;
         tac.m_src0.build(m_location->getIdentifier().get());
         ctx->append(tac);

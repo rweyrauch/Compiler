@@ -149,8 +149,7 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
     
     ctx->pushParent(this);
 
-    IrTacStmt tac;
-    tac.m_opcode = IrOpcode::IFZ;
+    IrTacStmt tac(IrOpcode::IFZ, getLineNumber());
     
     IrBooleanExpression* boolexpr = dynamic_cast<IrBooleanExpression*>(m_condition.get());
     IrBooleanLiteral* literal = dynamic_cast<IrBooleanLiteral*>(m_condition.get());
@@ -273,38 +272,33 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
     
     if (m_trueBlock)
     {
-        IrTacStmt label;
-        label.m_opcode = IrOpcode::LABEL;
+        IrTacStmt label(IrOpcode::LABEL, getLineNumber());
         label.m_src0.build(m_labelTrue.get());
         ctx->append(label);
         
         if (!m_trueBlock->codegen(ctx))
             valid = false;
         
-        IrTacStmt jump;
-        jump.m_opcode = IrOpcode::JUMP;
+        IrTacStmt jump(IrOpcode::JUMP, getLineNumber());
         jump.m_src0.build(m_labelEnd.get());
         ctx->append(jump);
     }   
     
     if (m_falseBlock)
     {                          
-        IrTacStmt label;
-        label.m_opcode = IrOpcode::LABEL;
+        IrTacStmt label(IrOpcode::LABEL, getLineNumber());
         label.m_src0.build(m_labelFalse.get());
         ctx->append(label);
     
         if (!m_falseBlock->codegen(ctx))
             valid = false;
             
-        IrTacStmt jump;
-        jump.m_opcode = IrOpcode::JUMP;
+        IrTacStmt jump(IrOpcode::JUMP, getLineNumber());
         jump.m_src0.build(m_labelEnd.get());
         ctx->append(jump);
     } 
     
-    IrTacStmt elabel;
-    elabel.m_opcode = IrOpcode::LABEL;
+    IrTacStmt elabel(IrOpcode::LABEL, getLineNumber());
     elabel.m_src0.build(m_labelEnd.get());
     ctx->append(elabel);
 

@@ -29,8 +29,6 @@
 
 namespace Decaf
 {
-class IrIdentifier;
-class IrStringLiteral;
 
 enum class IrType : int
 {
@@ -117,8 +115,8 @@ struct SMethodSymbol
 
 struct SStringSymbol
 {
-    std::shared_ptr<IrIdentifier> m_name;
-    std::shared_ptr<IrStringLiteral> m_value;
+    std::string m_name;
+    std::string m_value;
 };
 
 } // namespace Decaf

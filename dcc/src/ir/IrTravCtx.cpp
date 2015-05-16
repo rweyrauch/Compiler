@@ -88,24 +88,24 @@ bool IrTraversalContext::lookup(IrMethodCall* method, SMethodSymbol& symbol) con
     return found;
 }
    
-bool IrTraversalContext::addString(IrIdentifier* identifier, IrStringLiteral* value)
+bool IrTraversalContext::addString(IrIdentifier* identifier, const std::string& value)
 {
+    if (identifier == nullptr) return false;
+    
     bool ok = true;
     auto it = m_strings.find(identifier->getIdentifier());
     if (it == m_strings.end())
     {
         SStringSymbol symbol;
-        symbol.m_name = std::shared_ptr<IrIdentifier>(identifier);
-        symbol.m_value = std::shared_ptr<IrStringLiteral>(value);
+        symbol.m_name = identifier->getIdentifier();
+        symbol.m_value = value;
         m_strings[identifier->getIdentifier()] = symbol;
     }
     else
     {
-        // Error - duplicate
-        std::cerr << identifier->getFilename() << ":" << identifier->getLineNumber() << ":" << identifier->getColumnNumber() << ": error: string \'" << identifier->getIdentifier() << "\' already declared in scope." << std::endl;                
         ok = false;
     }
-    return ok;    
+    return ok;
 }
    
 bool IrTraversalContext::lookup(const std::string& value, SStringSymbol& symbol)
@@ -114,7 +114,7 @@ bool IrTraversalContext::lookup(const std::string& value, SStringSymbol& symbol)
     
     for (auto it : m_strings)
     {
-        if (it.second.m_value->getValue() == value)
+        if (it.second.m_value == value)
         {
             found = true;
             symbol = it.second;
@@ -160,6 +160,9 @@ void IrTraversalContext::codegen(std::ostream& stream)
     if (!m_ia64)
         IrGenIA32();
 
+    if (!m_sourceFilename.empty())
+        stream << ".file \"" << m_sourceFilename << "\"" << std::endl;
+    
     stream << ".text" << std::endl;
     for (auto it : m_statements)
     {
@@ -171,20 +174,24 @@ void IrTraversalContext::genStrings()
 {
     for (auto it = m_strings.cbegin(); it != m_strings.cend(); ++it)
     {
-        IrTacStmt tac;
-        tac.m_opcode = IrOpcode::STRING;
-        tac.m_src0.build(it->second.m_name.get());
-        tac.m_src1.build(it->second.m_value.get());
+        IrTacStmt tac(IrOpcode::STRING);
+        tac.m_src0.build(it->second.m_name);
+        tac.m_src1.build(it->second.m_value);
         append(tac);
     }
     
-    std::shared_ptr<IrIdentifier> label = std::shared_ptr<IrIdentifier>(new IrIdentifier(__LINE__, 0, __FILE__, ".BOUNDSMSG", true));
-    std::shared_ptr<IrStringLiteral> value = std::shared_ptr<IrStringLiteral>(new IrStringLiteral(__LINE__, 0, __FILE__, "\"*** RUNTIME ERROR ***: Array out of Bounds access in method \\\"main\\\"\""));
-    IrTacStmt rtc;
-    rtc.m_opcode = IrOpcode::STRING;
-    rtc.m_src0.build(label.get());
-    rtc.m_src1.build(value.get());
+    IrTacStmt rtc(IrOpcode::STRING);
+    rtc.m_src0.build(".BOUNDSMSG");
+    rtc.m_src1.build("*** RUNTIME ERROR ***: Array out of bounds access in file \\\"%s\\\" at line %d.\\n");
     append(rtc);
+    
+    if (!m_sourceFilename.empty())
+    {
+        IrTacStmt tac(IrOpcode::STRING);
+        tac.m_src0.build(".DCFFILE");
+        tac.m_src1.build(m_sourceFilename);
+        append(tac);
+    }
 }
   
 } // namespace Decaf

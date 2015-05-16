@@ -80,8 +80,7 @@ bool IrReturnStatement::codegen(IrTraversalContext* ctx)
 
     ctx->pushParent(this);
     
-    IrTacStmt tac;
-    tac.m_opcode = IrOpcode::RETURN;
+    IrTacStmt tac(IrOpcode::RETURN, getLineNumber());
     
     if (m_returnValue)
     {

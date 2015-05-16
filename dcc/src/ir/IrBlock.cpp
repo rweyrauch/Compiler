@@ -140,8 +140,7 @@ bool IrBlock::codegen(IrTraversalContext* ctx)
         for (size_t i = 0; i < numVars; i++)
         {
             auto var = it->getVariable(i);
-            IrTacStmt initVar;
-            initVar.m_opcode = IrOpcode::MOV;
+            IrTacStmt initVar(IrOpcode::MOV, var->getLineNumber());
             if (it->getType() == IrType::Integer) {
                 initVar.m_src0.build(IrIntegerLiteral::GetZero().get());
             }

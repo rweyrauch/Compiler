@@ -30,6 +30,7 @@
 namespace Decaf
 {
 class IrIdentifier;
+class IrStringLiteral;
 
 class IrMethodCall : public IrExpression
 {

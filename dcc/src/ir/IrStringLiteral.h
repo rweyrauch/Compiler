@@ -34,12 +34,8 @@ class IrIdentifier;
 class IrStringLiteral : public IrLiteral
 {
 public:
-    IrStringLiteral(int lineNumber, int columnNumber, const std::string& filename, const std::string& value) :
-        IrLiteral(lineNumber, columnNumber, filename, IrType::String, value),
-        m_label(nullptr)
-    {
-    }
-    
+    IrStringLiteral(int lineNumber, int columnNumber, const std::string& filename, const std::string& value);
+     
     virtual ~IrStringLiteral()
     {}
     

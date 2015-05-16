@@ -54,8 +54,7 @@ bool IrGotoStatement::codegen(IrTraversalContext* ctx)
 
     ctx->pushParent(this);
     
-    IrTacStmt tac;
-    tac.m_opcode = IrOpcode::JUMP;
+    IrTacStmt tac(IrOpcode::JUMP, getLineNumber());
     tac.m_src0.build(m_label.get());
     ctx->append(tac);
     

@@ -114,7 +114,9 @@ struct IrTacArg
     void build(const IrDoubleLiteral* literal);
     void build(const IrBooleanLiteral* literal);
     void build(const IrStringLiteral* literal);
-
+    void buildLabel(const std::string& label);
+    void build(const std::string& literal);
+    
     IrUsage m_usage;
     IrArgType m_type;
     union {
@@ -130,18 +132,19 @@ struct IrTacArg
 
 struct IrTacStmt
 {
-    IrTacStmt() :
-        m_opcode(IrOpcode::NOOP),
+    IrTacStmt(IrOpcode opcode, int lineNo = 0) :
+        m_opcode(opcode),
         m_src0(),
         m_src1(),
         m_dst(),
-        m_info(0)
+        m_info(0),
+        m_lineNo(lineNo)
     {}
         
     IrOpcode m_opcode;
     IrTacArg m_src0, m_src1, m_dst;
     int m_info;
-    
+    int m_lineNo;
     bool hasSrc0() const;
     bool hasSrc1() const;
     bool hasDst() const;

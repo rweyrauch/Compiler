@@ -41,9 +41,7 @@ IrMethodCall::IrMethodCall(int lineNumber, int columnNumber, const std::string& 
     m_externalFunction(true),
     m_arguments()
 {
-    // strip quotes from literal
-    std::string funcName = name->getValue().substr(1, name->getValue().size()-2);   
-    m_identifier = std::shared_ptr<IrIdentifier>(new IrIdentifier(lineNumber, columnNumber, filename, funcName));
+    m_identifier = std::shared_ptr<IrIdentifier>(new IrIdentifier(lineNumber, columnNumber, filename, name->getValue()));
 }
  
 IrMethodCall::~IrMethodCall()
@@ -182,8 +180,7 @@ bool IrMethodCall::codegen(IrTraversalContext* ctx)
     int argCount = 0;    
     for (auto it : m_arguments)
     {    
-        IrTacStmt tac;
-        tac.m_opcode = IrOpcode::PARAM;
+        IrTacStmt tac(IrOpcode::PARAM, it->getLineNumber());
         
         IrStringLiteral* sliteral = dynamic_cast<IrStringLiteral*>(it.get());
         IrLiteral* literal = dynamic_cast<IrLiteral*>(it.get());
@@ -207,8 +204,7 @@ bool IrMethodCall::codegen(IrTraversalContext* ctx)
         if (!m_result->codegen(ctx))
             valid = false;
     
-    IrTacStmt callStmt;
-    callStmt.m_opcode = IrOpcode::CALL;
+    IrTacStmt callStmt(IrOpcode::CALL, getLineNumber());
     callStmt.m_src0.build(m_identifier.get());
     callStmt.m_src1.build(m_result.get());
     ctx->append(callStmt);

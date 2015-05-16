@@ -30,6 +30,20 @@
 namespace Decaf
 {
    
+IrStringLiteral::IrStringLiteral(int lineNumber, int columnNumber, const std::string& filename, const std::string& value) :
+    IrLiteral(lineNumber, columnNumber, filename, IrType::String, value),
+    m_label(nullptr)
+{
+    if (m_valueAsString.front() == '"')
+    {
+        m_valueAsString.erase(0, 1);
+    }
+    if (m_valueAsString.back() == '"')
+    {
+        m_valueAsString.pop_back();
+    }
+}
+    
 void IrStringLiteral::print(unsigned int depth) 
 {
     IRPRINT_INDENT(depth);
@@ -38,18 +52,24 @@ void IrStringLiteral::print(unsigned int depth)
     
 bool IrStringLiteral::codegen(IrTraversalContext* ctx)
 {
+    bool ok = true;
     SStringSymbol symbol;
     if (!ctx->lookup(getValue(), symbol))
     {
         m_label = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
-        ctx->addString(m_label.get(), this);
+        ok = ctx->addString(m_label.get(), getValue());
+        if (!ok)
+        {
+            // Error - duplicate
+            std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: string \'" << m_label->getIdentifier() << "\' already declared in scope." << std::endl;                            
+        }
     }
     else
     {
-        m_label = symbol.m_name;
+        m_label = std::shared_ptr<IrIdentifier>(new IrIdentifier(getLineNumber(), getColumnNumber(), getFilename(), symbol.m_name, true));
     }
     
-    return true;
+    return ok;
 }
 
 }

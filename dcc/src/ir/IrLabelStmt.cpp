@@ -54,8 +54,7 @@ bool IrLabelStatement::codegen(IrTraversalContext* ctx)
 
     ctx->pushParent(this);
     
-    IrTacStmt tac;
-    tac.m_opcode = IrOpcode::LABEL;
+    IrTacStmt tac(IrOpcode::LABEL, getLineNumber());
     tac.m_src0.build(m_label.get());
     
     ctx->append(tac);

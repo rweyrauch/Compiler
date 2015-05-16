@@ -186,15 +186,13 @@ bool IrForStatement::codegen(IrTraversalContext* ctx)
     m_initLoopAuto->codegen(ctx);
     m_labelTop->codegen(ctx);
     
-    IrTacStmt label;
-    label.m_opcode = IrOpcode::LABEL;
+    IrTacStmt label(IrOpcode::LABEL, getLineNumber());
     label.m_src0.build(m_labelTop.get());
     ctx->append(label);
      
     m_terminatingExpr->codegen(ctx);
     
-    IrTacStmt tac;
-    tac.m_opcode = IrOpcode::IFZ;
+    IrTacStmt tac(IrOpcode::IFZ, getLineNumber());
     tac.m_src0.build(m_terminatingExpr->getResult().get());
     tac.m_src1.build(m_labelEnd.get());
     ctx->append(tac);

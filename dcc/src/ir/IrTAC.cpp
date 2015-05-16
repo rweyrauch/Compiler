@@ -170,6 +170,22 @@ void IrTacArg::build(const IrStringLiteral* literal)
     }
 }
 
+void IrTacArg::buildLabel(const std::string& label)
+{
+    m_usage = IrUsage::Label;
+    m_isConstant = true;
+    m_type = IrArgType::String;
+    m_asString = label;
+}
+
+void IrTacArg::build(const std::string& literal)
+{
+    m_usage = IrUsage::Literal;
+    m_isConstant = true;
+    m_type = IrArgType::String;
+    m_asString = literal;
+}
+
 bool IrTacStmt::hasSrc0() const
 {
     return (m_src0.m_usage != IrUsage::Unused);
@@ -450,35 +466,39 @@ void IrGenMov(const IrTacArg& src, const IrTacArg& dst, std::ostream& stream)
 
 static int s_boundsCounter = 0;
 
-void IrGenBoundsCheck(const IrTacArg& offset, int limit, std::ostream& stream)
+void IrGenBoundsCheck(const IrTacArg& offset, int limit, int lineNo, std::ostream& stream)
 {
-    std::stringstream tempName;
-    tempName << ".LB" << s_boundsCounter++;
-
+    std::stringstream labelPass;
+    labelPass << ".LB" << s_boundsCounter++;
+    std::stringstream labelFail;
+    labelFail << ".LB" << s_boundsCounter++;
+    
     IrGenMov(offset, g_tempReg, stream); 
     
-    stream << "cmpq $" << limit << "," << g_tempReg << std::endl;
-    stream << "jl " << tempName.str() << std::endl;    
-    
-    /*
     stream << "cmpq $0," << g_tempReg << std::endl;
-    stream << "jge " << tempName.str() << std::endl;
-    */
+    stream << "jl " << labelFail.str() << std::endl;
+    
+    stream << "cmpq $" << limit << "," << g_tempReg << std::endl;
+    stream << "jl " << labelPass.str() << std::endl;    
+
+    stream << labelFail.str() << ":" << std::endl;    
     
     // puts(.BOUNDSMSG)
     stream << "mov $.BOUNDSMSG, %rdi" << std::endl;
-    stream << "call puts" << std::endl;
+    stream << "mov $.DCFFILE, %rsi" << std::endl;
+    stream << "mov $" << lineNo << ", %rdx" << std::endl;
+    stream << "call printf" << std::endl;
      
     // abort() 
     stream << "call abort" << std::endl;
 
-    stream << tempName.str() << ":" << std::endl;    
+    stream << labelPass.str() << ":" << std::endl;    
 }
 
-void IrGenLoad(const IrTacArg& baseAddr, const IrTacArg& offset, const IrTacArg& dst, int limit, std::ostream& stream)
+void IrGenLoad(const IrTacArg& baseAddr, const IrTacArg& offset, const IrTacArg& dst, int limit, int lineNo, std::ostream& stream)
 {
     // add bounds check to offset argument, range in offset.m_info
-    IrGenBoundsCheck(offset, limit, stream); 
+    IrGenBoundsCheck(offset, limit, lineNo, stream); 
     
     // load offset value into rsi/esi register
     IrGenMov(offset, g_indexRegister, stream);
@@ -507,10 +527,10 @@ void IrGenLoad(const IrTacArg& baseAddr, const IrTacArg& offset, const IrTacArg&
     stream << (g_ia64 ? "movq " : "movl ") << g_tempReg << ", " << dst << std::endl;      
 }
 
-void IrGenStore(const IrTacArg& src, const IrTacArg& baseAddr, const IrTacArg& offset, int limit, std::ostream& stream)
+void IrGenStore(const IrTacArg& src, const IrTacArg& baseAddr, const IrTacArg& offset, int limit, int lineNo, std::ostream& stream)
 {
     // add bounds check to offset argument, range in offset.m_info
-    IrGenBoundsCheck(offset, limit, stream); 
+    IrGenBoundsCheck(offset, limit, lineNo, stream); 
             
     // Load source value into a register.
     stream << (g_ia64 ? "movq " : "movl ") << src << ", " << g_tempReg << std::endl;
@@ -664,11 +684,11 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         break;
         
     case IrOpcode::LOAD:       // *[arg0 + arg1] -> arg2
-        IrGenLoad(stmt.m_src0, stmt.m_src1, stmt.m_dst, stmt.m_info, stream);
+        IrGenLoad(stmt.m_src0, stmt.m_src1, stmt.m_dst, stmt.m_info, stmt.m_lineNo, stream);
         break;
         
     case IrOpcode::STORE:      // arg0 -> *[arg1 + arg2]
-        IrGenStore(stmt.m_src0, stmt.m_src1, stmt.m_dst, stmt.m_info, stream);
+        IrGenStore(stmt.m_src0, stmt.m_src1, stmt.m_dst, stmt.m_info, stmt.m_lineNo, stream);
         break;
         
     case IrOpcode::ADD:        // arg0 + arg1 -> arg2
@@ -859,7 +879,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         
     case IrOpcode::STRING:     // string label -> arg0 value -> arg1
         stream << stmt.m_src0.m_asString << ":" << std::endl;
-        stream << ".string " << stmt.m_src1.m_asString << std::endl;
+        stream << ".string \"" << stmt.m_src1.m_asString << "\"" << std::endl;
         break;
         
     case IrOpcode::GLOBAL:

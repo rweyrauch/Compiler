@@ -62,7 +62,7 @@ class Parser: public ParserBase
             preloadSource(infile);            
             d_scanner.setSLoc(&d_loc__);            
             d_ctx = new IrTraversalContext(ia64);
-            d_ctx->setSource(&d_source);
+            d_ctx->setSource(infile, &d_source);
             d_optimizer = new IrOptimizer();
         }
         virtual ~Parser() 

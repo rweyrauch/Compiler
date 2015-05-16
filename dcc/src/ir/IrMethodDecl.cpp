@@ -86,6 +86,8 @@ bool IrMethodDecl::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
  
+    ctx->addString(IrIdentifier::CreateLabel(), getName());
+    
     ctx->pushSymbols(m_symbols.get());
     ctx->pushParent(this);
     
@@ -172,8 +174,7 @@ bool IrMethodDecl::codegen(IrTraversalContext* ctx)
 
     m_identifier->codegen(ctx);
     
-    IrTacStmt beginTac;
-    beginTac.m_opcode = IrOpcode::FBEGIN;
+    IrTacStmt beginTac(IrOpcode::FBEGIN, getLineNumber());
     beginTac.m_src0.build(m_identifier.get());
     beginTac.m_info = (int)m_stackSize;
     
@@ -184,8 +185,7 @@ bool IrMethodDecl::codegen(IrTraversalContext* ctx)
     {
         it->codegen(ctx);
         
-        IrTacStmt paramTac;
-        paramTac.m_opcode = IrOpcode::GETPARAM;
+        IrTacStmt paramTac(IrOpcode::GETPARAM, it->getLineNumber());
         paramTac.m_src0.build(it->getVariable(0).get());
         paramTac.m_info = argNum;
         argNum++;
