@@ -1,0 +1,6 @@
+testdata/semantic/illegal-02.dcf:3:4: error: variable 'a' not declared.
+    a = 34;	// identifier used before being declared
+    ^
+testdata/semantic/illegal-02.dcf:3:6: error: lhs and rhs of assigment operator must be of the same type.
+    a = 34;	// identifier used before being declared
+      ^

@@ -1,0 +1,4 @@
+testdata/semantic/illegal-04.dcf:2:8: error: field 'a' array size must be integer greater than zero.
+testdata/semantic/illegal-04.dcf:2:6: error: variable 'a' not declared.
+  int a[0];	// bad array size
+      ^

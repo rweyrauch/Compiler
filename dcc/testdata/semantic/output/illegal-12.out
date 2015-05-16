@@ -1,0 +1,15 @@
+testdata/semantic/illegal-12.dcf:3:4: error: for loop initial value expression must be of type integer.  Got: Boolean.
+    for x = false, 10 {   //initial condition must be an int
+    ^
+testdata/semantic/illegal-12.dcf:3:4: error: variable 'x' not declared.
+    for x = false, 10 {   //initial condition must be an int
+    ^
+testdata/semantic/illegal-12.dcf:3:4: error: lhs and rhs of assigment operator must be of the same type.
+    for x = false, 10 {   //initial condition must be an int
+    ^
+testdata/semantic/illegal-12.dcf:3:4: error: variable 'x' not declared.
+    for x = false, 10 {   //initial condition must be an int
+    ^
+testdata/semantic/illegal-12.dcf:3:4: error: variable 'x' not declared.
+    for x = false, 10 {   //initial condition must be an int
+    ^

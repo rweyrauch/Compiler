@@ -1,0 +1,3 @@
+testdata/semantic/illegal-11.dcf:5:4: error: if conditional expression must be of type boolean.  Got: Integer.
+    if (a[3]) {}	// condition should be a boolean
+    ^

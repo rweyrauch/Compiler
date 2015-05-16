@@ -1,0 +1,3 @@
+testdata/semantic/illegal-10.dcf:5:9: error: rhs of assignment operator may not be an array name.
+    a[1] = a;	// bad type, rhs should be an int
+         ^

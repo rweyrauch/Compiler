@@ -1,0 +1,3 @@
+testdata/semantic/illegal-07.dcf:2:2: error: incorrect return type.  Expected Void but found Integer.
+  void foo(int i, boolean b) {
+  ^

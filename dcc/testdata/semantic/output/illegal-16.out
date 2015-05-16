@@ -1,0 +1,3 @@
+testdata/semantic/illegal-16.dcf:5:8: error: rhs of not operator(!) must of type boolean.
+    b = !5;	// operand of ! must be boolean
+        ^

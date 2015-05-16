@@ -1,0 +1,6 @@
+testdata/semantic/illegal-17.dcf:5:6: error: lhs of increment/decrement assigment operator must be of type integer or double.
+    b += true;	// lhs and rhs of += must be int
+      ^
+testdata/semantic/illegal-17.dcf:5:6: error: rhs of increment/decrement assigment operator must be of type integer or double.
+    b += true;	// lhs and rhs of += must be int
+      ^

@@ -1,0 +1,3 @@
+testdata/semantic/illegal-08.dcf:2:2: error: incorrect return type.  Expected Integer but found Boolean.
+  int foo(int i, boolean b) {
+  ^

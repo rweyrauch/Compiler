@@ -1,0 +1,3 @@
+testdata/semantic/illegal-03.dcf:2:0: error: class must contain a method 'main'.
+class Program {
+^

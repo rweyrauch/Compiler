@@ -1,0 +1,3 @@
+testdata/semantic/illegal-09.dcf:6:4: error: array 'a' index must be an integer expression.  Got: Boolean.
+    a[b] = 25;	// array index has wrong type
+    ^

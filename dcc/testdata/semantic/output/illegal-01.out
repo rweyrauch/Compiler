@@ -1,0 +1,1 @@
+testdata/semantic/illegal-01.dcf:4:12: error: variable 'x' of type Boolean already declared in scope.

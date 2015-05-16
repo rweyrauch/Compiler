@@ -1,0 +1,8 @@
+testdata/semantic/illegal-05.dcf:8:8: error: method 'foo' incorrect number of arguments.
+testdata/semantic/illegal-05.dcf:8:8: error: method 'foo' incorrect number of arguments.
+testdata/semantic/illegal-05.dcf:8:8: error: method foo not defined.
+    x = foo(34, true, true);	// argument mismatch
+        ^
+testdata/semantic/illegal-05.dcf:8:6: error: lhs and rhs of assigment operator must be of the same type.
+    x = foo(34, true, true);	// argument mismatch
+      ^

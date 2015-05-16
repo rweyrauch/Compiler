@@ -1,0 +1,3 @@
+testdata/semantic/illegal-13.dcf:6:9: error: lhs and rhs of assigment operator must be of the same type.
+    a[3] = i < 35;	// rhs should be an int expression
+         ^

@@ -1,0 +1,8 @@
+testdata/semantic/illegal-06.dcf:8:8: error: method 'foo' incorrect argument type for argument, 1.  Expected type Boolean but given Integer
+testdata/semantic/illegal-06.dcf:8:8: error: method 'foo' incorrect argument type for argument, 1.  Expected type Boolean but given Integer
+testdata/semantic/illegal-06.dcf:8:8: error: method foo not defined.
+    x = foo(34, 35);	// types don't match signature
+        ^
+testdata/semantic/illegal-06.dcf:8:6: error: lhs and rhs of assigment operator must be of the same type.
+    x = foo(34, 35);	// types don't match signature
+      ^

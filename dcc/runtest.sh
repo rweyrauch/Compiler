@@ -11,7 +11,21 @@ TESTFILES=testdata/semantic/*.dcf
 for input in ${TESTFILES}
 do
     dcfinput=${input##*/}
-    echo $dcfinput
-    ${DCC} -o out/$dcfinput.s $input 2> out/$dcfinput.log
+    dcfinput=${dcfinput%%.*}
+    
+    rm -f out/$dcfinput
+    rm -f out/$dcfinput.*
+    
+    echo "---------------------------"
+    echo "Test: ${dcfinput}"
+    
+    ${DCC} -o out/$dcfinput.s $input 2> out/$dcfinput.output
+    diff out/$dcfinput.output testdata/semantic/output/$dcfinput.out > /dev/null
+    if [ $? -eq "0" ]
+    then
+        echo "PASS: ${input}."
+    else
+        echo "FAIL: ${input} did not produce the expected output."                
+    fi
 done
-popd
+
