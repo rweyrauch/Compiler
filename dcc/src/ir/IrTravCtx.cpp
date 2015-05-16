@@ -157,9 +157,6 @@ void IrTraversalContext::highlightError(int line, int column, int length) const
   
 void IrTraversalContext::codegen(std::ostream& stream)
 {
-    if (!m_ia64)
-        IrGenIA32();
-
     if (!m_sourceFilename.empty())
         stream << ".file \"" << m_sourceFilename << "\"" << std::endl;
     

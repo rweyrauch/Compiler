@@ -7,7 +7,6 @@
 char* g_target = 0;
 char* g_outputFilename = 0;
 int g_debug = 0;
-int g_ia32 = 0;
 int g_opt_global_cse = 0;
 int g_opt_all = 0;
 int g_output_ir = 0;
@@ -18,7 +17,6 @@ poptOption appOptions[] =
     { "target", 't', POPT_ARG_STRING, &g_target, 0, "scan or parse", NULL },
     { "output", 'o', POPT_ARG_STRING, &g_outputFilename, 0, "output filename", NULL },
     { "debug", 'd', POPT_ARG_NONE, &g_debug, 0, "debugging output", NULL },
-    { "m32", '3', POPT_ARG_NONE, &g_ia32, 0, "generate 32-bit code", NULL },
     { "ir", 'i', POPT_ARG_NONE, &g_output_ir, 0, "output intermediate representation", NULL },
     { "blocks", 'b', POPT_ARG_NONE, &g_output_blocks, 0, "output basic blocks", NULL },
     { "opt-common-subexpr-elim", 0, POPT_ARG_NONE, &g_opt_global_cse, 0, "enable global common subexpression elimination", NULL },
@@ -81,11 +79,11 @@ int main(int argc, char **argv)
         Parser* parser = 0;
         if (poptPeekArg(cmd))
         {
-            parser = new Parser(poptGetArg(cmd), g_outputFilename ? g_outputFilename : "decaf.out", !g_ia32);
+            parser = new Parser(poptGetArg(cmd), g_outputFilename ? g_outputFilename : "decaf.out");
         }
         else
         {
-            parser = new Parser(std::cin, std::cout, !g_ia32);
+            parser = new Parser(std::cin, std::cout);
         }
         
         if (g_output_ir) parser->enableIrOutput();

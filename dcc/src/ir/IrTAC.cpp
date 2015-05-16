@@ -271,40 +271,6 @@ const std::string g_registerNames[(int)IrReg::NUM] =
     "%rsi"
 };
 
-const std::string g_registerNames_ia32[(int)IrReg::NUM] =
-{
-    // temp registers
-    "%eax",
-    "%al",
-    "%edx",
-    "%dl",
-    "%ebx",
-    
-    "%xmm7",
-    "%xmm0",
-    
-    // parameter registers
-    "---",
-    "---",
-    "---",
-    "---",
-    "---",
-    "---"    
-
-    // double parameter registers
-    "---",
-    "---",
-    "---",
-    "---",
-    "---",
-    "---"    
-    "---",
-    "---"    
-    
-    // addressing register
-    "%ebx",
-    "%esi"    
-};
 
 IrTacArg makeRegister(IrArgType type, IrReg which)
 {
@@ -374,8 +340,6 @@ void IrPrintTac(const IrTacStmt& stmt, std::ostream& stream)
     stream << "\t// " << stmt.m_info << std::endl;
 }
 
-static bool g_ia64 = true;
-
 std::ostream& operator<<(std::ostream& stream,const IrTacArg& arg)
 {
     switch (arg.m_usage)
@@ -388,16 +352,13 @@ std::ostream& operator<<(std::ostream& stream,const IrTacArg& arg)
         break;
     case IrUsage::Identifier:
     case IrUsage::Argument:
-        stream << "-" << arg.m_value.m_address+8 << (g_ia64 ? "(%rbp)" : "(%ebp)");       
+        stream << "-" << arg.m_value.m_address+8 <<  "(%rbp)";       
         break;
     case IrUsage::Literal:
         stream << "$" << arg.m_asString;
         break;
     case IrUsage::Register:
-        if (g_ia64)
-            stream << g_registerNames[arg.m_value.m_int];
-        else
-            stream << g_registerNames_ia32[arg.m_value.m_int];
+        stream << g_registerNames[arg.m_value.m_int];
         break;
     default:
         // Unexpected.
@@ -455,12 +416,12 @@ void IrGenMov(const IrTacArg& src, const IrTacArg& dst, std::ostream& stream)
 {
     if (IrIsMemory(src) && IrIsMemory(dst))
     {
-        stream << (g_ia64 ? "movq " : "movl ") << src << ", " << g_tempReg << std::endl;     
-        stream << (g_ia64 ? "movq " : "movl ") << g_tempReg << ", " << dst << std::endl;      
+        stream << "movq " << src << ", " << g_tempReg << std::endl;     
+        stream << "movq " << g_tempReg << ", " << dst << std::endl;      
     }
     else
     {
-        stream << (g_ia64 ? "movq " : "movl ") << src << ", " << dst << std::endl;
+        stream << "movq " << src << ", " << dst << std::endl;
     }
 }
 
@@ -503,7 +464,7 @@ void IrGenLoad(const IrTacArg& baseAddr, const IrTacArg& offset, const IrTacArg&
     // load offset value into rsi/esi register
     IrGenMov(offset, g_indexRegister, stream);
         
-    stream << (g_ia64 ? "movq " : "movl ");
+    stream << "movq ";
     
     if (baseAddr.m_usage == IrUsage::Label)
     {
@@ -520,11 +481,11 @@ void IrGenLoad(const IrTacArg& baseAddr, const IrTacArg& offset, const IrTacArg&
     }
     else if (offset.m_usage == IrUsage::Identifier)
     {
-        stream << (g_ia64 ? "(,%rsi,8), " : "(,%esi,4), ");
+        stream << "(,%rsi,8), ";
     }
     stream << g_tempReg << std::endl;
     
-    stream << (g_ia64 ? "movq " : "movl ") << g_tempReg << ", " << dst << std::endl;      
+    stream << "movq " << g_tempReg << ", " << dst << std::endl;      
 }
 
 void IrGenStore(const IrTacArg& src, const IrTacArg& baseAddr, const IrTacArg& offset, int limit, int lineNo, std::ostream& stream)
@@ -533,12 +494,12 @@ void IrGenStore(const IrTacArg& src, const IrTacArg& baseAddr, const IrTacArg& o
     IrGenBoundsCheck(offset, limit, lineNo, stream); 
             
     // Load source value into a register.
-    stream << (g_ia64 ? "movq " : "movl ") << src << ", " << g_tempReg << std::endl;
+    stream << "movq " << src << ", " << g_tempReg << std::endl;
 
     // load offset value into rsi/esi register
     IrGenMov(offset, g_indexRegister, stream);
 
-    stream << (g_ia64 ? "movq " : "movl ") << g_tempReg << ",";
+    stream << "movq " << g_tempReg << ",";
     
     if (baseAddr.m_usage == IrUsage::Label)
     {
@@ -555,7 +516,7 @@ void IrGenStore(const IrTacArg& src, const IrTacArg& baseAddr, const IrTacArg& o
     }
     else if (offset.m_usage == IrUsage::Identifier)
     {
-        stream << (g_ia64 ? "(,%rsi,8)" : "(,%esi,4)");
+        stream << "(,%rsi,8)";
     }
     stream << std::endl;
 }
@@ -612,44 +573,37 @@ void IrGenParamPush(std::ostream& stream)
 {
     std::vector<IrTacArg> extraParams;
     
-    if (g_ia64)
-    {
-        int nextDoubleRegister = 0;
-        int nextNormalRegister = 0;
+    int nextDoubleRegister = 0;
+    int nextNormalRegister = 0;
 
-        for (auto it : g_funcCallParams)
+    for (auto it : g_funcCallParams)
+    {
+        if (IrIsDouble(it))
         {
-            if (IrIsDouble(it))
+            if (nextDoubleRegister < NUM_DOUBLE_ARG_REGS)
             {
-                if (nextDoubleRegister < NUM_DOUBLE_ARG_REGS)
-                {
-                    IrGenMov(it, g_paramDoubleRegisters[nextDoubleRegister], stream);
-                    nextDoubleRegister++;
-                }
-                else
-                {
-                    extraParams.push_back(it);
-                }
+                IrGenMov(it, g_paramDoubleRegisters[nextDoubleRegister], stream);
+                nextDoubleRegister++;
             }
             else
             {
-                if (nextNormalRegister < NUM_ARG_REGS)
-                {
-                    IrGenMov(it, g_paramRegisters[nextNormalRegister], stream);
-                    nextNormalRegister++;
-                }
-                else
-                {
-                    extraParams.push_back(it);
-                }
-            }       
+                extraParams.push_back(it);
+            }
         }
+        else
+        {
+            if (nextNormalRegister < NUM_ARG_REGS)
+            {
+                IrGenMov(it, g_paramRegisters[nextNormalRegister], stream);
+                nextNormalRegister++;
+            }
+            else
+            {
+                extraParams.push_back(it);
+            }
+        }       
     }
-    else
-    {
-        extraParams = g_funcCallParams;
-    }
-    
+
     // Pop extra parameters off the param stack
     if (!extraParams.empty())
     {
@@ -664,11 +618,6 @@ void IrGenParamPush(std::ostream& stream)
     }   
         
     g_funcCallParams.clear();
-}
-
-void IrGenIA32()
-{
-    g_ia64 = false;
 }
 
 static int g_nextUsedDoubleParamReg = 0;
@@ -827,7 +776,6 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         break;
     
     case IrOpcode::GETPARAM:	// stack -> arg0
-        if (g_ia64)
         {
             bool onStack = false;
             if (IrIsDouble(stmt.m_src0))
@@ -864,16 +812,6 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
                 
                 g_nextParamStackLocation++;
             }   
-        }
-        else
-        {
-            int argOffset = g_nextParamStackLocation;
-
-            stream << "movl " << (argOffset*8+16) << "(%rbp), " << g_tempReg << std::endl;
- 
-            stream << "movl " << g_tempReg << ", " << stmt.m_src0 << std::endl;
-            
-            g_nextParamStackLocation++;
         }
         break;
         

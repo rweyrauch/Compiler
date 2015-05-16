@@ -39,7 +39,7 @@ class Parser: public ParserBase
     
     public:
         
-        Parser(std::istream &in, std::ostream &out, bool ia64) :
+        Parser(std::istream &in, std::ostream &out) :
             d_scanner(in, out),
             d_root(nullptr),
             d_ctx(nullptr),
@@ -48,10 +48,10 @@ class Parser: public ParserBase
             m_enableBasicBlocksOutput(false)
         {
             d_scanner.setSLoc(&d_loc__);
-            d_ctx = new IrTraversalContext(ia64);
+            d_ctx = new IrTraversalContext();
             d_optimizer = new IrOptimizer();
         }
-        Parser(std::string const &infile, std::string const &outfile, bool ia64) :
+        Parser(std::string const &infile, std::string const &outfile) :
             d_scanner(infile, outfile),
             d_root(nullptr),
             d_ctx(nullptr),
@@ -61,7 +61,7 @@ class Parser: public ParserBase
        {
             preloadSource(infile);            
             d_scanner.setSLoc(&d_loc__);            
-            d_ctx = new IrTraversalContext(ia64);
+            d_ctx = new IrTraversalContext();
             d_ctx->setSource(infile, &d_source);
             d_optimizer = new IrOptimizer();
         }
