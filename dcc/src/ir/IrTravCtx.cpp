@@ -28,6 +28,7 @@
 #include "IrIdentifier.h"
 #include "IrMethodCall.h"
 #include "IrStringLiteral.h"
+#include "IrDoubleLiteral.h"
 
 namespace Decaf
 {
@@ -125,6 +126,43 @@ bool IrTraversalContext::lookup(const std::string& value, SStringSymbol& symbol)
     return found;
 }
    
+bool IrTraversalContext::addDouble(IrIdentifier* identifier, double value)
+{
+    if (identifier == nullptr) return false;
+    
+    bool ok = true;
+    auto it = m_doubles.find(identifier->getIdentifier());
+    if (it == m_doubles.end())
+    {
+        SDoubleSymbol symbol;
+        symbol.m_name = identifier->getIdentifier();
+        symbol.m_value = value;
+        m_doubles[identifier->getIdentifier()] = symbol;
+    }
+    else
+    {
+        ok = false;
+    }
+    return ok;    
+}
+
+bool IrTraversalContext::lookup(double value, SDoubleSymbol& symbol)
+{
+    bool found = false;
+    
+    for (auto it : m_doubles)
+    {
+        if (it.second.m_value == value)
+        {
+            found = true;
+            symbol = it.second;
+            break;
+        }
+    }
+    
+    return found;
+}
+   
 const std::string& IrTraversalContext::sourceAt(int line_num) const
 {
     if (m_source && line_num > 0 && line_num <= (int)m_source->size())
@@ -191,4 +229,15 @@ void IrTraversalContext::genStrings()
     }
 }
   
+void IrTraversalContext::genDoubles()
+{
+    for (auto it = m_doubles.cbegin(); it != m_doubles.cend(); ++it)
+    {
+        IrTacStmt tac(IrOpcode::DOUBLE);
+        tac.m_src0.build(it->second.m_name);
+        tac.m_src1.build(it->second.m_value);
+        append(tac);
+    }    
+}
+
 } // namespace Decaf

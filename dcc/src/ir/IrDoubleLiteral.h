@@ -40,17 +40,23 @@ public:
     virtual void print(unsigned int depth);
     virtual bool analyze(IrTraversalContext* ctx) { return true; }
     virtual bool allocate(IrTraversalContext* ctx) { return true; }
+    virtual bool codegen(IrTraversalContext* ctx);
      
     double getValue() const { return m_value; }
     void setValue(double value);
+    std::shared_ptr<IrIdentifier> getIdentifier() const { return m_label; }
 
     static std::shared_ptr<IrDoubleLiteral> GetZero() { return s_zero_literal; }
     static std::shared_ptr<IrDoubleLiteral> GetOne() { return s_one_literal; }
+   
+    static bool CodeGenConsts(IrTraversalContext* ctx);
     
 protected:
     
     double m_value;
+    std::shared_ptr<IrIdentifier> m_label;
     
+    static bool s_codegened_consts;
     static std::shared_ptr<IrDoubleLiteral> s_zero_literal;
     static std::shared_ptr<IrDoubleLiteral> s_one_literal;
     

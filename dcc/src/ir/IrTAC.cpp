@@ -67,7 +67,8 @@ const std::string gIrOpcodeStrings[(int)IrOpcode::NUM_OPCODES] =
     "PARAM",
     "GETPARAM",
     "STRING",
-    "GLOBAL"
+    "GLOBAL",
+    "DOUBLE",
 };
 static_assert(sizeof(gIrOpcodeStrings)/sizeof(std::string) == (size_t)IrOpcode::NUM_OPCODES, "Unexpected number of IrOpcode strings.");
 
@@ -184,6 +185,17 @@ void IrTacArg::build(const std::string& literal)
     m_isConstant = true;
     m_type = IrArgType::String;
     m_asString = literal;
+}
+
+void IrTacArg::build(double literal)
+{
+    m_usage = IrUsage::Literal;
+    m_isConstant = true;
+    m_type = IrArgType::Double;
+    m_value.m_double = literal;
+    std::stringstream str;
+    str << literal;
+    m_asString = str.str();
 }
 
 bool IrTacStmt::hasSrc0() const
@@ -399,29 +411,31 @@ const IrTacArg g_paramDoubleRegisters[NUM_DOUBLE_ARG_REGS] =
     makeRegister(IrArgType::Double, IrReg::DoubleParam8)
 };
 
-bool IrIsRegister(const IrTacArg& arg)
-{
-    return (arg.m_usage == IrUsage::Register);
-}
-bool IrIsMemory(const IrTacArg& arg)
-{
-    return (arg.m_usage == IrUsage::Identifier) || (arg.m_usage == IrUsage::Global);
-}
-bool IrIsDouble(const IrTacArg& arg)
-{
-    return (arg.m_type == IrArgType::Double);
-}
-
 void IrGenMov(const IrTacArg& src, const IrTacArg& dst, std::ostream& stream)
 {
-    if (IrIsMemory(src) && IrIsMemory(dst))
+    if (src.isMemory() && dst.isMemory())
     {
-        stream << "movq " << src << ", " << g_tempReg << std::endl;     
-        stream << "movq " << g_tempReg << ", " << dst << std::endl;      
+        if (src.isDouble() || dst.isDouble())
+        {
+            stream << "movsd " << src << ", " << g_tempDoubleReg << std::endl;     
+            stream << "movsd " << g_tempDoubleReg << ", " << dst << std::endl;                  
+        }
+        else
+        {
+            stream << "movq " << src << ", " << g_tempReg << std::endl;     
+            stream << "movq " << g_tempReg << ", " << dst << std::endl;      
+        }
     }
     else
     {
-        stream << "movq " << src << ", " << dst << std::endl;
+        if (src.isDouble() || dst.isDouble())
+        {
+            stream << "movsd " << src << ", " << dst << std::endl;
+        }
+        else
+        {
+            stream << "movq " << src << ", " << dst << std::endl;
+        }
     }
 }
 
@@ -578,7 +592,7 @@ void IrGenParamPush(std::ostream& stream)
 
     for (auto it : g_funcCallParams)
     {
-        if (IrIsDouble(it))
+        if (it.isDouble())
         {
             if (nextDoubleRegister < NUM_DOUBLE_ARG_REGS)
             {
@@ -642,33 +656,55 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         
     case IrOpcode::ADD:        // arg0 + arg1 -> arg2
     case IrOpcode::SUB:        // arg0 - arg1 -> arg2
-        IrGenMov(stmt.m_src0, g_tempReg, stream);
+        if (stmt.m_dst.isDouble())
+        {
+            IrGenMov(stmt.m_src0, g_tempDoubleReg, stream);
         
-        stream << (stmt.m_opcode == IrOpcode::ADD ? "add " : "sub ") << stmt.m_src1 << ", " << g_tempReg << std::endl;
+            stream << (stmt.m_opcode == IrOpcode::ADD ? "addsd " : "subsd ") << stmt.m_src1 << ", " << g_tempDoubleReg << std::endl;
         
-        IrGenMov(g_tempReg, stmt.m_dst, stream);
+            IrGenMov(g_tempDoubleReg, stmt.m_dst, stream);
+        }
+        else
+        {
+            IrGenMov(stmt.m_src0, g_tempReg, stream);
+        
+            stream << (stmt.m_opcode == IrOpcode::ADD ? "add " : "sub ") << stmt.m_src1 << ", " << g_tempReg << std::endl;
+        
+            IrGenMov(g_tempReg, stmt.m_dst, stream);
+        }
         break;
         
     case IrOpcode::MUL:        // arg0 * arg1 -> arg2
     case IrOpcode::DIV:        // arg0 / arg1 -> arg2
-    case IrOpcode::MOD:        // arg0 % arg1 -> arg2     
-        // zero the temp output reg
-        stream << "xor " << g_outReg << ", " << g_outReg << std::endl;
-        
-        IrGenMov(stmt.m_src0, g_retReg, stream); // arg0 => %rax
-        
-        // make sure the second arg is not an immediate nor a memory access
-        IrGenMov(stmt.m_src1, g_tempReg, stream);
-        
-        stream << (stmt.m_opcode == IrOpcode::MUL ? "imul " : "idiv ") << g_tempReg << std::endl;
-        
-        if (stmt.m_opcode == IrOpcode::MOD)
+    case IrOpcode::MOD:        // arg0 % arg1 -> arg2  
+        if (stmt.m_dst.isDouble())
         {
-            IrGenMov(g_outReg, stmt.m_dst, stream); // %rdx => arg2                       
+            IrGenMov(stmt.m_src0, g_tempDoubleReg, stream);
+        
+            stream << (stmt.m_opcode == IrOpcode::MUL ? "mulsd " : "divsd ") << stmt.m_src1 << ", " << g_tempDoubleReg << std::endl;
+        
+            IrGenMov(g_tempDoubleReg, stmt.m_dst, stream);
         }
         else
         {
-            IrGenMov(g_retReg, stmt.m_dst, stream); // %rax => arg2
+            // zero the temp output reg
+            stream << "xor " << g_outReg << ", " << g_outReg << std::endl;
+            
+            IrGenMov(stmt.m_src0, g_retReg, stream); // arg0 => %rax
+            
+            // make sure the second arg is not an immediate nor a memory access
+            IrGenMov(stmt.m_src1, g_tempReg, stream);
+            
+            stream << (stmt.m_opcode == IrOpcode::MUL ? "imul " : "idiv ") << g_tempReg << std::endl;
+            
+            if (stmt.m_opcode == IrOpcode::MOD)
+            {
+                IrGenMov(g_outReg, stmt.m_dst, stream); // %rdx => arg2                       
+            }
+            else
+            {
+                IrGenMov(g_retReg, stmt.m_dst, stream); // %rax => arg2
+            }
         }
         break;
         
@@ -696,7 +732,14 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
     case IrOpcode::RETURN:     // return |arg0|
         if (stmt.hasSrc0())
         {
-            IrGenMov(stmt.m_src0, g_retReg, stream);
+            if (stmt.m_src0.isDouble())
+            {
+                IrGenMov(stmt.m_src0, g_retDoubleReg, stream);
+            }
+            else
+            {
+                IrGenMov(stmt.m_src0, g_retReg, stream);
+            }
         }
         stream << "leave" << std::endl;
         stream << "ret" << std::endl;
@@ -778,7 +821,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
     case IrOpcode::GETPARAM:	// stack -> arg0
         {
             bool onStack = false;
-            if (IrIsDouble(stmt.m_src0))
+            if (stmt.m_src0.isDouble())
             {
                 if (g_nextUsedDoubleParamReg < NUM_DOUBLE_ARG_REGS)
                 {
@@ -824,6 +867,10 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         // put global allocations in zero-initialized section (ie bss)
         stream << ".lcomm " << stmt.m_src0.m_asString << "," << stmt.m_info << std::endl;
         break;
+        
+    case IrOpcode::DOUBLE:  // double label -> arg0 value -> arg1
+        stream << stmt.m_src0.m_asString << ":" << std::endl;
+        stream << ".double " << stmt.m_src1.m_asString << std::endl;
         
     default:
         break;

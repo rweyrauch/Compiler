@@ -67,6 +67,7 @@ enum class IrOpcode : int
     GETPARAM,	// get value from param, arg0 => ident info => argument number
     STRING,     // string label -> arg0 value -> arg1
     GLOBAL,     // global arg0
+    DOUBLE,     // double label -> arg0 value -> arg1
     
     NUM_OPCODES
 };
@@ -116,6 +117,12 @@ struct IrTacArg
     void build(const IrStringLiteral* literal);
     void buildLabel(const std::string& label);
     void build(const std::string& literal);
+    void build(double literal);
+    
+    bool isLiteral() const { return (m_usage == IrUsage::Literal); }
+    bool isMemory() const { return (m_usage == IrUsage::Identifier) || (m_usage == IrUsage::Global); }
+    bool isRegister() const { return (m_usage == IrUsage::Register); }
+    bool isDouble() const { return (m_type == IrArgType::Double); }
     
     IrUsage m_usage;
     IrArgType m_type;

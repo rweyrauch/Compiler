@@ -150,7 +150,7 @@ bool IrBlock::codegen(IrTraversalContext* ctx)
             }
             else if (it->getType() == IrType::Double)
             {
-                initVar.m_src0.build(IrDoubleLiteral::GetZero().get());
+                initVar.m_src0.build(IrDoubleLiteral::GetZero()->getIdentifier().get());
             }
             initVar.m_dst.build(var.get());
             

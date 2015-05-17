@@ -45,7 +45,10 @@ public:
         m_parents(),
         m_sourceFilename(""),
         m_source(nullptr),
-        m_blank("")
+        m_blank(""),
+        m_statements(),
+        m_strings(),
+        m_doubles()
     {}
     
     ~IrTraversalContext() {}
@@ -67,6 +70,9 @@ public:
     bool addString(IrIdentifier* identifier, const std::string& value);
     bool lookup(const std::string& value, SStringSymbol& symbol);
     
+    bool addDouble(IrIdentifier* identifier, double value);
+    bool lookup(double value, SDoubleSymbol& symbol);
+    
     void setSource(const std::string& filename, std::vector<std::string> const* source) { m_sourceFilename = filename; m_source = source; }
     const std::string& sourceAt(int line_num) const;
     const std::string& sourceFilename() const { return m_sourceFilename; }
@@ -83,6 +89,7 @@ public:
     void codegen(std::ostream& stream);
     
     void genStrings();
+    void genDoubles();
     
 protected:
     
@@ -95,7 +102,9 @@ protected:
     
     std::vector<IrTacStmt> m_statements;
     
-    std::map<std::string, SStringSymbol> m_strings;  
+    std::map<std::string, SStringSymbol> m_strings; 
+    std::map<std::string, SDoubleSymbol> m_doubles;
+    
 };
 
 } // namespace Decaf

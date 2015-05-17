@@ -86,6 +86,9 @@ class Parser: public ParserBase
             if (d_root)
             {
                 d_root->allocate(d_ctx);
+                
+                IrDoubleLiteral::CodeGenConsts(d_ctx);
+    
                 d_root->codegen(d_ctx);
                 
                 // convert generated TAC into basic blocks and optimize
@@ -93,7 +96,10 @@ class Parser: public ParserBase
                 
                 // write string table
                 d_ctx->genStrings();
-		
+
+                // write double constants
+                d_ctx->genDoubles();
+                
                 if (m_enableIrOutput)
                 {
                     for (auto it : statements)

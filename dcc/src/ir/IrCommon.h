@@ -119,4 +119,10 @@ struct SStringSymbol
     std::string m_value;
 };
 
+struct SDoubleSymbol
+{
+    std::string m_name;
+    double m_value;
+};
+
 } // namespace Decaf
