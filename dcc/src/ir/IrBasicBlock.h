@@ -162,7 +162,7 @@ protected:
     std::map<ValueKey, Available> m_availables;
     int m_next_value_number;
     
-    int getValueNumber(const std::shared_ptr<IrBase>& arg);
+    int getValueNumber(const IrTacArg& arg);
     
 private:
     IrBasicBlock(const IrBasicBlock& rhs) = delete;

@@ -157,7 +157,7 @@ bool IrBasicBlock::commonSubexpressionElimination()
         endfor
     endfor
 */
-#if 0
+#if 1
     // Statement of form: T <- L op R
     for (auto it = m_statements.begin(); it != m_statements.end(); ++it)
     {
@@ -171,8 +171,8 @@ bool IrBasicBlock::commonSubexpressionElimination()
         if (it->m_opcode == IrOpcode::MOV)
         {
             // dst = arg0 (arg0 is lhs)
-            m_symbols[it->m_dst->asString()].m_value_number = l;
-            m_symbols[it->m_dst->asString()].m_isConstant = m_symbols[it->m_src0->asString()].m_isConstant;
+            m_symbols[it->m_dst.m_asString].m_value_number = l;
+            m_symbols[it->m_dst.m_asString].m_isConstant = m_symbols[it->m_src0.m_asString].m_isConstant;
         }
         else // expression of form: result = lhs op rhs
         {
@@ -182,7 +182,7 @@ bool IrBasicBlock::commonSubexpressionElimination()
             //if (m_symbols[it.m_src1->asString()].m_isConstant)
             //{
             //}
-            if (m_symbols[it->m_src0->asString()].m_isConstant && m_symbols[it->m_src1->asString()].m_isConstant)
+            if (m_symbols[it->m_src0.m_asString].m_isConstant && m_symbols[it->m_src1.m_asString].m_isConstant)
             {
                 // create a new constant C = src0 op src1
             }
@@ -199,7 +199,6 @@ bool IrBasicBlock::commonSubexpressionElimination()
                     // replace (lhs op[i] rhs) with “AVAIL(l, op[i], r).result[j]”
                     it->m_src0 = ait->second.m_stmt.m_dst;
                     it->m_opcode = IrOpcode::MOV;
-                    it->m_src1 = nullptr;
                 }
                 else
                 {
@@ -215,7 +214,7 @@ bool IrBasicBlock::commonSubexpressionElimination()
             }
             
             // Create key from op, L and R.
-            std::string exprKey = it->m_src0->asString() + IrOpcodeToString(it->m_opcode) + it->m_src1->asString();                
+            std::string exprKey = it->m_src0.m_asString + IrOpcodeToString(it->m_opcode) + it->m_src1.m_asString;                
             auto mip = m_symbols.find(exprKey);
             if (mip == m_symbols.end())
             {
@@ -269,25 +268,18 @@ void IrBasicBlock::print(std::ostream& stream)
     }
 }
 
-int IrBasicBlock::getValueNumber(const std::shared_ptr<IrBase>& arg)
+int IrBasicBlock::getValueNumber(const IrTacArg& arg)
 {
-    if (arg == nullptr)
-        return 0;
-    
-    auto it = m_symbols.find(arg->asString());
+    auto it = m_symbols.find(arg.m_asString);
     if (it != m_symbols.end())
     {
         return it->second.m_value_number;
     }
     
     Symbol symbol;
-    symbol.m_name = arg->asString();
+    symbol.m_name = arg.m_asString;
     symbol.m_value_number = m_next_value_number++;
-    symbol.m_isConstant = false;
-    
-    const IrLiteral* literal = dynamic_cast<const IrLiteral*>(arg.get());
-    if (literal != nullptr)
-        symbol.m_isConstant = true;
+    symbol.m_isConstant = arg.isLiteral();
     
     m_symbols[symbol.m_name] = symbol;
     

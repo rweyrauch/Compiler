@@ -139,6 +139,14 @@ struct IrTacArg
 
 struct IrTacStmt
 {
+    IrTacStmt() :
+	m_opcode(IrOpcode::NOOP),
+	m_src0(),
+	m_src1(),
+	m_dst(),
+	m_info(0),
+	m_lineNo(0)
+    {}
     IrTacStmt(IrOpcode opcode, int lineNo = 0) :
         m_opcode(opcode),
         m_src0(),
