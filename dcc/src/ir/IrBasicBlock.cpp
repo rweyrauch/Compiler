@@ -49,197 +49,82 @@ bool isBinaryOp(IrOpcode opcode)
 
 bool IrBasicBlock::commonSubexpressionElimination()
 {
-    m_value_numbering_map.clear();
-        
-    // Statement of form: T <- L op R
+    m_variable_value_map.clear();
+    m_expression_value_map.clear();
+    
+    // Statement of form: D = L op R
     for (auto it : m_statements)
     {
         if (!isBinaryOp(it.m_opcode))
             continue;
         
-        // Get/create the value numbers of T, L and R      
-        Key keyL(it.m_src0.m_asString, IrOpcode::NOOP, "");
-        auto lip = m_value_numbering_map.find(keyL);
-        if (lip == m_value_numbering_map.end())
+        // Get/create the value numbers of D, L and R      
+        auto lip = m_variable_value_map.find(it.m_src0.m_asString);
+        if (lip == m_variable_value_map.end())
         {
-            m_value_numbering_map[keyL] = m_next_value_number++;
+            it.m_src0.m_valueNumber = m_next_value_number++;
+            m_variable_value_map[it.m_src0.m_asString] = it.m_src0.m_valueNumber;
+        }
+        else
+        {
+            it.m_src0.m_valueNumber = lip->second;
         }
         
         if (it.hasSrc1())
         {
-            Key keyR(it.m_src1.m_asString, IrOpcode::NOOP, "");
-            auto rip = m_value_numbering_map.find(keyR);
-            if (rip == m_value_numbering_map.end())
+            auto rip = m_variable_value_map.find(it.m_src1.m_asString);
+            if (rip == m_variable_value_map.end())
             {
-                m_value_numbering_map[keyR] = m_next_value_number++;
-            }
-        }
-        
-        Key keyT(it.m_dst.m_asString, IrOpcode::NOOP, "");
-        auto tip = m_value_numbering_map.find(keyT);
-        if (tip == m_value_numbering_map.end())
-        {
-            m_value_numbering_map[keyT] = m_next_value_number++;
-        }
-        
-        // Create key from op, L and R.
-        Key keyExpr(it.m_src0.m_asString, it.m_opcode, it.hasSrc1() ? it.m_src1.m_asString : "");
-                
-        auto mip = m_value_numbering_map.find(keyExpr);
-        if (mip != m_value_numbering_map.end())
-        {
-            m_value_numbering_map[keyT] = mip->second;
-        }
-        else
-        {
-            // insert new value number into table using the key
-            int value = m_next_value_number++;
-            m_value_numbering_map[keyExpr] = value;
-            
-            // record that new value for T.
-            m_value_numbering_map[keyT] = value;
-        }
-    }
-    
-    std::cout << "Value Map" << std::endl;
-    for (auto it : m_value_numbering_map)
-    {
-        std::cout << it.second << " [" << it.first.m_left;
-        std::cout << "," << IrOpcodeToString(it.first.m_op);
-        std::cout << "," << it.first.m_right;
-        std::cout << "]" << std::endl;
-    }
-    
-/*    
-    for (auto it : m_statements)
-    {
-        if (!isBinaryOp(it.m_opcode))
-            continue;
-        
-        Key keyExpr(it.m_src0->asString(), it.m_opcode, (it.m_src1 != nullptr) ? it.m_src1->asString() : "");
-        auto mip = m_value_numbering_map.find(keyExpr);
-        if (mip != m_value_numbering_map.end())
-        {
-            std::cout << "#" << mip->second << std::endl;
-        }
-        else
-        {
-            std::cout << "-" << std::endl;
-        }
-    }
-*/
-/*
-    for i ← 1 to n
-        r ← value number for rhs[i]
-        l ← value number for lhs[i]
-        if op[i] is a store then
-            SYMBOLS[result[i]].val ← r
-            if r is constant then
-                SYMBOLS[lhs[i]].isConstant ← true
-        else // an expression
-            if l is constant then replace lhs[i] with constant
-            if r is constant then replace rhs[i] with constant
-            if l and r are both constant then
-                create CONSTANTS(l, op[i], r)
-                CONSTANTS(l, op[i], r).bits ← eval(l op[i] r)
-                CONSTANTS(l, op[i], r).val ← new value number
-                replace (lhs op[i] rhs) with “ constant (l op[i] r)”
-            else if (l, op[i], r) ∈ AVAIL then
-                replace (lhs op[i] rhs) with “AVAIL(l, op[i], r).result[j]”
-            else create AVAIL(l, op[i], r)
-                AVAIL(l, op[i], r).val ← new value number
-            endif
-            SYMBOLS[result[i]].val ← value number of expression
-        endif
-        for all AVAIL(l, op[ j], r)
-            if result[i].val = l or r or result[ j].val, ( j < i)
-                remove (l, op[ j], r) from AVAIL
-        endfor
-    endfor
-*/
-#if 1
-    // Statement of form: T <- L op R
-    for (auto it = m_statements.begin(); it != m_statements.end(); ++it)
-    {
-        if (!isBinaryOp(it->m_opcode))
-            continue;
-        
-        int l = getValueNumber(it->m_src0);
-        int r = getValueNumber(it->m_src1);
-        int res = getValueNumber(it->m_dst);
-        
-        if (it->m_opcode == IrOpcode::MOV)
-        {
-            // dst = arg0 (arg0 is lhs)
-            m_symbols[it->m_dst.m_asString].m_value_number = l;
-            m_symbols[it->m_dst.m_asString].m_isConstant = m_symbols[it->m_src0.m_asString].m_isConstant;
-        }
-        else // expression of form: result = lhs op rhs
-        {
-            //if (m_symbols[it.m_src0->asString()].m_isConstant)
-            //{
-            //}
-            //if (m_symbols[it.m_src1->asString()].m_isConstant)
-            //{
-            //}
-            if (m_symbols[it->m_src0.m_asString].m_isConstant && m_symbols[it->m_src1.m_asString].m_isConstant)
-            {
-                // create a new constant C = src0 op src1
+                it.m_src1.m_valueNumber = m_next_value_number++;
+                m_variable_value_map[it.m_src1.m_asString] = it.m_src1.m_valueNumber;
             }
             else
             {
-                ValueKey key;
-                key.m_lhs = l;
-                key.m_op = (int)it->m_opcode;
-                key.m_rhs = r;
-                
-                auto ait = m_availables.find(key);
-                if (ait != m_availables.end())
-                {
-                    // replace (lhs op[i] rhs) with “AVAIL(l, op[i], r).result[j]”
-                    it->m_src0 = ait->second.m_stmt.m_dst;
-                    it->m_opcode = IrOpcode::MOV;
-                }
-                else
-                {
-                    Available avail;
-                    avail.m_lhs = key.m_lhs;
-                    avail.m_op = key.m_op;
-                    avail.m_rhs = key.m_rhs;
-                    avail.m_result = res;
-                    avail.m_stmt = *it;
-                    
-                    m_availables[key] = avail;
-                }
-            }
-            
-            // Create key from op, L and R.
-            std::string exprKey = it->m_src0.m_asString + IrOpcodeToString(it->m_opcode) + it->m_src1.m_asString;                
-            auto mip = m_symbols.find(exprKey);
-            if (mip == m_symbols.end())
-            {
-                // insert new value number into table using the key
-                Symbol symbol;
-                symbol.m_name = exprKey;
-                symbol.m_value_number = m_next_value_number++;
-                symbol.m_isConstant = false;
-                
-                m_symbols[exprKey] = symbol;
+                it.m_src1.m_valueNumber = rip->second;
             }
         }
-        /*
-        for all AVAIL(l, op[ j], r)
-            if result[i].val = l or r or result[ j].val, ( j < i)
-                remove (l, op[ j], r) from AVAIL
-        endfor
-        */
-        for (auto iit = m_statements.begin(); iit != it; ++iit)
+        
+        auto dip = m_variable_value_map.find(it.m_dst.m_asString);
+        if (dip == m_variable_value_map.end())
         {
+            it.m_dst.m_valueNumber = m_next_value_number++;
+            m_variable_value_map[it.m_dst.m_asString] = it.m_dst.m_valueNumber;
+        }
+        else
+        {
+            it.m_dst.m_valueNumber = dip->second;
+        }
+        
+        // Create key from opcode, L and R.
+        Key keyExpr(it.m_src0.m_valueNumber, it.m_opcode, it.m_src1.m_valueNumber);
+                
+        auto mip = m_expression_value_map.find(keyExpr);
+        if (mip == m_expression_value_map.end())
+        {
+            int value = m_next_value_number++;
+            m_expression_value_map[keyExpr] = value;
             
+            // Record new value for D.
+            m_variable_value_map[it.m_dst.m_asString] = value;
+        }
+        else
+        {
+            // Replace exist value for D with value from expression.
+            m_variable_value_map[it.m_dst.m_asString] = mip->second;
         }
     }
-#endif
     
+    std::cout << "Variable-Value Map" << std::endl;
+    for (auto it : m_variable_value_map)
+    {
+        std::cout << "[" << it.first << "] = " << it.second << std::endl;
+    }
+    std::cout << "Expression-Value Map" << std::endl;
+    for (auto it : m_expression_value_map)
+    {
+        std::cout << "[" << it.first.m_left << ", " << IrOpcodeToString(it.first.m_op) << ", " << it.first.m_right << "] = " << it.second << std::endl;
+    }
+        
     for (auto it : m_statements)
     {
         IrPrintTac(it, std::cout);
@@ -266,24 +151,6 @@ void IrBasicBlock::print(std::ostream& stream)
         
         stream << "----End----" << std::endl;
     }
-}
-
-int IrBasicBlock::getValueNumber(const IrTacArg& arg)
-{
-    auto it = m_symbols.find(arg.m_asString);
-    if (it != m_symbols.end())
-    {
-        return it->second.m_value_number;
-    }
-    
-    Symbol symbol;
-    symbol.m_name = arg.m_asString;
-    symbol.m_value_number = m_next_value_number++;
-    symbol.m_isConstant = arg.isLiteral();
-    
-    m_symbols[symbol.m_name] = symbol;
-    
-    return symbol.m_value_number;
 }
 
 } // namespace Decaf

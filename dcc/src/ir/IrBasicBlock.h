@@ -39,7 +39,8 @@ class IrBasicBlock
 public:
     IrBasicBlock() :
         m_statements(),
-        m_value_numbering_map(),
+        m_variable_value_map(),
+        m_expression_value_map(),
         m_next_value_number(42)
     {}
     
@@ -65,18 +66,18 @@ protected:
     
     struct Key
     {
-        Key(const std::string& left, IrOpcode opcode, const std::string& right) :
+        Key(int left, IrOpcode opcode, int right) :
             m_left(left),
             m_op(opcode),
             m_right(right) {}
         Key() :
-            m_left(""),
+            m_left(0),
             m_op(IrOpcode::NOOP),
-            m_right("") {}
+            m_right(0) {}
             
-        std::string m_left;
+        int m_left;
         IrOpcode m_op;
-        std::string m_right;
+        int m_right;
         
         bool operator<(const Key& lhs) const
         {
@@ -102,67 +103,19 @@ protected:
     {
         size_t operator()(const Key& key) const
         {
-            return ((std::hash<std::string>()(key.m_left) ^
+            return ((std::hash<int>()(key.m_left) ^
                     (std::hash<int>()((int)key.m_op) << 1)) >> 1) ^
-                    (std::hash<std::string>()(key.m_right) << 1);
+                    (std::hash<int>()(key.m_right) << 1);
         }
     };
     
-    struct Available
-    {
-        int m_lhs;
-        int m_op;
-        int m_rhs;
-        int m_result;
-        IrTacStmt m_stmt;
-    };
+    // Value number for each variable/literal in block.
+    std::unordered_map<std::string, int> m_variable_value_map;
     
-    std::unordered_map<Key, int, KeyHasher> m_value_numbering_map;
+    // Value number for each expression in block.
+    std::unordered_map<Key, int, KeyHasher> m_expression_value_map;
     
-    struct Symbol
-    {
-        std::string m_name;
-        int m_value_number;
-        bool m_isConstant;
-    };
-    
-    std::map<std::string, Symbol> m_symbols;
-    
-    struct Constant
-    {
-        int m_value_number;
-        IrType m_type;
-        union
-        {
-            int m_value_int;
-            double m_value_double;
-            bool m_value_bool;
-        };
-    };
-    
-    struct ValueKey
-    {
-        int m_lhs;
-        int m_op;
-        int m_rhs;
-        
-       bool operator<(const ValueKey& lhs) const
-       {
-            if (m_lhs < lhs.m_lhs)
-                return true;
-            else if (m_op < lhs.m_op)
-                return true;
-            else if (m_rhs < lhs.m_rhs)
-                return true;
-            return false;
-        }      
-    };
-        
-    std::map<ValueKey, Constant> m_constants;  
-    std::map<ValueKey, Available> m_availables;
     int m_next_value_number;
-    
-    int getValueNumber(const IrTacArg& arg);
     
 private:
     IrBasicBlock(const IrBasicBlock& rhs) = delete;
