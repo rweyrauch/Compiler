@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #include <iostream>
+#include <cassert>
 #include "IrBasicBlock.h"
 #include "IrTAC.h"
 #include "IrIdentifier.h"
@@ -80,10 +81,12 @@ bool IrBasicBlock::commonSubexpressionElimination()
         
         // Get/create the value numbers of D, L and R    
         it.m_src0.m_valueNumber = getValueNumber(it.m_src0.m_asString);
-         
+        it.m_src0.m_isConstant = (it.m_src0.m_usage == IrUsage::Literal);
+        
         if (it.hasSrc1())
         {
 			it.m_src1.m_valueNumber = getValueNumber(it.m_src1.m_asString);
+            it.m_src1.m_isConstant = (it.m_src1.m_usage == IrUsage::Literal);
         }
         else
         {
@@ -91,6 +94,8 @@ bool IrBasicBlock::commonSubexpressionElimination()
 		}
 		
         it.m_dst.m_valueNumber = getValueNumber(it.m_dst.m_asString);
+        assert(it.m_dst.m_usage != IrUsage::Literal);
+        it.m_dst.m_isConstant = false;
         
         // Create key from opcode, L and R.
         Key keyExpr(it.m_src0.m_valueNumber, it.m_opcode, it.m_src1.m_valueNumber);
@@ -103,11 +108,13 @@ bool IrBasicBlock::commonSubexpressionElimination()
             
             // Record new value for D.
             m_variable_value_map[it.m_dst.m_asString] = value;
+            it.m_dst.m_valueNumber = value;
         }
         else
         {
             // Replace exist value for D with value from expression.
             m_variable_value_map[it.m_dst.m_asString] = mip->second;
+            it.m_dst.m_valueNumber = mip->second;
         }
     }
     
