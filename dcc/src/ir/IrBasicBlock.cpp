@@ -39,12 +39,32 @@ bool isBinaryOp(IrOpcode opcode)
         case IrOpcode::MUL:
         case IrOpcode::DIV:
         case IrOpcode::MOD:
-        case IrOpcode::MOV:
             return true;
         default:
             break;
     }
     return false;
+}
+
+bool isMoveOp(IrOpcode opcode)
+{
+	return (opcode == IrOpcode::MOV);
+}
+
+int IrBasicBlock::getValueNumber(const std::string& ident)
+{  
+	int valueNumber = -1;
+	auto ip = m_variable_value_map.find(ident);
+	if (ip == m_variable_value_map.end())
+	{
+		valueNumber = m_next_value_number++;
+		m_variable_value_map[ident] = valueNumber;
+	}
+	else
+	{
+		valueNumber = ip->second;
+	}
+	return valueNumber;
 }
 
 bool IrBasicBlock::commonSubexpressionElimination()
@@ -55,45 +75,22 @@ bool IrBasicBlock::commonSubexpressionElimination()
     // Statement of form: D = L op R
     for (auto it : m_statements)
     {
-        if (!isBinaryOp(it.m_opcode))
+        if (!isBinaryOp(it.m_opcode) && !isMoveOp(it.m_opcode))
             continue;
         
-        // Get/create the value numbers of D, L and R      
-        auto lip = m_variable_value_map.find(it.m_src0.m_asString);
-        if (lip == m_variable_value_map.end())
-        {
-            it.m_src0.m_valueNumber = m_next_value_number++;
-            m_variable_value_map[it.m_src0.m_asString] = it.m_src0.m_valueNumber;
-        }
-        else
-        {
-            it.m_src0.m_valueNumber = lip->second;
-        }
-        
+        // Get/create the value numbers of D, L and R    
+        it.m_src0.m_valueNumber = getValueNumber(it.m_src0.m_asString);
+         
         if (it.hasSrc1())
         {
-            auto rip = m_variable_value_map.find(it.m_src1.m_asString);
-            if (rip == m_variable_value_map.end())
-            {
-                it.m_src1.m_valueNumber = m_next_value_number++;
-                m_variable_value_map[it.m_src1.m_asString] = it.m_src1.m_valueNumber;
-            }
-            else
-            {
-                it.m_src1.m_valueNumber = rip->second;
-            }
-        }
-        
-        auto dip = m_variable_value_map.find(it.m_dst.m_asString);
-        if (dip == m_variable_value_map.end())
-        {
-            it.m_dst.m_valueNumber = m_next_value_number++;
-            m_variable_value_map[it.m_dst.m_asString] = it.m_dst.m_valueNumber;
+			it.m_src1.m_valueNumber = getValueNumber(it.m_src1.m_asString);
         }
         else
         {
-            it.m_dst.m_valueNumber = dip->second;
-        }
+			it.m_src1.m_valueNumber = -1;
+		}
+		
+        it.m_dst.m_valueNumber = getValueNumber(it.m_dst.m_asString);
         
         // Create key from opcode, L and R.
         Key keyExpr(it.m_src0.m_valueNumber, it.m_opcode, it.m_src1.m_valueNumber);

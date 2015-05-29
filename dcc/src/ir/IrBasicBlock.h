@@ -117,6 +117,8 @@ protected:
     
     int m_next_value_number;
     
+    int getValueNumber(const std::string& ident);
+    
 private:
     IrBasicBlock(const IrBasicBlock& rhs) = delete;
 };
