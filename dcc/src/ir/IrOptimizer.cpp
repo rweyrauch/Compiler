@@ -94,6 +94,18 @@ void IrOptimizer::globalCommonSubexpressionElimination()
             bit->commonSubexpressionElimination();
         }
     }
+    
+    m_statements.clear();
+    for (auto it : m_blocks)
+    {
+        const std::vector<IrTacStmt>& stmts = it->getStatements();
+        if (stmts.empty()) continue;
+        
+        for (auto sit : stmts)
+        {
+            m_statements.push_back(sit);
+        }
+    }    
 }
 
 bool IrOptimizer::isLeaderPost(const IrTacStmt& stmt)

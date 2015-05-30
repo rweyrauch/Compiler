@@ -85,6 +85,7 @@ public:
         m_statements.push_back(stmt);
     }
     const std::vector<IrTacStmt>& getStatements() const { return m_statements; }
+    void setStatements(const std::vector<IrTacStmt>& statements) { m_statements = statements; }
     
     void codegen(std::ostream& stream);
     

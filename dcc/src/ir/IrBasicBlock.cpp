@@ -49,35 +49,48 @@ bool isBinaryOp(IrOpcode opcode)
 
 bool isMoveOp(IrOpcode opcode)
 {
-	return (opcode == IrOpcode::MOV);
+    return (opcode == IrOpcode::MOV);
+}
+
+bool isTempIdentifier(const IrTacArg& arg)
+{
+    if ((arg.m_usage == IrUsage::Identifier) && (arg.m_asString.find_first_of(".LC") != std::string::npos))
+        return true;
+    return false;
 }
 
 int IrBasicBlock::getValueNumber(const std::string& ident)
 {  
-	int valueNumber = -1;
-	auto ip = m_variable_value_map.find(ident);
-	if (ip == m_variable_value_map.end())
-	{
-		valueNumber = m_next_value_number++;
-		m_variable_value_map[ident] = valueNumber;
-	}
-	else
-	{
-		valueNumber = ip->second;
-	}
-	return valueNumber;
+    int valueNumber = -1;
+    auto ip = m_variable_value_map.find(ident);
+    if (ip == m_variable_value_map.end())
+    {
+        valueNumber = m_next_value_number++;
+        m_variable_value_map[ident] = valueNumber;
+    }
+    else
+    {
+        valueNumber = ip->second;
+    }
+    return valueNumber;
 }
 
 bool IrBasicBlock::commonSubexpressionElimination()
 {
     m_variable_value_map.clear();
     m_expression_value_map.clear();
+    m_expression_temp_map.clear();
+    
+    std::vector<IrTacStmt> optStatements;
     
     // Statement of form: D = L op R
     for (auto it : m_statements)
     {
         if (!isBinaryOp(it.m_opcode) && !isMoveOp(it.m_opcode))
+        {
+            optStatements.push_back(it);
             continue;
+        }
         
         // Get/create the value numbers of D, L and R    
         it.m_src0.m_valueNumber = getValueNumber(it.m_src0.m_asString);
@@ -85,21 +98,30 @@ bool IrBasicBlock::commonSubexpressionElimination()
         
         if (it.hasSrc1())
         {
-			it.m_src1.m_valueNumber = getValueNumber(it.m_src1.m_asString);
+            it.m_src1.m_valueNumber = getValueNumber(it.m_src1.m_asString);
             it.m_src1.m_isConstant = (it.m_src1.m_usage == IrUsage::Literal);
         }
         else
         {
-			it.m_src1.m_valueNumber = -1;
-		}
-		
+            it.m_src1.m_valueNumber = -1;
+        }
+        
         it.m_dst.m_valueNumber = getValueNumber(it.m_dst.m_asString);
         assert(it.m_dst.m_usage != IrUsage::Literal);
         it.m_dst.m_isConstant = false;
         
         // Create key from opcode, L and R.
         Key keyExpr(it.m_src0.m_valueNumber, it.m_opcode, it.m_src1.m_valueNumber);
-                
+           
+        if (isTempIdentifier(it.m_dst))
+        {
+            auto tip = m_expression_temp_map.find(keyExpr);
+            if (tip == m_expression_temp_map.end())
+            {
+                m_expression_temp_map[keyExpr] = it.m_dst;
+            }
+        }        
+        
         auto mip = m_expression_value_map.find(keyExpr);
         if (mip == m_expression_value_map.end())
         {
@@ -115,33 +137,62 @@ bool IrBasicBlock::commonSubexpressionElimination()
             // Replace exist value for D with value from expression.
             m_variable_value_map[it.m_dst.m_asString] = mip->second;
             it.m_dst.m_valueNumber = mip->second;
+            
+            auto tip = m_expression_temp_map.find(keyExpr);
+            if (tip != m_expression_temp_map.end())
+            {
+                // Replace the current expression statement with a MOV.
+                it.m_opcode = IrOpcode::MOV;
+                it.m_src0 = tip->second;
+                it.m_src1.m_usage = IrUsage::Unused;
+            }
+        }
+        optStatements.push_back(it);        
+    }
+    
+    if (m_verbose)
+    {
+        if (!m_variable_value_map.empty())
+            std::cout << "Variable-Value Map" << std::endl;
+        for (auto it : m_variable_value_map)
+        {
+            std::cout << "[" << it.first << "] = " << it.second << std::endl;
+        }
+        if (!m_expression_value_map.empty())
+            std::cout << "Expression-Value Map" << std::endl;
+        for (auto it : m_expression_value_map)
+        {
+            std::cout << "[" << it.first.m_left << ", " << IrOpcodeToString(it.first.m_op) << ", " << it.first.m_right << "] = " << it.second << std::endl;
+        }
+        if (!m_expression_temp_map.empty())
+            std::cout << "Expression-Temp Map" << std::endl;
+        for (auto it : m_expression_temp_map)
+        {
+            std::cout << "[" << it.first.m_left << ", " << IrOpcodeToString(it.first.m_op) << ", " << it.first.m_right << "] = " << it.second.m_asString << std::endl;
+        }
+        
+        std::cout << "Original statements: " << std::endl;
+        for (auto it : m_statements)
+        {
+            IrPrintTac(it, std::cout);
+        }
+        std::cout << "Optimized statements: " << std::endl;
+        for (auto it : optStatements)
+        {
+            IrPrintTac(it, std::cout);
         }
     }
     
-    std::cout << "Variable-Value Map" << std::endl;
-    for (auto it : m_variable_value_map)
-    {
-        std::cout << "[" << it.first << "] = " << it.second << std::endl;
-    }
-    std::cout << "Expression-Value Map" << std::endl;
-    for (auto it : m_expression_value_map)
-    {
-        std::cout << "[" << it.first.m_left << ", " << IrOpcodeToString(it.first.m_op) << ", " << it.first.m_right << "] = " << it.second << std::endl;
-    }
-        
-    for (auto it : m_statements)
-    {
-        IrPrintTac(it, std::cout);
-    }
-
+    m_statements = optStatements;
+    
     return true;
 }
 
-bool IrBasicBlock::codegen(IrTraversalContext* ctx)
+bool IrBasicBlock::copyPropagation()
 {
-    return false;
+    return true;
 }
-
+    
 void IrBasicBlock::print(std::ostream& stream)
 {
     if (!m_statements.empty())

@@ -94,6 +94,8 @@ class Parser: public ParserBase
                 // convert generated TAC into basic blocks and optimize
                 std::vector<IrTacStmt> statements = optimize(d_ctx->getStatements());
                 
+                d_ctx->setStatements(statements);
+                
                 // write string table
                 d_ctx->genStrings();
 
@@ -129,10 +131,7 @@ class Parser: public ParserBase
         }
         std::vector<IrTacStmt> optimize(const std::vector<IrTacStmt>& statements)
         {
-            std::vector<IrTacStmt> optimized_statements = statements;
             d_optimizer->generateBasicBlocks(statements);
-            
-            if (m_enableBasicBlocksOutput) d_optimizer->print();
             
             std::sort(m_optimizations.begin(), m_optimizations.end());
             std::unique(m_optimizations.begin(), m_optimizations.end());
@@ -145,6 +144,9 @@ class Parser: public ParserBase
                     d_optimizer->globalCommonSubexpressionElimination();
                 }
             }
+            
+            if (m_enableBasicBlocksOutput) d_optimizer->print();
+                        
             return d_optimizer->getOptimizedStatements();
         }
         

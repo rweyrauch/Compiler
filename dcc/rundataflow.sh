@@ -20,7 +20,7 @@ do
     echo "---------------------------"
     echo "Test: ${dcfinput}"
     
-    ${DCC} -o out/$dcfinput.s $input
+    ${DCC} --opt-common-subexpr-elim -o out/$dcfinput.s $input
     if [ -e out/$dcfinput.s ]
     then
         gcc out/$dcfinput.s -o out/$dcfinput 2> out/$dcfinput.log

@@ -41,7 +41,9 @@ public:
         m_statements(),
         m_variable_value_map(),
         m_expression_value_map(),
-        m_next_value_number(42)
+        m_expression_temp_map(),
+        m_next_value_number(42),
+        m_verbose(false)
     {}
     
     virtual ~IrBasicBlock() 
@@ -55,8 +57,7 @@ public:
     const std::vector<IrTacStmt>& getStatements() const { return m_statements; }
     
     bool commonSubexpressionElimination();
-    
-    bool codegen(IrTraversalContext* ctx);
+    bool copyPropagation();
     
     void print(std::ostream& stream);
     
@@ -115,9 +116,14 @@ protected:
     // Value number for each expression in block.
     std::unordered_map<Key, int, KeyHasher> m_expression_value_map;
     
+    // Temp var for each expression in block.
+    std::unordered_map<Key, IrTacArg, KeyHasher> m_expression_temp_map;
+    
     int m_next_value_number;
     
     int getValueNumber(const std::string& ident);
+    
+    bool m_verbose;
     
 private:
     IrBasicBlock(const IrBasicBlock& rhs) = delete;
