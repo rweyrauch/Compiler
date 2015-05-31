@@ -1,0 +1,8 @@
+Add constant.  Result should be 9 is 9
+Add constant.  Result should be 9 is 9
+Subtract constant.  Result should be 7 is 7
+Subtract constant.  Result should be -7 is -7
+Multiply by constant.  Result should be 16 is 16
+Multiply by zero.  Result should be 16 is 16
+Divide by constant.  Result should be 4 is 4
+Divide by constant.  Result should be 4 is 4

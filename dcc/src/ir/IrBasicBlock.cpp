@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #include <iostream>
+#include <sstream>
 #include <list>
 #include <algorithm>
 #include <cassert>
@@ -154,7 +155,7 @@ void IrBasicBlock::optimize(IrBasicBlockOpts which)
 void IrBasicBlock::constantPropagation()
 {
     // not working yet
-    return;
+    //return;
     
     std::vector<IrTacStmt> optStatements;
 
@@ -205,6 +206,8 @@ void IrBasicBlock::constantPropagation()
         if (dstIsConstant)
         {
             int value = evaluateConstIntExpression(it.m_opcode, src0, src1);
+            std::stringstream str;
+            str << value;
             
             std::cout << "Dst Constant: " << IrOpcodeToString(it.m_opcode) << " " << src0 << " " << src1 << " = " << value << std::endl;
             integerConstants[it.m_dst.m_asString] = value;
@@ -213,6 +216,7 @@ void IrBasicBlock::constantPropagation()
             it.m_src0.m_usage = IrUsage::Literal;
             it.m_src0.m_type = IrArgType::Integer;
             it.m_src0.m_value.m_int = value;
+            it.m_src0.m_asString = str.str();
             it.m_src1.m_usage = IrUsage::Unused;
         }
         else
@@ -228,7 +232,7 @@ void IrBasicBlock::constantPropagation()
         optStatements.push_back(it);
     }
    
-   if (m_verbose)
+    if (true)
     {
         if (!m_statements.empty())
             std::cout << "Original statements: " << std::endl;
