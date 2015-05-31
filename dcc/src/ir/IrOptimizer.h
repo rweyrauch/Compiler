@@ -26,6 +26,7 @@
 #include <vector>
 #include <memory>
 #include <list>
+#include "IrCommon.h"
 #include "IrTAC.h"
 
 namespace Decaf
@@ -43,7 +44,7 @@ public:
     {}
    
     void generateBasicBlocks(const std::vector<IrTacStmt>& statements);
-    void basicBlocksOptimizations();
+    void basicBlocksOptimizations(IrBasicBlockOpts which);
     void globalCommonSubexpressionElimination();
 
     const std::vector<IrTacStmt>& getOptimizedStatements() const { return m_statements; }

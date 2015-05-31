@@ -1,0 +1,55 @@
+class Program
+{
+    void main () 
+    {
+        boolean i, j;
+        j = true;
+        
+        callout("printf", "Correct if no additional messages.\n");
+        
+        i = j || true;
+        if (!i)
+        {
+            callout("printf", "Failed.  Or with true should be true.\n");
+        }   
+        i = true || j;
+        if (!i)
+        {
+            callout("printf", "Failed.  Or with true should be true.\n");
+        }   
+        i = j && false;
+        if (i)
+        {
+            callout("printf", "Failed.  And with false should be false.\n");
+        }   
+        i = false && j;
+        if (i)
+        {
+            callout("printf", "Failed.  And with false should be false.\n");
+        }
+          
+        j = false;
+        
+        i = j || true;
+        if (!i)
+        {
+            callout("printf", "Failed.  Or with true should be true.\n");
+        }
+        i = true || j;
+        if (!i)
+        {
+            callout("printf", "Failed.  Or with true should be true.\n");
+        }
+        i = j && false;
+        if (i)
+        {
+            callout("printf", "Failed.  And with false should be false.\n");
+        }
+        i = false && j;
+        if (i)
+        {
+            callout("printf", "Failed.  And with false should be false.\n");
+        }
+     }
+}
+

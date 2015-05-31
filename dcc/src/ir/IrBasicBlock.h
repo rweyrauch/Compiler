@@ -56,10 +56,8 @@ public:
     
     const std::vector<IrTacStmt>& getStatements() const { return m_statements; }
     
-    bool commonSubexpressionElimination();
-    bool copyPropagation();
-    bool deadCodeElimination();
-    
+    void optimize(IrBasicBlockOpts which);
+        
     void print(std::ostream& stream);
     
 protected:
@@ -125,6 +123,12 @@ protected:
     int getValueNumber(const std::string& ident);
     
     bool m_verbose;
+    
+    void constantPropagation();
+    void algebraicSimplification();
+    void commonSubexpressionElimination();
+    void copyPropagation();
+    void deadCodeElimination();
     
 private:
     IrBasicBlock(const IrBasicBlock& rhs) = delete;

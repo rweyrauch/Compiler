@@ -20,7 +20,8 @@ do
     echo "---------------------------"
     echo "Test: ${dcfinput}"
     
-    ${DCC} -o out/$dcfinput.s $input
+    ${DCC} -o out/${dcfinput}_none.s $input
+    ${DCC} --opt-all -o out/$dcfinput.s $input
     if [ -e out/$dcfinput.s ]
     then
         gcc out/$dcfinput.s -o out/$dcfinput 2> out/$dcfinput.log
@@ -28,6 +29,43 @@ do
         then
             out/$dcfinput > out/$dcfinput.output
             diff out/$dcfinput.output testdata/optimizer/correctness/output/$dcfinput.out > /dev/null
+            if [ $? -eq "0" ]
+            then
+                echo "PASS: ${input}."
+            else
+                echo "FAIL: ${input} did not produce the expected output."                
+            fi
+        else
+            echo "FAIL: Failed to link ${input}."
+        fi
+    else
+        echo "FAIL: Failed to compile ${input}."
+    fi
+done
+
+TESTFILES=testdata/optimizer/basicblocks/*.dcf
+
+for input in ${TESTFILES}
+do
+    dcfinput=${input##*/}
+    dcfinput=${dcfinput%%.*}
+    
+    rm -f out/$dcfinput
+    rm -f out/$dcfinput.*
+    
+    echo "---------------------------"
+    echo "Test: ${dcfinput}"
+    
+    ${DCC} --opt-basic-blocks -o out/$dcfinput.s $input
+    ${DCC} -o out/${dcfinput}_none.s $input
+    
+    if [ -e out/$dcfinput.s ]
+    then
+        gcc out/$dcfinput.s -o out/$dcfinput 2> out/$dcfinput.log
+        if [ -e out/$dcfinput ]
+        then
+            out/$dcfinput > out/$dcfinput.output
+            diff out/$dcfinput.output testdata/optimizer/basicblocks/output/$dcfinput.out > /dev/null
             if [ $? -eq "0" ]
             then
                 echo "PASS: ${input}."
@@ -62,6 +100,7 @@ do
     echo "---------------------------"
     echo "Test: ${dcfinput}"
     
+    # Compile with and without optimizations.
     ${DCC} --opt-all -o out/$dcfinput.s $input
     if [ -e out/$dcfinput.s ]
     then    
@@ -76,6 +115,13 @@ do
         fi        
     else
         echo "FAIL: Failed to compile ${input}."
-    fi        
+    fi 
+    
+    ${DCC} -o out/${dcfinput}_none.s $input
+    if [ -e out/${dcfinput}_none.s ]
+    then    
+        gcc out/${dcfinput}_none.s out/6035.o -o out/${dcfinput}_none 2> out/$dcfinput.log
+    fi
+        
 done
 

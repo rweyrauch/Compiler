@@ -150,7 +150,7 @@ class Parser: public ParserBase
             {
                 if (it == Optimization::BASIC_BLOCKS)
                 {
-                    d_optimizer->basicBlocksOptimizations();                    
+                    d_optimizer->basicBlocksOptimizations(BBOPTS_ALL);                    
                 }
                 if (it == Optimization::GLOBAL_CSE)
                 {

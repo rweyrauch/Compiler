@@ -84,18 +84,14 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
     }
 }
 
-void IrOptimizer::basicBlocksOptimizations()
+void IrOptimizer::basicBlocksOptimizations(IrBasicBlockOpts which)
 {
     for (auto it : m_control_graphs)
     {
-        it.m_block->commonSubexpressionElimination();
-        it.m_block->copyPropagation();
-        it.m_block->deadCodeElimination();
+        it.m_block->optimize(which);
         for (auto bit : it.m_next_blocks)
         {
-            bit->commonSubexpressionElimination();
-            bit->copyPropagation();
-            bit->deadCodeElimination();
+            bit->optimize(which);
         }
     }
     

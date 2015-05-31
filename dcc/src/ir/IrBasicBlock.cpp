@@ -49,6 +49,18 @@ bool isBinaryOp(IrOpcode opcode)
     return false;
 }
 
+bool isLogicOp(IrOpcode opcode)
+{
+    switch (opcode)
+    {
+        case IrOpcode::OR:
+        case IrOpcode::AND:
+            return true;
+        default:
+            break;
+    }
+    return false;
+}
 bool isMoveOp(IrOpcode opcode)
 {
     return (opcode == IrOpcode::MOV);
@@ -59,6 +71,23 @@ bool isTempIdentifier(const IrTacArg& arg)
     if ((arg.m_usage == IrUsage::Identifier) && (arg.m_asString.find_first_of(".LC") != std::string::npos))
         return true;
     return false;
+}
+
+bool isIntegerZero(const IrTacArg& arg)
+{
+    return (arg.m_usage == IrUsage::Literal && arg.m_type == IrArgType::Integer && arg.m_value.m_int == 0);  
+}
+bool isIntegerOne(const IrTacArg& arg)
+{
+    return (arg.m_usage == IrUsage::Literal && arg.m_type == IrArgType::Integer && arg.m_value.m_int == 1);  
+}
+bool isTrue(const IrTacArg& arg)
+{
+    return (arg.m_usage == IrUsage::Literal && arg.m_type == IrArgType::Boolean && arg.m_value.m_int == 1);  
+}
+bool isFalse(const IrTacArg& arg)
+{
+    return (arg.m_usage == IrUsage::Literal && arg.m_type == IrArgType::Boolean && arg.m_value.m_int == 0);  
 }
 
 int IrBasicBlock::getValueNumber(const std::string& ident)
@@ -77,7 +106,149 @@ int IrBasicBlock::getValueNumber(const std::string& ident)
     return valueNumber;
 }
 
-bool IrBasicBlock::commonSubexpressionElimination()
+void IrBasicBlock::optimize(IrBasicBlockOpts which)
+{
+    if (which & BBOPTS_CONSTANT_PROP)
+        constantPropagation();
+    if (which & BBOPTS_ALGEBRAIC_SIMP)
+        algebraicSimplification();
+    if (which & BBOPTS_COMMON_SUBEXPR_ELIM)
+        commonSubexpressionElimination();
+    if (which & BBOPTS_COPY_PROP)
+        copyPropagation();
+    if (which & BBOPTS_DEAD_CODE_ELIM)
+        deadCodeElimination();
+}
+
+void IrBasicBlock::constantPropagation()
+{
+}
+
+void IrBasicBlock::algebraicSimplification()
+{
+    std::vector<IrTacStmt> optStatements;
+
+    for (auto it : m_statements)
+    {
+        if (!isBinaryOp(it.m_opcode) && !isMoveOp(it.m_opcode) && !isLogicOp(it.m_opcode))
+        {
+            optStatements.push_back(it);
+            continue;
+        }
+        
+        // Add zero, arg0 + 0 or 0 + arg1
+        if (it.m_opcode == IrOpcode::ADD)
+        {
+            if (isIntegerZero(it.m_src0))
+            {
+                it.m_opcode = IrOpcode::MOV;
+                it.m_src0 = it.m_src1;
+                it.m_src1.m_usage = IrUsage::Unused;                
+            }
+            else if (isIntegerZero(it.m_src1))
+            {
+                it.m_opcode = IrOpcode::MOV;
+                it.m_src1.m_usage = IrUsage::Unused;
+           }
+        }
+        // Subtract zero, arg0 - 0
+        // TODO: Implement 0 - arg1
+        if (it.m_opcode == IrOpcode::SUB)
+        {
+            if (isIntegerZero(it.m_src1))
+            {
+                it.m_opcode = IrOpcode::MOV;
+                it.m_src1.m_usage = IrUsage::Unused;
+           }            
+        }
+        
+        // Multiply by 1, arg0 * 1 or 1 * arg1
+        if (it.m_opcode == IrOpcode::MUL)
+        {
+            if (isIntegerOne(it.m_src0))
+            {
+                it.m_opcode = IrOpcode::MOV;
+                it.m_src0 = it.m_src1;
+                it.m_src1.m_usage = IrUsage::Unused;
+            }
+            else if (isIntegerOne(it.m_src1))
+            {
+                it.m_opcode = IrOpcode::MOV;
+                it.m_src1.m_usage = IrUsage::Unused;                
+            }
+        }
+        
+        // Multiply by zero
+        if (it.m_opcode == IrOpcode::MUL)
+        {
+            if (isIntegerZero(it.m_src0))
+            {
+                it.m_opcode = IrOpcode::MOV;
+                it.m_src1.m_usage = IrUsage::Unused;
+            }
+            else if (isIntegerZero(it.m_src1))
+            {
+                it.m_opcode = IrOpcode::MOV;
+                it.m_src0 = it.m_src1;
+                it.m_src1.m_usage = IrUsage::Unused;                
+            }
+        }
+        
+        // Or with true
+        if (it.m_opcode == IrOpcode::OR)
+        {
+            if (isTrue(it.m_src0))
+            {
+                it.m_opcode = IrOpcode::MOV;
+                it.m_src1.m_usage = IrUsage::Unused;
+            }
+            else if (isTrue(it.m_src1))
+            {
+                it.m_opcode = IrOpcode::MOV;
+                it.m_src0 = it.m_src1;
+                it.m_src1.m_usage = IrUsage::Unused;                
+            }
+        }
+            
+        // And with false
+        if (it.m_opcode == IrOpcode::AND)
+        {
+            if (isFalse(it.m_src0))
+            {
+                it.m_opcode = IrOpcode::MOV;
+                it.m_src1.m_usage = IrUsage::Unused;
+            }
+            else if (isFalse(it.m_src1))
+            {
+                it.m_opcode = IrOpcode::MOV;
+                it.m_src0 = it.m_src1;
+                it.m_src1.m_usage = IrUsage::Unused;                
+            }
+        }
+        
+        optStatements.push_back(it);
+    }
+    
+   if (m_verbose)
+    {
+        if (!m_statements.empty())
+            std::cout << "Original statements: " << std::endl;
+        for (auto it : m_statements)
+        {
+            IrPrintTac(it, std::cout);
+        }
+        if (!optStatements.empty())
+            std::cout << "Optimized statements: " << std::endl;
+        for (auto it : optStatements)
+        {
+            IrPrintTac(it, std::cout);
+        }
+    }
+    
+    m_statements = optStatements;
+}
+
+void IrBasicBlock::commonSubexpressionElimination()
 {
     m_variable_value_map.clear();
     m_expression_value_map.clear();
@@ -173,12 +344,14 @@ bool IrBasicBlock::commonSubexpressionElimination()
             std::cout << "[" << it.first.m_left << ", " << IrOpcodeToString(it.first.m_op) << ", " << it.first.m_right << "] = " << it.second.m_asString << std::endl;
         }
         
-        std::cout << "Original statements: " << std::endl;
+        if (!m_statements.empty())
+            std::cout << "Original statements: " << std::endl;
         for (auto it : m_statements)
         {
             IrPrintTac(it, std::cout);
         }
-        std::cout << "Optimized statements: " << std::endl;
+        if (!optStatements.empty())
+            std::cout << "Optimized statements: " << std::endl;
         for (auto it : optStatements)
         {
             IrPrintTac(it, std::cout);
@@ -186,11 +359,9 @@ bool IrBasicBlock::commonSubexpressionElimination()
     }
     
     m_statements = optStatements;
-    
-    return true;
 }
 
-bool IrBasicBlock::copyPropagation()
+void IrBasicBlock::copyPropagation()
 {
     std::vector<IrTacStmt> optStatements;
     
@@ -224,12 +395,14 @@ bool IrBasicBlock::copyPropagation()
  
     if (m_verbose)
     {
-        std::cout << "Original statements: " << std::endl;
+       if (!m_statements.empty())
+            std::cout << "Original statements: " << std::endl;
         for (auto it : m_statements)
         {
             IrPrintTac(it, std::cout);
         }
-        std::cout << "Optimized statements: " << std::endl;
+        if (!optStatements.empty())
+            std::cout << "Optimized statements: " << std::endl;
         for (auto it : optStatements)
         {
             IrPrintTac(it, std::cout);
@@ -237,11 +410,9 @@ bool IrBasicBlock::copyPropagation()
     }
     
     m_statements = optStatements;
-    
-    return true;
 }
     
-bool IrBasicBlock::deadCodeElimination()
+void IrBasicBlock::deadCodeElimination()
 {
     std::vector<std::string> needed_var_set;
     
@@ -276,12 +447,14 @@ bool IrBasicBlock::deadCodeElimination()
  
     if (m_verbose)
     {
-        std::cout << "Original statements: " << std::endl;
+       if (!m_statements.empty())
+            std::cout << "Original statements: " << std::endl;
         for (auto it : m_statements)
         {
             IrPrintTac(it, std::cout);
         }
-        std::cout << "Optimized statements: " << std::endl;
+        if (!optStatements.empty())
+            std::cout << "Optimized statements: " << std::endl;
         for (auto it : optStatements)
         {
             IrPrintTac(it, std::cout);
@@ -293,8 +466,6 @@ bool IrBasicBlock::deadCodeElimination()
     {
         m_statements.push_back(it);
     }
-        
-    return true;
 }
     
 void IrBasicBlock::print(std::ostream& stream)

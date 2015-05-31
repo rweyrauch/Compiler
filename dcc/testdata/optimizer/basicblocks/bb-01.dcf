@@ -1,0 +1,31 @@
+class Program
+{
+    void main () 
+    {
+        int i, j;
+        j = 7;
+        
+        i = 0 + j;
+        callout("printf", "Add zero.  Result should be %d is %d\n", j, i);
+
+        i = j + 0;
+        callout("printf", "Add zero.  Result should be %d is %d\n", j, i);
+        
+        i = j - 0;
+        callout("printf", "Subtract zero.  Result should be %d is %d\n", j, i);
+        
+        i = j * 0;
+        callout("printf", "Multiply by zero.  Result should be 0 is %d\n", i);
+
+        i = 0 * j;
+        callout("printf", "Multiply by zero.  Result should be 0 is %d\n", i);
+         
+        i = j * 1;
+        callout("printf", "Multiply by one.  Result should be %d is %d\n", j, i);
+
+        i = 1 * j;
+        callout("printf", "Multiply by one.  Result should be %d is %d\n", j, i);
+         
+     }
+}
+

@@ -95,6 +95,18 @@ const std::string& IrBooleanOperatorToString(IrBooleanOperator op);
 const std::string& IrAssignmentOperatorToString(IrAssignmentOperator op);
 const std::string& IrMemLocationToString(IrMemLocation loc);
 
+enum IrBasicBlockOpts
+{
+    BBOPTS_NONE = 0x0000,
+    BBOPTS_CONSTANT_PROP = 0x0001,
+    BBOPTS_ALGEBRAIC_SIMP = 0x0002,
+    BBOPTS_COMMON_SUBEXPR_ELIM = 0x0004,
+    BBOPTS_COPY_PROP = 0x0008,
+    BBOPTS_DEAD_CODE_ELIM = 0x0010,
+    
+    BBOPTS_ALL = BBOPTS_CONSTANT_PROP | BBOPTS_ALGEBRAIC_SIMP | BBOPTS_COMMON_SUBEXPR_ELIM | BBOPTS_COPY_PROP | BBOPTS_DEAD_CODE_ELIM
+};
+
 #define IRPRINT_INDENT(depth) { for (int d = 0; d < (int)(depth); d++) std::cout << "  "; }
 
 struct SVariableSymbol

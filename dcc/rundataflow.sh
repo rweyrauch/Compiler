@@ -20,7 +20,10 @@ do
     echo "---------------------------"
     echo "Test: ${dcfinput}"
     
+    # Compile with and without optimizations.
     ${DCC} --opt-basic-blocks -o out/$dcfinput.s $input
+    ${DCC} -o out/${dcfinput}_none.s $input
+    
     if [ -e out/$dcfinput.s ]
     then
         gcc out/$dcfinput.s -o out/$dcfinput 2> out/$dcfinput.log
