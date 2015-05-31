@@ -1,0 +1,33 @@
+class Program
+{
+    void main () 
+    {
+        int i, j;
+        j = 8;
+        
+        i = 1 + j;
+        callout("printf", "Add constant.  Result should be 9 is %d\n", i);
+
+        i = j + 1;
+        callout("printf", "Add constant.  Result should be 9 is %d\n", i);
+        
+        i = j - 1;
+        callout("printf", "Subtract constant.  Result should be 7 is %d\n", i);
+
+        i = 1 - j;
+        callout("printf", "Subtract constant.  Result should be -7 is %d\n", i);
+        
+        i = j * 2;
+        callout("printf", "Multiply by constant.  Result should be 16 is %d\n", i);
+
+        i = 2 * j;
+        callout("printf", "Multiply by zero.  Result should be 16 is %d\n", i);
+         
+        i = j / 2;
+        callout("printf", "Divide by constant.  Result should be 4 is %d\n", i);
+
+        i = 32 / j;
+        callout("printf", "Divide by constant.  Result should be 4 is %d\n", i);
+     }
+}
+
