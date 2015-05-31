@@ -209,7 +209,6 @@ void IrBasicBlock::constantPropagation()
             std::stringstream str;
             str << value;
             
-            std::cout << "Dst Constant: " << IrOpcodeToString(it.m_opcode) << " " << src0 << " " << src1 << " = " << value << std::endl;
             integerConstants[it.m_dst.m_asString] = value;
             
             it.m_opcode = IrOpcode::MOV;
@@ -232,7 +231,7 @@ void IrBasicBlock::constantPropagation()
         optStatements.push_back(it);
     }
    
-    if (true)
+    if (m_verbose)
     {
         if (!m_statements.empty())
             std::cout << "Original statements: " << std::endl;
