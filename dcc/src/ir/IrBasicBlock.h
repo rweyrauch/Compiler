@@ -58,6 +58,7 @@ public:
     
     bool commonSubexpressionElimination();
     bool copyPropagation();
+    bool deadCodeElimination();
     
     void print(std::ostream& stream);
     

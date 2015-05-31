@@ -90,10 +90,12 @@ void IrOptimizer::basicBlocksOptimizations()
     {
         it.m_block->commonSubexpressionElimination();
         it.m_block->copyPropagation();
+        it.m_block->deadCodeElimination();
         for (auto bit : it.m_next_blocks)
         {
             bit->commonSubexpressionElimination();
             bit->copyPropagation();
+            bit->deadCodeElimination();
         }
     }
     

@@ -22,6 +22,8 @@
 // THE SOFTWARE.
 //
 #include <iostream>
+#include <list>
+#include <algorithm>
 #include <cassert>
 #include "IrBasicBlock.h"
 #include "IrTAC.h"
@@ -236,6 +238,62 @@ bool IrBasicBlock::copyPropagation()
     
     m_statements = optStatements;
     
+    return true;
+}
+    
+bool IrBasicBlock::deadCodeElimination()
+{
+    std::vector<std::string> needed_var_set;
+    
+    std::list<IrTacStmt> optStatements;
+    
+    for (auto it = m_statements.rbegin(); it != m_statements.rend(); ++it)
+    {
+        if (!isMoveOp(it->m_opcode))
+        {
+            optStatements.push_front(*it);
+            continue;
+        }
+        
+        if (isTempIdentifier(it->m_dst))
+        {
+            auto vip = std::find(needed_var_set.begin(), needed_var_set.end(), it->m_src0.m_asString);
+            if (vip != needed_var_set.end())
+            {
+                // copy not needed
+            }
+            else
+            {
+                optStatements.push_front(*it);
+            }
+        }
+        else
+        {
+            needed_var_set.push_back(it->m_src0.m_asString);
+            optStatements.push_front(*it);
+        }
+    }
+ 
+    if (m_verbose)
+    {
+        std::cout << "Original statements: " << std::endl;
+        for (auto it : m_statements)
+        {
+            IrPrintTac(it, std::cout);
+        }
+        std::cout << "Optimized statements: " << std::endl;
+        for (auto it : optStatements)
+        {
+            IrPrintTac(it, std::cout);
+        }
+    }
+
+    m_statements.clear();
+    for (auto it : optStatements)
+    {
+        m_statements.push_back(it);
+    }
+        
     return true;
 }
     
