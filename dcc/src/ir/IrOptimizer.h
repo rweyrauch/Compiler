@@ -43,6 +43,7 @@ public:
     {}
    
     void generateBasicBlocks(const std::vector<IrTacStmt>& statements);
+    void basicBlocksOptimizations();
     void globalCommonSubexpressionElimination();
 
     const std::vector<IrTacStmt>& getOptimizedStatements() const { return m_statements; }

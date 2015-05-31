@@ -190,6 +190,52 @@ bool IrBasicBlock::commonSubexpressionElimination()
 
 bool IrBasicBlock::copyPropagation()
 {
+    std::vector<IrTacStmt> optStatements;
+    
+    std::map<std::string, IrTacArg> temp_to_var_map;
+    std::map<std::string, std::string> var_to_temp_map;
+    
+    for (auto it : m_statements)
+    {
+        if (!isMoveOp(it.m_opcode))
+        {
+            optStatements.push_back(it);
+            continue;
+        }
+
+        if (isTempIdentifier(it.m_dst))
+        {
+            temp_to_var_map[it.m_dst.m_asString] = it.m_src0;
+            var_to_temp_map[it.m_src0.m_asString] = it.m_dst.m_asString;
+        }
+        else if (isTempIdentifier(it.m_src0))
+        {
+            auto tip = temp_to_var_map.find(it.m_src0.m_asString);
+            if (tip != temp_to_var_map.end())
+            {
+                it.m_src0 = tip->second;
+            }
+        }
+        
+        optStatements.push_back(it);
+    }
+ 
+    if (m_verbose)
+    {
+        std::cout << "Original statements: " << std::endl;
+        for (auto it : m_statements)
+        {
+            IrPrintTac(it, std::cout);
+        }
+        std::cout << "Optimized statements: " << std::endl;
+        for (auto it : optStatements)
+        {
+            IrPrintTac(it, std::cout);
+        }
+    }
+    
+    m_statements = optStatements;
+    
     return true;
 }
     

@@ -16,6 +16,7 @@ using namespace Decaf;
 
 enum class Optimization : int
 {
+    BASIC_BLOCKS,
     GLOBAL_CSE,
     ALL
 };
@@ -70,7 +71,15 @@ class Parser: public ParserBase
         }
         void enableOpt(Optimization which)
         {
-            m_optimizations.push_back(which);
+            if (which == Optimization::ALL)
+            {
+                m_optimizations.push_back(Optimization::BASIC_BLOCKS);
+                m_optimizations.push_back(Optimization::GLOBAL_CSE);
+            }
+            else
+            {
+                m_optimizations.push_back(which);
+            }
         }
         void enableIrOutput()
         {
@@ -139,6 +148,10 @@ class Parser: public ParserBase
             // apply requested optimizations in the required order
             for (auto it : m_optimizations)
             {
+                if (it == Optimization::BASIC_BLOCKS)
+                {
+                    d_optimizer->basicBlocksOptimizations();                    
+                }
                 if (it == Optimization::GLOBAL_CSE)
                 {
                     d_optimizer->globalCommonSubexpressionElimination();

@@ -62,7 +62,7 @@ do
     echo "---------------------------"
     echo "Test: ${dcfinput}"
     
-    ${DCC} --opt-common-subexpr-elim -o out/$dcfinput.s $input
+    ${DCC} --opt-all -o out/$dcfinput.s $input
     if [ -e out/$dcfinput.s ]
     then    
         gcc out/$dcfinput.s out/6035.o -o out/$dcfinput 2> out/$dcfinput.log

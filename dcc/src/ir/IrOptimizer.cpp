@@ -84,14 +84,16 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
     }
 }
 
-void IrOptimizer::globalCommonSubexpressionElimination()
+void IrOptimizer::basicBlocksOptimizations()
 {
     for (auto it : m_control_graphs)
     {
         it.m_block->commonSubexpressionElimination();
+        it.m_block->copyPropagation();
         for (auto bit : it.m_next_blocks)
         {
             bit->commonSubexpressionElimination();
+            bit->copyPropagation();
         }
     }
     
@@ -105,7 +107,11 @@ void IrOptimizer::globalCommonSubexpressionElimination()
         {
             m_statements.push_back(sit);
         }
-    }    
+    }        
+}
+
+void IrOptimizer::globalCommonSubexpressionElimination()
+{
 }
 
 bool IrOptimizer::isLeaderPost(const IrTacStmt& stmt)
