@@ -396,7 +396,7 @@ void IrBasicBlock::commonSubexpressionElimination()
         }
     }
     
-    if (true)
+    if (m_verbose)
     {
         if (!m_variable_value_map.empty())
             std::cout << "Variable-Value Map" << std::endl;
@@ -426,17 +426,12 @@ void IrBasicBlock::copyPropagation()
     
     for (auto it = m_statements.begin(); it != m_statements.end(); ++it)
     {
-        if (!isMoveOp(it->m_opcode))
+        if (!isBinaryOp(it->m_opcode) && !isMoveOp(it->m_opcode) && !isLogicOp(it->m_opcode))
         {
             continue;
         }
 
-        if (isTempIdentifier(it->m_dst))
-        {
-            temp_to_var_map[it->m_dst.m_asString] = it->m_src0;
-            var_to_temp_map[it->m_src0.m_asString] = it->m_dst.m_asString;
-        }
-        else if (isTempIdentifier(it->m_src0))
+        if (it->hasSrc0() && isTempIdentifier(it->m_src0))
         {
             auto tip = temp_to_var_map.find(it->m_src0.m_asString);
             if (tip != temp_to_var_map.end())
@@ -444,6 +439,38 @@ void IrBasicBlock::copyPropagation()
                 it->m_src0 = tip->second;
             }
         }
+		if (it->hasSrc1() && isTempIdentifier(it->m_src1))
+		{
+            auto tip = temp_to_var_map.find(it->m_src1.m_asString);
+            if (tip != temp_to_var_map.end())
+            {
+                it->m_src1 = tip->second;
+            }			
+		}
+        if (isTempIdentifier(it->m_dst))
+        {
+			if (isMoveOp(it->m_opcode))
+			{
+				temp_to_var_map[it->m_dst.m_asString] = it->m_src0;
+				var_to_temp_map[it->m_src0.m_asString] = it->m_dst.m_asString;
+			}
+        }
+        else
+        {
+			if (isMoveOp(it->m_opcode))
+			{
+				auto vip = var_to_temp_map.find(it->m_dst.m_asString);
+				if (vip != var_to_temp_map.end())
+				{
+					auto tip = temp_to_var_map.find(vip->second);
+					if (tip != temp_to_var_map.end())
+					{
+						temp_to_var_map.erase(tip);
+					}
+					var_to_temp_map.erase(vip);
+				}
+			}
+		}
     }
 }
     
