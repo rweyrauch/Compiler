@@ -141,7 +141,7 @@ int IrBasicBlock::getValueNumber(const std::string& ident)
 void IrBasicBlock::optimize(IrBasicBlockOpts which)
 {
     if (which & BBOPTS_CONSTANT_PROP)
-        constantPropagation();
+        constantPropagation();  
     if (which & BBOPTS_ALGEBRAIC_SIMP)
         algebraicSimplification();
     if (which & BBOPTS_COMMON_SUBEXPR_ELIM)
@@ -149,33 +149,27 @@ void IrBasicBlock::optimize(IrBasicBlockOpts which)
     if (which & BBOPTS_COPY_PROP)
         copyPropagation();
     if (which & BBOPTS_DEAD_CODE_ELIM)
-        deadCodeElimination();
+        deadCodeElimination(); 
 }
 
 void IrBasicBlock::constantPropagation()
 {
-    // not working yet
-    //return;
-    
-    std::vector<IrTacStmt> optStatements;
-
     std::map<std::string, int> integerConstants;
     
-    for (auto it : m_statements)
+    for (auto it = m_statements.begin(); it != m_statements.end(); ++it)
     {
-        if (!isBinaryOp(it.m_opcode) && !isMoveOp(it.m_opcode) && !isLogicOp(it.m_opcode))
+        if (!isBinaryOp(it->m_opcode) && !isMoveOp(it->m_opcode) && !isLogicOp(it->m_opcode))
         {
-            optStatements.push_back(it);
             continue;
         }
         
         // check for expression with constant results
-        bool src0IsConstant = (it.m_src0.m_usage == IrUsage::Literal);
-        int src0 = it.m_src0.m_value.m_int;
-        if (it.m_src0.m_usage == IrUsage::Identifier && it.m_src0.m_type == IrArgType::Integer)
+        bool src0IsConstant = (it->m_src0.m_usage == IrUsage::Literal);
+        int src0 = it->m_src0.m_value.m_int;
+        if (it->m_src0.m_usage == IrUsage::Identifier && it->m_src0.m_type == IrArgType::Integer)
         {
             // lookup the identifier in the constant table
-            auto cip = integerConstants.find(it.m_src0.m_asString);
+            auto cip = integerConstants.find(it->m_src0.m_asString);
             if (cip != integerConstants.end())
             {
                 src0IsConstant = true;
@@ -183,17 +177,17 @@ void IrBasicBlock::constantPropagation()
             }
         }
         
-        bool src1IsConstant = (it.hasSrc1() && it.m_src1.m_usage == IrUsage::Literal);
-        int src1 = it.m_src1.m_value.m_int;
-        if (!it.hasSrc1())
+        bool src1IsConstant = (it->hasSrc1() && it->m_src1.m_usage == IrUsage::Literal);
+        int src1 = it->m_src1.m_value.m_int;
+        if (!it->hasSrc1())
         {
             src1IsConstant = true;
             src1 = 0;
         }
-        else if (it.m_src1.m_usage == IrUsage::Identifier && it.m_src1.m_type == IrArgType::Integer)
+        else if (it->m_src1.m_usage == IrUsage::Identifier && it->m_src1.m_type == IrArgType::Integer)
         {
             // lookup the identifier in the constant table
-            auto cip = integerConstants.find(it.m_src1.m_asString);
+            auto cip = integerConstants.find(it->m_src1.m_asString);
             if (cip != integerConstants.end())
             {
                 src1IsConstant = true;
@@ -205,174 +199,130 @@ void IrBasicBlock::constantPropagation()
 
         if (dstIsConstant)
         {
-            int value = evaluateConstIntExpression(it.m_opcode, src0, src1);
+            int value = evaluateConstIntExpression(it->m_opcode, src0, src1);
             std::stringstream str;
             str << value;
             
-            integerConstants[it.m_dst.m_asString] = value;
+            integerConstants[it->m_dst.m_asString] = value;
             
-            it.m_opcode = IrOpcode::MOV;
-            it.m_src0.m_usage = IrUsage::Literal;
-            it.m_src0.m_type = IrArgType::Integer;
-            it.m_src0.m_value.m_int = value;
-            it.m_src0.m_asString = str.str();
-            it.m_src1.m_usage = IrUsage::Unused;
+            it->m_opcode = IrOpcode::MOV;
+            it->m_src0.m_usage = IrUsage::Literal;
+            it->m_src0.m_type = IrArgType::Integer;
+            it->m_src0.m_value.m_int = value;
+            it->m_src0.m_asString = str.str();
+            it->m_src1.m_usage = IrUsage::Unused;
         }
         else
         {
             // remove the dst from the constant table if present
-            auto cip = integerConstants.find(it.m_dst.m_asString);
+            auto cip = integerConstants.find(it->m_dst.m_asString);
             if (cip != integerConstants.end())
             {
                 integerConstants.erase(cip);
             }
         }
-        
-        optStatements.push_back(it);
-    }
-   
-    if (m_verbose)
-    {
-        if (!m_statements.empty())
-            std::cout << "Original statements: " << std::endl;
-        for (auto it : m_statements)
-        {
-            IrPrintTac(it, std::cout);
-        }
-        if (!optStatements.empty())
-            std::cout << "Optimized statements: " << std::endl;
-        for (auto it : optStatements)
-        {
-            IrPrintTac(it, std::cout);
-        }
-    }
-    
-    m_statements = optStatements;
-   
+    }   
 }
 
 void IrBasicBlock::algebraicSimplification()
 {
-    std::vector<IrTacStmt> optStatements;
-
-    for (auto it : m_statements)
+    for (auto it = m_statements.begin(); it != m_statements.end(); ++it)
     {
-        if (!isBinaryOp(it.m_opcode) && !isMoveOp(it.m_opcode) && !isLogicOp(it.m_opcode))
+        if (!isBinaryOp(it->m_opcode) && !isMoveOp(it->m_opcode) && !isLogicOp(it->m_opcode))
         {
-            optStatements.push_back(it);
             continue;
         }
         
         // Add zero, arg0 + 0 or 0 + arg1
-        if (it.m_opcode == IrOpcode::ADD)
+        if (it->m_opcode == IrOpcode::ADD)
         {
-            if (isIntegerZero(it.m_src0))
+            if (isIntegerZero(it->m_src0))
             {
-                it.m_opcode = IrOpcode::MOV;
-                it.m_src0 = it.m_src1;
-                it.m_src1.m_usage = IrUsage::Unused;                
+                it->m_opcode = IrOpcode::MOV;
+                it->m_src0 = it->m_src1;
+                it->m_src1.m_usage = IrUsage::Unused;                
             }
-            else if (isIntegerZero(it.m_src1))
+            else if (isIntegerZero(it->m_src1))
             {
-                it.m_opcode = IrOpcode::MOV;
-                it.m_src1.m_usage = IrUsage::Unused;
+                it->m_opcode = IrOpcode::MOV;
+                it->m_src1.m_usage = IrUsage::Unused;
            }
         }
         // Subtract zero, arg0 - 0
         // TODO: Implement 0 - arg1
-        if (it.m_opcode == IrOpcode::SUB)
+        if (it->m_opcode == IrOpcode::SUB)
         {
-            if (isIntegerZero(it.m_src1))
+            if (isIntegerZero(it->m_src1))
             {
-                it.m_opcode = IrOpcode::MOV;
-                it.m_src1.m_usage = IrUsage::Unused;
+                it->m_opcode = IrOpcode::MOV;
+                it->m_src1.m_usage = IrUsage::Unused;
            }            
         }
         
         // Multiply by 1, arg0 * 1 or 1 * arg1
-        if (it.m_opcode == IrOpcode::MUL)
+        if (it->m_opcode == IrOpcode::MUL)
         {
-            if (isIntegerOne(it.m_src0))
+            if (isIntegerOne(it->m_src0))
             {
-                it.m_opcode = IrOpcode::MOV;
-                it.m_src0 = it.m_src1;
-                it.m_src1.m_usage = IrUsage::Unused;
+                it->m_opcode = IrOpcode::MOV;
+                it->m_src0 = it->m_src1;
+                it->m_src1.m_usage = IrUsage::Unused;
             }
-            else if (isIntegerOne(it.m_src1))
+            else if (isIntegerOne(it->m_src1))
             {
-                it.m_opcode = IrOpcode::MOV;
-                it.m_src1.m_usage = IrUsage::Unused;                
+                it->m_opcode = IrOpcode::MOV;
+                it->m_src1.m_usage = IrUsage::Unused;                
             }
         }
         
         // Multiply by zero
-        if (it.m_opcode == IrOpcode::MUL)
+        if (it->m_opcode == IrOpcode::MUL)
         {
-            if (isIntegerZero(it.m_src0))
+            if (isIntegerZero(it->m_src0))
             {
-                it.m_opcode = IrOpcode::MOV;
-                it.m_src1.m_usage = IrUsage::Unused;
+                it->m_opcode = IrOpcode::MOV;
+                it->m_src1.m_usage = IrUsage::Unused;
             }
-            else if (isIntegerZero(it.m_src1))
+            else if (isIntegerZero(it->m_src1))
             {
-                it.m_opcode = IrOpcode::MOV;
-                it.m_src0 = it.m_src1;
-                it.m_src1.m_usage = IrUsage::Unused;                
+                it->m_opcode = IrOpcode::MOV;
+                it->m_src0 = it->m_src1;
+                it->m_src1.m_usage = IrUsage::Unused;                
             }
         }
         
         // Or with true
-        if (it.m_opcode == IrOpcode::OR)
+        if (it->m_opcode == IrOpcode::OR)
         {
-            if (isTrue(it.m_src0))
+            if (isTrue(it->m_src0))
             {
-                it.m_opcode = IrOpcode::MOV;
-                it.m_src1.m_usage = IrUsage::Unused;
+                it->m_opcode = IrOpcode::MOV;
+                it->m_src1.m_usage = IrUsage::Unused;
             }
-            else if (isTrue(it.m_src1))
+            else if (isTrue(it->m_src1))
             {
-                it.m_opcode = IrOpcode::MOV;
-                it.m_src0 = it.m_src1;
-                it.m_src1.m_usage = IrUsage::Unused;                
+                it->m_opcode = IrOpcode::MOV;
+                it->m_src0 = it->m_src1;
+                it->m_src1.m_usage = IrUsage::Unused;                
             }
         }
             
         // And with false
-        if (it.m_opcode == IrOpcode::AND)
+        if (it->m_opcode == IrOpcode::AND)
         {
-            if (isFalse(it.m_src0))
+            if (isFalse(it->m_src0))
             {
-                it.m_opcode = IrOpcode::MOV;
-                it.m_src1.m_usage = IrUsage::Unused;
+                it->m_opcode = IrOpcode::MOV;
+                it->m_src1.m_usage = IrUsage::Unused;
             }
-            else if (isFalse(it.m_src1))
+            else if (isFalse(it->m_src1))
             {
-                it.m_opcode = IrOpcode::MOV;
-                it.m_src0 = it.m_src1;
-                it.m_src1.m_usage = IrUsage::Unused;                
+                it->m_opcode = IrOpcode::MOV;
+                it->m_src0 = it->m_src1;
+                it->m_src1.m_usage = IrUsage::Unused;                
             }
-        }
-        
-        optStatements.push_back(it);
-    }
-    
-   if (m_verbose)
-    {
-        if (!m_statements.empty())
-            std::cout << "Original statements: " << std::endl;
-        for (auto it : m_statements)
-        {
-            IrPrintTac(it, std::cout);
-        }
-        if (!optStatements.empty())
-            std::cout << "Optimized statements: " << std::endl;
-        for (auto it : optStatements)
-        {
-            IrPrintTac(it, std::cout);
         }
     }
-    
-    m_statements = optStatements;
 }
 
 void IrBasicBlock::commonSubexpressionElimination()
@@ -381,44 +331,41 @@ void IrBasicBlock::commonSubexpressionElimination()
     m_expression_value_map.clear();
     m_expression_temp_map.clear();
     
-    std::vector<IrTacStmt> optStatements;
-    
     // Statement of form: D = L op R
-    for (auto it : m_statements)
+    for (auto it = m_statements.begin(); it != m_statements.end(); ++it)
     {
-        if (!isBinaryOp(it.m_opcode) && !isMoveOp(it.m_opcode) && !isLogicOp(it.m_opcode))
+        if (!isBinaryOp(it->m_opcode) && !isMoveOp(it->m_opcode) && !isLogicOp(it->m_opcode))
         {
-            optStatements.push_back(it);
             continue;
         }
         
         // Get/create the value numbers of D, L and R    
-        it.m_src0.m_valueNumber = getValueNumber(it.m_src0.m_asString);
-        it.m_src0.m_isConstant = (it.m_src0.m_usage == IrUsage::Literal);
+        it->m_src0.m_valueNumber = getValueNumber(it->m_src0.m_asString);
+        it->m_src0.m_isConstant = (it->m_src0.m_usage == IrUsage::Literal);
         
-        if (it.hasSrc1())
+        if (it->hasSrc1())
         {
-            it.m_src1.m_valueNumber = getValueNumber(it.m_src1.m_asString);
-            it.m_src1.m_isConstant = (it.m_src1.m_usage == IrUsage::Literal);
+            it->m_src1.m_valueNumber = getValueNumber(it->m_src1.m_asString);
+            it->m_src1.m_isConstant = (it->m_src1.m_usage == IrUsage::Literal);
         }
         else
         {
-            it.m_src1.m_valueNumber = -1;
+            it->m_src1.m_valueNumber = -1;
         }
         
-        it.m_dst.m_valueNumber = getValueNumber(it.m_dst.m_asString);
-        assert(it.m_dst.m_usage != IrUsage::Literal);
-        it.m_dst.m_isConstant = false;
+        it->m_dst.m_valueNumber = getValueNumber(it->m_dst.m_asString);
+        assert(it->m_dst.m_usage != IrUsage::Literal);
+        it->m_dst.m_isConstant = false;
         
         // Create key from opcode, L and R.
-        Key keyExpr(it.m_src0.m_valueNumber, it.m_opcode, it.m_src1.m_valueNumber);
+        Key keyExpr(it->m_src0.m_valueNumber, it->m_opcode, it->m_src1.m_valueNumber);
            
-        if (isTempIdentifier(it.m_dst))
+        if (isTempIdentifier(it->m_dst))
         {
             auto tip = m_expression_temp_map.find(keyExpr);
             if (tip == m_expression_temp_map.end())
             {
-                m_expression_temp_map[keyExpr] = it.m_dst;
+                m_expression_temp_map[keyExpr] = it->m_dst;
             }
         }        
         
@@ -429,28 +376,27 @@ void IrBasicBlock::commonSubexpressionElimination()
             m_expression_value_map[keyExpr] = value;
             
             // Record new value for D.
-            m_variable_value_map[it.m_dst.m_asString] = value;
-            it.m_dst.m_valueNumber = value;
+            m_variable_value_map[it->m_dst.m_asString] = value;
+            it->m_dst.m_valueNumber = value;
         }
         else
         {
             // Replace exist value for D with value from expression.
-            m_variable_value_map[it.m_dst.m_asString] = mip->second;
-            it.m_dst.m_valueNumber = mip->second;
+            m_variable_value_map[it->m_dst.m_asString] = mip->second;
+            it->m_dst.m_valueNumber = mip->second;
             
             auto tip = m_expression_temp_map.find(keyExpr);
             if (tip != m_expression_temp_map.end())
             {
                 // Replace the current expression statement with a MOV.
-                it.m_opcode = IrOpcode::MOV;
-                it.m_src0 = tip->second;
-                it.m_src1.m_usage = IrUsage::Unused;
+                it->m_opcode = IrOpcode::MOV;
+                it->m_src0 = tip->second;
+                it->m_src1.m_usage = IrUsage::Unused;
             }
         }
-        optStatements.push_back(it);        
     }
     
-    if (m_verbose)
+    if (true)
     {
         if (!m_variable_value_map.empty())
             std::cout << "Variable-Value Map" << std::endl;
@@ -470,86 +416,45 @@ void IrBasicBlock::commonSubexpressionElimination()
         {
             std::cout << "[" << it.first.m_left << ", " << IrOpcodeToString(it.first.m_op) << ", " << it.first.m_right << "] = " << it.second.m_asString << std::endl;
         }
-        
-        if (!m_statements.empty())
-            std::cout << "Original statements: " << std::endl;
-        for (auto it : m_statements)
-        {
-            IrPrintTac(it, std::cout);
-        }
-        if (!optStatements.empty())
-            std::cout << "Optimized statements: " << std::endl;
-        for (auto it : optStatements)
-        {
-            IrPrintTac(it, std::cout);
-        }
     }
-    
-    m_statements = optStatements;
 }
 
 void IrBasicBlock::copyPropagation()
 {
-    std::vector<IrTacStmt> optStatements;
-    
     std::map<std::string, IrTacArg> temp_to_var_map;
     std::map<std::string, std::string> var_to_temp_map;
     
-    for (auto it : m_statements)
+    for (auto it = m_statements.begin(); it != m_statements.end(); ++it)
     {
-        if (!isMoveOp(it.m_opcode))
+        if (!isMoveOp(it->m_opcode))
         {
-            optStatements.push_back(it);
             continue;
         }
 
-        if (isTempIdentifier(it.m_dst))
+        if (isTempIdentifier(it->m_dst))
         {
-            temp_to_var_map[it.m_dst.m_asString] = it.m_src0;
-            var_to_temp_map[it.m_src0.m_asString] = it.m_dst.m_asString;
+            temp_to_var_map[it->m_dst.m_asString] = it->m_src0;
+            var_to_temp_map[it->m_src0.m_asString] = it->m_dst.m_asString;
         }
-        else if (isTempIdentifier(it.m_src0))
+        else if (isTempIdentifier(it->m_src0))
         {
-            auto tip = temp_to_var_map.find(it.m_src0.m_asString);
+            auto tip = temp_to_var_map.find(it->m_src0.m_asString);
             if (tip != temp_to_var_map.end())
             {
-                it.m_src0 = tip->second;
+                it->m_src0 = tip->second;
             }
         }
-        
-        optStatements.push_back(it);
     }
- 
-    if (m_verbose)
-    {
-       if (!m_statements.empty())
-            std::cout << "Original statements: " << std::endl;
-        for (auto it : m_statements)
-        {
-            IrPrintTac(it, std::cout);
-        }
-        if (!optStatements.empty())
-            std::cout << "Optimized statements: " << std::endl;
-        for (auto it : optStatements)
-        {
-            IrPrintTac(it, std::cout);
-        }
-    }
-    
-    m_statements = optStatements;
 }
     
 void IrBasicBlock::deadCodeElimination()
 {
     std::vector<std::string> needed_var_set;
     
-    std::list<IrTacStmt> optStatements;
-    
     for (auto it = m_statements.rbegin(); it != m_statements.rend(); ++it)
     {
         if (!isMoveOp(it->m_opcode))
         {
-            optStatements.push_front(*it);
             continue;
         }
         
@@ -559,39 +464,16 @@ void IrBasicBlock::deadCodeElimination()
             if (vip != needed_var_set.end())
             {
                 // copy not needed
+                it->m_opcode = IrOpcode::NOOP;
+                it->m_src0.m_usage = IrUsage::Unused;
+                it->m_src1.m_usage = IrUsage::Unused;
+                it->m_dst.m_usage = IrUsage::Unused;
             }
-            else
-            {
-                optStatements.push_front(*it);
-            }
-        }
+         }
         else
         {
             needed_var_set.push_back(it->m_src0.m_asString);
-            optStatements.push_front(*it);
         }
-    }
- 
-    if (m_verbose)
-    {
-       if (!m_statements.empty())
-            std::cout << "Original statements: " << std::endl;
-        for (auto it : m_statements)
-        {
-            IrPrintTac(it, std::cout);
-        }
-        if (!optStatements.empty())
-            std::cout << "Optimized statements: " << std::endl;
-        for (auto it : optStatements)
-        {
-            IrPrintTac(it, std::cout);
-        }
-    }
-
-    m_statements.clear();
-    for (auto it : optStatements)
-    {
-        m_statements.push_back(it);
     }
 }
     

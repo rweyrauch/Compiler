@@ -16,7 +16,12 @@ using namespace Decaf;
 
 enum class Optimization : int
 {
-    BASIC_BLOCKS,
+    BASIC_BLOCKS_CONST_PROP,
+    BASIC_BLOCKS_ALG_SIMP,
+    BASIC_BLOCKS_CSE,
+    BASIC_BLOCKS_COPY_PROP,
+    BASIC_BLOCKS_DEAD_CODE,
+    BASIC_BLOCKS_ALL,
     GLOBAL_CSE,
     ALL
 };
@@ -35,6 +40,7 @@ class Parser: public ParserBase
     std::string d_blank;
     
     std::vector<Optimization> m_optimizations;
+    IrBasicBlockOpts m_blockOpts;
     bool m_enableIrOutput;
     bool m_enableBasicBlocksOutput;
     
@@ -45,6 +51,7 @@ class Parser: public ParserBase
             d_root(nullptr),
             d_ctx(nullptr),
             d_optimizer(nullptr),
+            m_blockOpts(BBOPTS_NONE),
             m_enableIrOutput(false),
             m_enableBasicBlocksOutput(false)
         {
@@ -57,6 +64,7 @@ class Parser: public ParserBase
             d_root(nullptr),
             d_ctx(nullptr),
             d_optimizer(nullptr),
+            m_blockOpts(BBOPTS_NONE),            
             m_enableIrOutput(false),
             m_enableBasicBlocksOutput(false)
        {
@@ -73,8 +81,28 @@ class Parser: public ParserBase
         {
             if (which == Optimization::ALL)
             {
-                m_optimizations.push_back(Optimization::BASIC_BLOCKS);
+                m_blockOpts = BBOPTS_ALL;
                 m_optimizations.push_back(Optimization::GLOBAL_CSE);
+            }
+            else if (which == Optimization::BASIC_BLOCKS_CONST_PROP)
+            {
+                m_blockOpts = static_cast<IrBasicBlockOpts>(m_blockOpts | BBOPTS_CONSTANT_PROP);
+            }
+            else if (which == Optimization::BASIC_BLOCKS_ALG_SIMP)
+            {
+                m_blockOpts = static_cast<IrBasicBlockOpts>(m_blockOpts | BBOPTS_ALGEBRAIC_SIMP);
+            }
+            else if (which == Optimization::BASIC_BLOCKS_CSE)
+            {
+                m_blockOpts = static_cast<IrBasicBlockOpts>(m_blockOpts | BBOPTS_COMMON_SUBEXPR_ELIM);
+            }
+            else if (which == Optimization::BASIC_BLOCKS_COPY_PROP)
+            {
+                m_blockOpts = static_cast<IrBasicBlockOpts>(m_blockOpts | BBOPTS_COPY_PROP);
+            }
+            else if (which == Optimization::BASIC_BLOCKS_DEAD_CODE)
+            {
+                m_blockOpts = static_cast<IrBasicBlockOpts>(m_blockOpts | BBOPTS_DEAD_CODE_ELIM);
             }
             else
             {
@@ -145,13 +173,11 @@ class Parser: public ParserBase
             std::sort(m_optimizations.begin(), m_optimizations.end());
             std::unique(m_optimizations.begin(), m_optimizations.end());
             
+            d_optimizer->basicBlocksOptimizations(m_blockOpts);                    
+            
             // apply requested optimizations in the required order
             for (auto it : m_optimizations)
             {
-                if (it == Optimization::BASIC_BLOCKS)
-                {
-                    d_optimizer->basicBlocksOptimizations(BBOPTS_ALL);                    
-                }
                 if (it == Optimization::GLOBAL_CSE)
                 {
                     d_optimizer->globalCommonSubexpressionElimination();

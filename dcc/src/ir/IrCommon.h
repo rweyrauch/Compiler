@@ -95,7 +95,7 @@ const std::string& IrBooleanOperatorToString(IrBooleanOperator op);
 const std::string& IrAssignmentOperatorToString(IrAssignmentOperator op);
 const std::string& IrMemLocationToString(IrMemLocation loc);
 
-enum IrBasicBlockOpts
+enum IrBasicBlockOpts : unsigned int
 {
     BBOPTS_NONE = 0x0000,
     BBOPTS_CONSTANT_PROP = 0x0001,
