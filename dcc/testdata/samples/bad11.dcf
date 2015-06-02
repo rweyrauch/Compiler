@@ -1,0 +1,17 @@
+interface Printable {
+    string ToString();
+    int NumChars();
+}
+class Number implements Printable {
+    void ToString(string s) {
+    }
+}
+class Program
+{
+    void main()
+    {
+        Number n;
+        Printable p;
+        n = p;
+    }
+}

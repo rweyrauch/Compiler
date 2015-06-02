@@ -1,0 +1,18 @@
+class Club 
+{    
+    void Meet() 
+    {
+        FindTime();
+    }              
+} 
+
+class Program 
+{
+    void main() 
+    {
+        Club tbc;
+        nico = trish + katie;
+        cheryl();
+        tbc.Meeting(caroline);
+    } 
+} 

@@ -1,0 +1,9 @@
+class Program 
+{
+    Unknown g;
+    void main()  
+    {
+        var = new Missing;
+        g.GetColor(10);
+    }             
+}

@@ -1,0 +1,13 @@
+ class Cow extends Animal {
+}  class Wacky implements Trick, Treat, Halloween {
+    bool lost;
+}  interface Treat {
+} int          Trick;
+ class Program  {
+    void           main() {
+	B b;
+	Trick c;
+	 new A;
+	new Treat;
+	NewArray(10, Trick);
+} }     
