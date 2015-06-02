@@ -74,6 +74,14 @@ bool isTempIdentifier(const IrTacArg& arg)
     return false;
 }
 
+bool isIntLiteral(const IrTacArg& arg)
+{
+    return (arg.m_usage == IrUsage::Literal && arg.m_type == IrArgType::Integer);
+}
+bool isBoolLiteral(const IrTacArg& arg)
+{
+    return (arg.m_usage == IrUsage::Literal && arg.m_type == IrArgType::Boolean);
+}
 bool isIntegerZero(const IrTacArg& arg)
 {
     return (arg.m_usage == IrUsage::Literal && arg.m_type == IrArgType::Integer && arg.m_value.m_int == 0);  
@@ -122,6 +130,28 @@ int evaluateConstIntExpression(IrOpcode opcode, int src0, int src1)
     return value;
 }
 
+int evaluateConstBoolExpression(IrOpcode opcode, int src0, int src1)
+{
+    int value = 0;
+    
+    switch (opcode)
+    {
+        case IrOpcode::AND:
+            value = src0 && src1;
+            break;
+        case IrOpcode::OR:
+            value = src0 || src1;
+            break;
+        case IrOpcode::NOT:
+            value = !src0;
+            break;
+        default:
+            assert(false);
+            break;
+    }
+    return value;
+}
+
 int IrBasicBlock::getValueNumber(const std::string& ident)
 {  
     int valueNumber = -1;
@@ -140,8 +170,8 @@ int IrBasicBlock::getValueNumber(const std::string& ident)
 
 void IrBasicBlock::optimize(IrBasicBlockOpts which)
 {
-    if (which & BBOPTS_CONSTANT_PROP)
-        constantPropagation();  
+    if (which & BBOPTS_CONSTANT_FOLDING)
+        constantFolding();  
     if (which & BBOPTS_ALGEBRAIC_SIMP)
         algebraicSimplification();
     if (which & BBOPTS_COMMON_SUBEXPR_ELIM)
@@ -152,58 +182,24 @@ void IrBasicBlock::optimize(IrBasicBlockOpts which)
         deadCodeElimination(); 
 }
 
-void IrBasicBlock::constantPropagation()
+void IrBasicBlock::constantFolding()
 {
-    std::map<std::string, int> integerConstants;
-    
     for (auto it = m_statements.begin(); it != m_statements.end(); ++it)
     {
-        if (!isBinaryOp(it->m_opcode) && !isMoveOp(it->m_opcode) && !isLogicOp(it->m_opcode))
+        if (!isBinaryOp(it->m_opcode) && !isLogicOp(it->m_opcode))
         {
             continue;
         }
         
         // check for expression with constant results
-        bool src0IsConstant = (it->m_src0.m_usage == IrUsage::Literal);
-        int src0 = it->m_src0.m_value.m_int;
-        if (it->m_src0.m_usage == IrUsage::Identifier && it->m_src0.m_type == IrArgType::Integer)
-        {
-            // lookup the identifier in the constant table
-            auto cip = integerConstants.find(it->m_src0.m_asString);
-            if (cip != integerConstants.end())
-            {
-                src0IsConstant = true;
-                src0 = cip->second;
-            }
-        }
+        const bool exprIsIntConstant = isIntLiteral(it->m_src0) && isIntLiteral(it->m_src1);
+        const bool exprIsBoolConstant = isBoolLiteral(it->m_src0) && isBoolLiteral(it->m_src1);
         
-        bool src1IsConstant = (it->hasSrc1() && it->m_src1.m_usage == IrUsage::Literal);
-        int src1 = it->m_src1.m_value.m_int;
-        if (!it->hasSrc1())
+        if (exprIsIntConstant)
         {
-            src1IsConstant = true;
-            src1 = 0;
-        }
-        else if (it->m_src1.m_usage == IrUsage::Identifier && it->m_src1.m_type == IrArgType::Integer)
-        {
-            // lookup the identifier in the constant table
-            auto cip = integerConstants.find(it->m_src1.m_asString);
-            if (cip != integerConstants.end())
-            {
-                src1IsConstant = true;
-                src1 = cip->second;
-            }            
-        }
-        
-        bool dstIsConstant = src0IsConstant && src1IsConstant;
-
-        if (dstIsConstant)
-        {
-            int value = evaluateConstIntExpression(it->m_opcode, src0, src1);
+            int value = evaluateConstIntExpression(it->m_opcode, it->m_src0.m_value.m_int, it->m_src1.m_value.m_int);
             std::stringstream str;
             str << value;
-            
-            integerConstants[it->m_dst.m_asString] = value;
             
             it->m_opcode = IrOpcode::MOV;
             it->m_src0.m_usage = IrUsage::Literal;
@@ -212,14 +208,18 @@ void IrBasicBlock::constantPropagation()
             it->m_src0.m_asString = str.str();
             it->m_src1.m_usage = IrUsage::Unused;
         }
-        else
+        else if (exprIsBoolConstant)
         {
-            // remove the dst from the constant table if present
-            auto cip = integerConstants.find(it->m_dst.m_asString);
-            if (cip != integerConstants.end())
-            {
-                integerConstants.erase(cip);
-            }
+            int value = evaluateConstBoolExpression(it->m_opcode, it->m_src0.m_value.m_int, it->m_src1.m_value.m_int);
+            std::stringstream str;
+            str << value;
+            
+            it->m_opcode = IrOpcode::MOV;
+            it->m_src0.m_usage = IrUsage::Literal;
+            it->m_src0.m_type = IrArgType::Boolean;
+            it->m_src0.m_value.m_int = value;
+            it->m_src0.m_asString = str.str();
+            it->m_src1.m_usage = IrUsage::Unused;
         }
     }   
 }

@@ -16,7 +16,7 @@ using namespace Decaf;
 
 enum class Optimization : int
 {
-    BASIC_BLOCKS_CONST_PROP,
+    BASIC_BLOCKS_CONST_FOLDING,
     BASIC_BLOCKS_ALG_SIMP,
     BASIC_BLOCKS_CSE,
     BASIC_BLOCKS_COPY_PROP,
@@ -84,9 +84,9 @@ class Parser: public ParserBase
                 m_blockOpts = BBOPTS_ALL;
                 m_optimizations.push_back(Optimization::GLOBAL_CSE);
             }
-            else if (which == Optimization::BASIC_BLOCKS_CONST_PROP)
+            else if (which == Optimization::BASIC_BLOCKS_CONST_FOLDING)
             {
-                m_blockOpts = static_cast<IrBasicBlockOpts>(m_blockOpts | BBOPTS_CONSTANT_PROP);
+                 m_blockOpts = static_cast<IrBasicBlockOpts>(m_blockOpts | BBOPTS_CONSTANT_FOLDING);
             }
             else if (which == Optimization::BASIC_BLOCKS_ALG_SIMP)
             {

@@ -12,11 +12,16 @@ class Program
             array[j] = j*2;
         }
         
-
-	for j = 0, 10 {
+		for j = 0, 10 {
+			int i;
+			i = 9 - j;
+			callout("printf", "%d ", array[i]);
+		}
+        callout("printf", "\n");
+ 		
+	    for j = 0, 10 {
             callout("printf", "%d ", array[9 - j]);
-        }
-        
+        }       
         callout("printf", "\n");
     }
 }

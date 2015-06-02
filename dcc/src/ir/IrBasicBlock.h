@@ -124,7 +124,7 @@ protected:
     
     bool m_verbose;
     
-    void constantPropagation();
+    void constantFolding();
     void algebraicSimplification();
     void commonSubexpressionElimination();
     void copyPropagation();
