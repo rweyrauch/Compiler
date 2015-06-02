@@ -360,7 +360,7 @@ std::ostream& operator<<(std::ostream& stream,const IrTacArg& arg)
         stream << "$" << arg.m_asString;
         break;
     case IrUsage::Global:
-        stream << arg.m_asString;
+        stream << arg.m_asString << "(%rip)";
         break;
     case IrUsage::Identifier:
     case IrUsage::Argument:
@@ -430,7 +430,18 @@ void IrGenMov(const IrTacArg& src, const IrTacArg& dst, std::ostream& stream)
     {
         if (src.isDouble() || dst.isDouble())
         {
-            stream << "movsd " << src << ", " << dst << std::endl;
+			if (src.isLiteral())
+			{
+				stream << "movabsq " << src << ", " << dst << std::endl;
+			}
+			else if (src.isRegister() || dst.isRegister())
+			{
+				stream << "movsd " << src << ", " << dst << std::endl;				
+			}
+			else
+			{
+				stream << "movq " << src << ", " << dst << std::endl;
+			}
         }
         else
         {
@@ -659,8 +670,9 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         if (stmt.m_dst.isDouble())
         {
             IrGenMov(stmt.m_src0, g_tempDoubleReg, stream);
-        
-            stream << (stmt.m_opcode == IrOpcode::ADD ? "addsd " : "subsd ") << stmt.m_src1 << ", " << g_tempDoubleReg << std::endl;
+			IrGenMov(stmt.m_src1, g_retDoubleReg, stream);
+			
+            stream << (stmt.m_opcode == IrOpcode::ADD ? "addsd " : "subsd ") << g_retDoubleReg << ", " << g_tempDoubleReg << std::endl;
         
             IrGenMov(g_tempDoubleReg, stmt.m_dst, stream);
         }
@@ -680,8 +692,9 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         if (stmt.m_dst.isDouble())
         {
             IrGenMov(stmt.m_src0, g_tempDoubleReg, stream);
-        
-            stream << (stmt.m_opcode == IrOpcode::MUL ? "mulsd " : "divsd ") << stmt.m_src1 << ", " << g_tempDoubleReg << std::endl;
+       		IrGenMov(stmt.m_src1, g_retDoubleReg, stream);
+ 
+            stream << (stmt.m_opcode == IrOpcode::MUL ? "mulsd " : "divsd ") << g_retDoubleReg << ", " << g_tempDoubleReg << std::endl;
         
             IrGenMov(g_tempDoubleReg, stmt.m_dst, stream);
         }
