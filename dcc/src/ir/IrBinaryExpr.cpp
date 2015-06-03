@@ -26,7 +26,6 @@
 #include "IrCommon.h"
 #include "IrBinaryExpr.h"
 #include "IrLiteral.h"
-#include "IrDoubleLiteral.h"
 #include "IrLocation.h"
 #include "IrIdentifier.h"
 #include "IrTravCtx.h"
@@ -205,13 +204,8 @@ bool IrBinaryExpression::codegen(IrTraversalContext* ctx)
         IrTacStmt tac(opcodeFor(m_operator), getLineNumber());
         if (m_lhs != nullptr)
         {
-            IrDoubleLiteral* dliteral = dynamic_cast<IrDoubleLiteral*>(m_lhs.get());
             IrLiteral* literal = dynamic_cast<IrLiteral*>(m_lhs.get());
-            if (dliteral)
-            {
-                tac.m_src0.build(dliteral->getIdentifier().get());
-            }
-            else if (literal)
+            if (literal)
             {
                 tac.m_src0.build(literal);
             }
@@ -222,13 +216,8 @@ bool IrBinaryExpression::codegen(IrTraversalContext* ctx)
         }
         if (m_rhs != nullptr)
         {
-            IrDoubleLiteral* dliteral = dynamic_cast<IrDoubleLiteral*>(m_rhs.get());
             IrLiteral* literal = dynamic_cast<IrLiteral*>(m_rhs.get());
-            if (dliteral)
-            {
-                tac.m_src1.build(dliteral->getIdentifier().get());
-            }
-            else if (literal)
+            if (literal)
             {
                 tac.m_src1.build(literal);
             }

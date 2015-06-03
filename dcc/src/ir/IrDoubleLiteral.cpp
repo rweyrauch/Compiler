@@ -29,7 +29,6 @@
 namespace Decaf
 {
  
-bool IrDoubleLiteral::s_codegened_consts = false;
 std::shared_ptr<IrDoubleLiteral> IrDoubleLiteral::s_zero_literal = std::shared_ptr<IrDoubleLiteral>(new IrDoubleLiteral(__LINE__, 0, __FILE__, "0.0"));
 std::shared_ptr<IrDoubleLiteral> IrDoubleLiteral::s_one_literal = std::shared_ptr<IrDoubleLiteral>(new IrDoubleLiteral(__LINE__, 0, __FILE__, "1.0"));
     
@@ -52,39 +51,6 @@ void IrDoubleLiteral::setValue(double value)
     std::stringstream conv;
     conv << m_value;
     m_valueAsString = conv.str();
-}
-
-bool IrDoubleLiteral::codegen(IrTraversalContext* ctx)
-{
-    bool ok = true;
-    SDoubleSymbol symbol;
-    if (!ctx->lookup(getValue(), symbol))
-    {
-        m_label = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
-        ok = ctx->addDouble(m_label.get(), getValue());
-        if (!ok)
-        {
-            // Error - duplicate
-            std::cerr << getFilename() << ":" << getLineNumber() << ":" << getColumnNumber() << ": error: double \'" << m_label->getIdentifier() << "\' already declared in scope." << std::endl;                            
-        }
-    }
-    else
-    {
-        m_label = std::shared_ptr<IrIdentifier>(new IrIdentifier(getLineNumber(), getColumnNumber(), getFilename(), symbol.m_name, true));
-    }
-    
-    return ok;
-}
-
-bool IrDoubleLiteral::CodeGenConsts(IrTraversalContext* ctx)
-{
-    if (!s_codegened_consts)
-    {
-        s_zero_literal->codegen(ctx);
-        s_one_literal->codegen(ctx);
-        s_codegened_consts = true;
-    } 
-    return true;
 }
 
 }

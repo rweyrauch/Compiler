@@ -28,7 +28,6 @@
 #include "IrMethodCall.h"
 #include "IrIdentifier.h"
 #include "IrStringLiteral.h"
-#include "IrDoubleLiteral.h"
 #include "IrLocation.h"
 #include "IrTravCtx.h"
 
@@ -184,15 +183,10 @@ bool IrMethodCall::codegen(IrTraversalContext* ctx)
         IrTacStmt tac(IrOpcode::PARAM, it->getLineNumber());
         
         IrStringLiteral* sliteral = dynamic_cast<IrStringLiteral*>(it.get());
-        IrDoubleLiteral* dliteral = dynamic_cast<IrDoubleLiteral*>(it.get());
         IrLiteral* literal = dynamic_cast<IrLiteral*>(it.get());
         if (sliteral)
         {
             tac.m_src0.build(sliteral->getIdentifier().get());
-        }
-        else if (dliteral)
-        {
-            tac.m_src0.build(dliteral->getIdentifier().get());
         }
         else if (literal)
         {

@@ -144,7 +144,9 @@ void IrTacArg::build(const IrDoubleLiteral* literal)
         m_isConstant = true;
         m_type = IrArgType::Double;
         m_value.m_double = literal->getValue();
-        m_asString = literal->getValueAsString();
+        std::stringstream str;
+        str << m_value.m_int;
+        m_asString = str.str();
     }
 }
 
@@ -194,7 +196,7 @@ void IrTacArg::build(double literal)
     m_type = IrArgType::Double;
     m_value.m_double = literal;
     std::stringstream str;
-    str << literal;
+    str << m_value.m_int;
     m_asString = str.str();
 }
 
@@ -311,7 +313,7 @@ void IrPrintTacArg(const IrTacArg& arg, std::ostream& stream)
     }
     else
     {
-	stream << "Unexpected arg usage " << (int)arg.m_usage << "  " << arg.m_asString;
+    stream << "Unexpected arg usage " << (int)arg.m_usage << "  " << arg.m_asString;
     }
 }
 
@@ -325,7 +327,7 @@ void IrPrintTacLabel(const IrTacArg& label, std::ostream& stream)
 
 void IrPrintTac(const IrTacStmt& stmt, std::ostream& stream)
 {
-     stream << IrOpcodeToString(stmt.m_opcode) << " ";
+    stream << IrOpcodeToString(stmt.m_opcode) << " ";
     
     if (stmt.m_opcode != IrOpcode::LABEL)
     {
@@ -430,18 +432,19 @@ void IrGenMov(const IrTacArg& src, const IrTacArg& dst, std::ostream& stream)
     {
         if (src.isDouble() || dst.isDouble())
         {
-			if (src.isLiteral())
-			{
-				stream << "movabsq " << src << ", " << dst << std::endl;
-			}
-			else if (src.isRegister() || dst.isRegister())
-			{
-				stream << "movsd " << src << ", " << dst << std::endl;				
-			}
-			else
-			{
-				stream << "movq " << src << ", " << dst << std::endl;
-			}
+            if (src.isLiteral())
+            {
+                stream << "movabsq " << src << ", " << g_tempReg << std::endl;
+                stream << "movq " << g_tempReg << ", " << dst << std::endl;
+            }
+            else if (src.isRegister() || dst.isRegister())
+            {
+                stream << "movsd " << src << ", " << dst << std::endl;				
+            }
+            else
+            {
+                stream << "movq " << src << ", " << dst << std::endl;
+            }
         }
         else
         {
@@ -474,7 +477,7 @@ void IrGenBoundsCheck(const IrTacArg& offset, int limit, int lineNo, std::ostrea
     stream << "mov $.DCFFILE, %rsi" << std::endl;
     stream << "mov $" << lineNo << ", %rdx" << std::endl;
     stream << "call printf" << std::endl;
-     
+    
     // abort() 
     stream << "call abort" << std::endl;
 
@@ -670,8 +673,8 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         if (stmt.m_dst.isDouble())
         {
             IrGenMov(stmt.m_src0, g_tempDoubleReg, stream);
-			IrGenMov(stmt.m_src1, g_retDoubleReg, stream);
-			
+            IrGenMov(stmt.m_src1, g_retDoubleReg, stream);
+            
             stream << (stmt.m_opcode == IrOpcode::ADD ? "addsd " : "subsd ") << g_retDoubleReg << ", " << g_tempDoubleReg << std::endl;
         
             IrGenMov(g_tempDoubleReg, stmt.m_dst, stream);
@@ -692,8 +695,8 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         if (stmt.m_dst.isDouble())
         {
             IrGenMov(stmt.m_src0, g_tempDoubleReg, stream);
-       		IrGenMov(stmt.m_src1, g_retDoubleReg, stream);
- 
+            IrGenMov(stmt.m_src1, g_retDoubleReg, stream);
+
             stream << (stmt.m_opcode == IrOpcode::MUL ? "mulsd " : "divsd ") << g_retDoubleReg << ", " << g_tempDoubleReg << std::endl;
         
             IrGenMov(g_tempDoubleReg, stmt.m_dst, stream);
@@ -722,10 +725,10 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         break;
         
     case IrOpcode::CALL:       // call arg0 arg1
-         IrGenParamPush(stream);
+        IrGenParamPush(stream);
 
         stream << "call " << stmt.m_src0.m_asString << std::endl;
-         
+        
         if (stmt.hasSrc1())
         {
             IrGenMov(g_retReg, stmt.m_src1, stream);
@@ -779,7 +782,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         
     case IrOpcode::NOT:        // !arg1 -> arg2 (0 or 1)
         // make sure the arg is not an immediate 
-         IrGenMov(stmt.m_src1, g_tempReg, stream);
+        IrGenMov(stmt.m_src1, g_tempReg, stream);
         
         // 'not' is a bit-wise invert 
         stream << "not " << g_tempReg << std::endl;
@@ -802,7 +805,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
         if (stmt.m_src0.m_usage != IrUsage::Literal)
         {    
             stream << "cmp $0, " << stmt.m_src0 << std::endl;           
-         }
+        }
         else // literal
         {
             IrGenMov(stmt.m_src0, g_tempReg, stream);
@@ -810,7 +813,7 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
             stream << "cmp $0, " << g_tempReg << std::endl;                       
         }
         stream << "jz " << stmt.m_src1.m_asString  << std::endl;
-       break;
+    break;
         
     case IrOpcode::IFNZ:        // jump if cmp != 0
         if (stmt.m_src0.m_usage != IrUsage::Literal)

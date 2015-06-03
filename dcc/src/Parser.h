@@ -123,8 +123,6 @@ class Parser: public ParserBase
             if (d_root)
             {
                 d_root->allocate(d_ctx);
-                
-                IrDoubleLiteral::CodeGenConsts(d_ctx);
     
                 d_root->codegen(d_ctx);
                 
