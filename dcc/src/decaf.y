@@ -439,15 +439,22 @@ unary_expr
     | MINUS unary_expr 
     { 
         Decaf::IrIntegerLiteral* intLit = dynamic_cast<Decaf::IrIntegerLiteral*>($2);
-        if (intLit == nullptr)
-        {
-            $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, nullptr, Decaf::IrBinaryOperator::Subtract, $2); 
-        }
-        else
+        Decaf::IrDoubleLiteral* doubleLit = dynamic_cast<Decaf::IrDoubleLiteral*>($2);
+        if (intLit)
         {
             // convert expression into negative integer literal
             intLit->setValue(-intLit->getValue());            
             $$ = $2;
+        }
+        else if (doubleLit)
+        {
+            // convert expression into negative double literal
+            doubleLit->setValue(-doubleLit->getValue());            
+            $$ = $2;
+        }
+        else
+        {
+            $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, nullptr, Decaf::IrBinaryOperator::Subtract, $2); 
         }
     }
     | BANG unary_expr  
