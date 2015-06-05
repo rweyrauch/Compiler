@@ -554,42 +554,81 @@ void IrGenComparison(const IrTacStmt& stmt, std::ostream& stream)
     // zero the temp output reg
     stream << "xor " << g_retReg << ", " << g_retReg << std::endl;
     
-    // make sure the second arg is not an immediate nor a memory access
-    IrGenMov(stmt.m_src0, g_tempReg, stream);
-    
-    stream << "cmp " << stmt.m_src1 << ", " << g_tempReg << std::endl;  
-    
-    switch (stmt.m_opcode)
+    if (stmt.m_src0.isDouble())
     {
-    case IrOpcode::EQUAL:      // arg0 == arg1 -> arg2 (0 or 1)
-        stream << "sete ";
-        break;
-                
-    case IrOpcode::NOTEQUAL:   // arg0 != arg1 -> arg2 (0 or 1)
-        stream << "setne ";
-        break;
-        
-    case IrOpcode::LESS:       // arg0 < arg1 -> arg2 (0 or 1)
-        stream << "setl ";
-        break;
-        
-    case IrOpcode::LESSEQUAL:  // arg0 <= arg1 -> arg2 (0 or 1)
-        stream << "setle ";
-        break;
-        
-    case IrOpcode::GREATER:    // arg0 > arg1 -> arg2 (0 or 1)
-        stream << "setg ";
-        break;
-        
-    case IrOpcode::GREATEREQUAL: // arg0 >= arg1 -> arg2 (0 or 1)
-        stream << "setge ";
-        break;
-        
-    default:
-        break;
-    }
-    stream << g_retRegWord << std::endl;  
+		unsigned int compOp = 0;
+		switch (stmt.m_opcode)
+		{
+		case IrOpcode::EQUAL:      // arg0 == arg1 -> arg2 (0 or 1)
+			compOp = 0;
+			break;
+					
+		case IrOpcode::NOTEQUAL:   // arg0 != arg1 -> arg2 (0 or 1)
+			compOp = 4;
+			break;
+			
+		case IrOpcode::LESS:       // arg0 < arg1 -> arg2 (0 or 1)
+			compOp = 1;
+			break;
+			
+		case IrOpcode::LESSEQUAL:  // arg0 <= arg1 -> arg2 (0 or 1)
+			compOp = 2;
+			break;
+			
+		case IrOpcode::GREATER:    // arg0 > arg1 -> arg2 (0 or 1)
+			compOp = 6;
+			break;
+			
+		case IrOpcode::GREATEREQUAL: // arg0 >= arg1 -> arg2 (0 or 1)
+			compOp = 5;
+			break;
+			
+		default:
+			break;
+		}
+		
+		// make sure the first arg is not an immediate nor a memory access
+		IrGenMov(stmt.m_src0, g_tempDoubleReg, stream);
+		stream << "cmpsd $" << compOp << ", " << stmt.m_src1 << ", " << g_tempDoubleReg << std::endl;  
+	}
+	else
+	{
+		// make sure the second arg is not an immediate nor a memory access
+ 		IrGenMov(stmt.m_src0, g_tempReg, stream);
+		stream << "cmp " << stmt.m_src1 << ", " << g_tempReg << std::endl;  
     
+		switch (stmt.m_opcode)
+		{
+		case IrOpcode::EQUAL:      // arg0 == arg1 -> arg2 (0 or 1)
+			stream << "sete ";
+			break;
+					
+		case IrOpcode::NOTEQUAL:   // arg0 != arg1 -> arg2 (0 or 1)
+			stream << "setne ";
+			break;
+			
+		case IrOpcode::LESS:       // arg0 < arg1 -> arg2 (0 or 1)
+			stream << "setl ";
+			break;
+			
+		case IrOpcode::LESSEQUAL:  // arg0 <= arg1 -> arg2 (0 or 1)
+			stream << "setle ";
+			break;
+			
+		case IrOpcode::GREATER:    // arg0 > arg1 -> arg2 (0 or 1)
+			stream << "setg ";
+			break;
+			
+		case IrOpcode::GREATEREQUAL: // arg0 >= arg1 -> arg2 (0 or 1)
+			stream << "setge ";
+			break;
+			
+		default:
+			break;
+		}
+		stream << g_retRegWord << std::endl;  
+	}
+
     stream << "movzb " << g_retRegWord << ", " << g_retReg << std::endl;
     
     IrGenMov(g_retReg, stmt.m_dst, stream);      
