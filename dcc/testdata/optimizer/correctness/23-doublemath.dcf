@@ -1,0 +1,26 @@
+class Program
+{
+    void main () 
+    {
+        double i1;
+    
+        i1 = -2147483647.0 - 1.0;
+        callout("printf","min int operation: result should be -2147483648, is: %f\n",i1);
+        i1 = (100.0 - 50.0) * 2.0;
+        callout("printf","paren assoc: result should be 100, is: %g\n",i1);
+        i1 = 100.0 - 50.0 - 40.0;
+        callout("printf","- assoc: result should be 10, is: %g\n",i1); 
+        i1 = 100.0 - 50.0 + 40.0;
+        callout("printf","-,+ assoc: result should be 90, is: %g\n",i1);
+        i1 = 100.0 - 5.0 * 4.0;
+        callout("printf","- * assoc: result should be 80, is: %g\n",i1);
+        i1 = 10.0 * 5.0 - 4.0;
+        callout("printf","result should be 46, is: %g\n",i1);
+        i1 = 3.0;
+        i1 = i1 * i1 - (0.0 - 2.0);
+        callout("printf","*, -, uses var: result should be 11, is: %g\n",i1);
+        i1 = 3.0 * 4.0 - 2.0 * 5.0;
+        callout("printf","*,- assoc: result should be 2, is: %g\n",i1);
+    }
+}
+

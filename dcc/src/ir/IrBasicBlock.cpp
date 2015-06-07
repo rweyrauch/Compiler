@@ -78,6 +78,10 @@ bool isIntLiteral(const IrTacArg& arg)
 {
     return (arg.m_usage == IrUsage::Literal && arg.m_type == IrArgType::Integer);
 }
+bool isDoubleLiteral(const IrTacArg& arg)
+{
+    return (arg.m_usage == IrUsage::Literal && arg.m_type == IrArgType::Double);
+}
 bool isBoolLiteral(const IrTacArg& arg)
 {
     return (arg.m_usage == IrUsage::Literal && arg.m_type == IrArgType::Boolean);
@@ -89,6 +93,14 @@ bool isIntegerZero(const IrTacArg& arg)
 bool isIntegerOne(const IrTacArg& arg)
 {
     return (arg.m_usage == IrUsage::Literal && arg.m_type == IrArgType::Integer && arg.m_value.m_int == 1);  
+}
+bool isDoubleZero(const IrTacArg& arg)
+{
+    return (arg.m_usage == IrUsage::Literal && arg.m_type == IrArgType::Double && arg.m_value.m_double == 0.0);  
+}
+bool isDoubleOne(const IrTacArg& arg)
+{
+    return (arg.m_usage == IrUsage::Literal && arg.m_type == IrArgType::Double && arg.m_value.m_double == 1.0);  
 }
 bool isTrue(const IrTacArg& arg)
 {
@@ -120,6 +132,34 @@ int evaluateConstIntExpression(IrOpcode opcode, int src0, int src1)
         case IrOpcode::MOD:
             value = src0 % src1;
             break;    
+        case IrOpcode::MOV:
+            value = src0;
+            break;
+        default:
+            assert(false);
+            break;
+    }
+    return value;
+}
+
+int evaluateConstDoubleExpression(IrOpcode opcode, double src0, double src1)
+{
+    double value = 0;
+    
+    switch (opcode)
+    {
+        case IrOpcode::ADD:
+            value = src0 + src1;
+            break;
+        case IrOpcode::SUB:
+            value = src0 - src1;
+            break;
+        case IrOpcode::MUL:
+            value = src0 * src1;
+            break;
+        case IrOpcode::DIV:
+            value = src0 / src1;
+            break;
         case IrOpcode::MOV:
             value = src0;
             break;
@@ -194,6 +234,7 @@ void IrBasicBlock::constantFolding()
         // check for expression with constant results
         const bool exprIsIntConstant = isIntLiteral(it->m_src0) && isIntLiteral(it->m_src1);
         const bool exprIsBoolConstant = isBoolLiteral(it->m_src0) && isBoolLiteral(it->m_src1);
+        const bool exprIsDoubleConstant = isDoubleLiteral(it->m_src0) && isDoubleLiteral(it->m_src1);
         
         if (exprIsIntConstant)
         {
@@ -221,6 +262,20 @@ void IrBasicBlock::constantFolding()
             it->m_src0.m_asString = str.str();
             it->m_src1.m_usage = IrUsage::Unused;
         }
+        else if (exprIsDoubleConstant)
+        {
+            double value = evaluateConstDoubleExpression(it->m_opcode, it->m_src0.m_value.m_double, it->m_src1.m_value.m_double);
+             
+            it->m_opcode = IrOpcode::MOV;
+            it->m_src0.m_usage = IrUsage::Literal;
+            it->m_src0.m_type = IrArgType::Double;
+            it->m_src0.m_value.m_double = value;
+            
+            std::stringstream str;
+            str << it->m_src0.m_value.m_int;        
+            it->m_src0.m_asString = str.str();
+            it->m_src1.m_usage = IrUsage::Unused;
+        }
     }   
 }
 
@@ -236,13 +291,13 @@ void IrBasicBlock::algebraicSimplification()
         // Add zero, arg0 + 0 or 0 + arg1
         if (it->m_opcode == IrOpcode::ADD)
         {
-            if (isIntegerZero(it->m_src0))
+            if (isIntegerZero(it->m_src0) || isDoubleZero(it->m_src0))
             {
                 it->m_opcode = IrOpcode::MOV;
                 it->m_src0 = it->m_src1;
                 it->m_src1.m_usage = IrUsage::Unused;                
             }
-            else if (isIntegerZero(it->m_src1))
+            else if (isIntegerZero(it->m_src1) || isDoubleZero(it->m_src1))
             {
                 it->m_opcode = IrOpcode::MOV;
                 it->m_src1.m_usage = IrUsage::Unused;
@@ -252,7 +307,7 @@ void IrBasicBlock::algebraicSimplification()
         // TODO: Implement 0 - arg1
         if (it->m_opcode == IrOpcode::SUB)
         {
-            if (isIntegerZero(it->m_src1))
+            if (isIntegerZero(it->m_src1) || isDoubleZero(it->m_src1))
             {
                 it->m_opcode = IrOpcode::MOV;
                 it->m_src1.m_usage = IrUsage::Unused;
@@ -262,13 +317,13 @@ void IrBasicBlock::algebraicSimplification()
         // Multiply by 1, arg0 * 1 or 1 * arg1
         if (it->m_opcode == IrOpcode::MUL)
         {
-            if (isIntegerOne(it->m_src0))
+            if (isIntegerOne(it->m_src0) || isDoubleOne(it->m_src0))
             {
                 it->m_opcode = IrOpcode::MOV;
                 it->m_src0 = it->m_src1;
                 it->m_src1.m_usage = IrUsage::Unused;
             }
-            else if (isIntegerOne(it->m_src1))
+            else if (isIntegerOne(it->m_src1) || isDoubleOne(it->m_src1))
             {
                 it->m_opcode = IrOpcode::MOV;
                 it->m_src1.m_usage = IrUsage::Unused;                
@@ -278,12 +333,12 @@ void IrBasicBlock::algebraicSimplification()
         // Multiply by zero
         if (it->m_opcode == IrOpcode::MUL)
         {
-            if (isIntegerZero(it->m_src0))
+            if (isIntegerZero(it->m_src0) || isDoubleZero(it->m_src0))
             {
                 it->m_opcode = IrOpcode::MOV;
                 it->m_src1.m_usage = IrUsage::Unused;
             }
-            else if (isIntegerZero(it->m_src1))
+            else if (isIntegerZero(it->m_src1) || isDoubleZero(it->m_src1))
             {
                 it->m_opcode = IrOpcode::MOV;
                 it->m_src0 = it->m_src1;
