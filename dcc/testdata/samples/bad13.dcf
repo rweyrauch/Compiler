@@ -1,9 +1,15 @@
-class           Program  {
-    void           function() {
-     }           int main() {
-	if (function() == function()) {
-	    Print("I like comparing void values!");
-	}
-    }
-}
+class Program 
+{
+    void function() 
+    {
+    }           
+
+    int main() 
+    {
+        if (function() == function()) 
+        {
+            Print("I like comparing void values!");
+        }
+    }
+}
 
