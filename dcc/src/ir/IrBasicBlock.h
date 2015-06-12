@@ -39,9 +39,6 @@ class IrBasicBlock
 public:
     IrBasicBlock() :
         m_statements(),
-        m_variable_value_map(),
-        m_expression_value_map(),
-        m_expression_temp_map(),
         m_next_value_number(42),
         m_verbose(false)
     {}
@@ -108,19 +105,10 @@ protected:
                     (std::hash<int>()(key.m_right) << 1);
         }
     };
-    
-    // Value number for each variable/literal in block.
-    std::unordered_map<std::string, int> m_variable_value_map;
-    
-    // Value number for each expression in block.
-    std::unordered_map<Key, int, KeyHasher> m_expression_value_map;
-    
-    // Temp var for each expression in block.
-    std::unordered_map<Key, IrTacArg, KeyHasher> m_expression_temp_map;
-    
+        
     int m_next_value_number;
     
-    int getValueNumber(const std::string& ident);
+    int getValueNumber(const std::string& ident, std::unordered_map<std::string, int>& variable_value_map);
     
     bool m_verbose;
     

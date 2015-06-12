@@ -192,14 +192,14 @@ int evaluateConstBoolExpression(IrOpcode opcode, int src0, int src1)
     return value;
 }
 
-int IrBasicBlock::getValueNumber(const std::string& ident)
+int IrBasicBlock::getValueNumber(const std::string& ident, std::unordered_map<std::string, int>& variable_value_map)
 {  
     int valueNumber = -1;
-    auto ip = m_variable_value_map.find(ident);
-    if (ip == m_variable_value_map.end())
+    auto ip = variable_value_map.find(ident);
+    if (ip == variable_value_map.end())
     {
         valueNumber = m_next_value_number++;
-        m_variable_value_map[ident] = valueNumber;
+        variable_value_map[ident] = valueNumber;
     }
     else
     {
@@ -382,9 +382,14 @@ void IrBasicBlock::algebraicSimplification()
 
 void IrBasicBlock::commonSubexpressionElimination()
 {
-    m_variable_value_map.clear();
-    m_expression_value_map.clear();
-    m_expression_temp_map.clear();
+    // Value number for each variable/literal in block.
+    std::unordered_map<std::string, int> variable_value_map;
+    
+    // Value number for each expression in block.
+    std::unordered_map<Key, int, KeyHasher> expression_value_map;
+    
+    // Temp var for each expression in block.
+    std::unordered_map<Key, IrTacArg, KeyHasher> expression_temp_map;
     
     // Statement of form: D = L op R
     for (auto it = m_statements.begin(); it != m_statements.end(); ++it)
@@ -395,12 +400,12 @@ void IrBasicBlock::commonSubexpressionElimination()
         }
         
         // Get/create the value numbers of D, L and R    
-        it->m_src0.m_valueNumber = getValueNumber(it->m_src0.m_asString);
+        it->m_src0.m_valueNumber = getValueNumber(it->m_src0.m_asString, variable_value_map);
         it->m_src0.m_isConstant = (it->m_src0.m_usage == IrUsage::Literal);
         
         if (it->hasSrc1())
         {
-            it->m_src1.m_valueNumber = getValueNumber(it->m_src1.m_asString);
+            it->m_src1.m_valueNumber = getValueNumber(it->m_src1.m_asString, variable_value_map);
             it->m_src1.m_isConstant = (it->m_src1.m_usage == IrUsage::Literal);
         }
         else
@@ -408,7 +413,7 @@ void IrBasicBlock::commonSubexpressionElimination()
             it->m_src1.m_valueNumber = -1;
         }
         
-        it->m_dst.m_valueNumber = getValueNumber(it->m_dst.m_asString);
+        it->m_dst.m_valueNumber = getValueNumber(it->m_dst.m_asString, variable_value_map);
         assert(it->m_dst.m_usage != IrUsage::Literal);
         it->m_dst.m_isConstant = false;
         
@@ -417,31 +422,31 @@ void IrBasicBlock::commonSubexpressionElimination()
            
         if (isTempIdentifier(it->m_dst))
         {
-            auto tip = m_expression_temp_map.find(keyExpr);
-            if (tip == m_expression_temp_map.end())
+            auto tip = expression_temp_map.find(keyExpr);
+            if (tip == expression_temp_map.end())
             {
-                m_expression_temp_map[keyExpr] = it->m_dst;
+                expression_temp_map[keyExpr] = it->m_dst;
             }
         }        
         
-        auto mip = m_expression_value_map.find(keyExpr);
-        if (mip == m_expression_value_map.end())
+        auto mip = expression_value_map.find(keyExpr);
+        if (mip == expression_value_map.end())
         {
             int value = m_next_value_number++;
-            m_expression_value_map[keyExpr] = value;
+            expression_value_map[keyExpr] = value;
             
             // Record new value for D.
-            m_variable_value_map[it->m_dst.m_asString] = value;
+            variable_value_map[it->m_dst.m_asString] = value;
             it->m_dst.m_valueNumber = value;
         }
         else
         {
             // Replace exist value for D with value from expression.
-            m_variable_value_map[it->m_dst.m_asString] = mip->second;
+            variable_value_map[it->m_dst.m_asString] = mip->second;
             it->m_dst.m_valueNumber = mip->second;
             
-            auto tip = m_expression_temp_map.find(keyExpr);
-            if (tip != m_expression_temp_map.end())
+            auto tip = expression_temp_map.find(keyExpr);
+            if (tip != expression_temp_map.end())
             {
                 // Replace the current expression statement with a MOV.
                 it->m_opcode = IrOpcode::MOV;
@@ -453,21 +458,21 @@ void IrBasicBlock::commonSubexpressionElimination()
     
     if (m_verbose)
     {
-        if (!m_variable_value_map.empty())
+        if (!variable_value_map.empty())
             std::cout << "Variable-Value Map" << std::endl;
-        for (auto it : m_variable_value_map)
+        for (auto it : variable_value_map)
         {
             std::cout << "[" << it.first << "] = " << it.second << std::endl;
         }
-        if (!m_expression_value_map.empty())
+        if (!expression_value_map.empty())
             std::cout << "Expression-Value Map" << std::endl;
-        for (auto it : m_expression_value_map)
+        for (auto it : expression_value_map)
         {
             std::cout << "[" << it.first.m_left << ", " << IrOpcodeToString(it.first.m_op) << ", " << it.first.m_right << "] = " << it.second << std::endl;
         }
-        if (!m_expression_temp_map.empty())
+        if (!expression_temp_map.empty())
             std::cout << "Expression-Temp Map" << std::endl;
-        for (auto it : m_expression_temp_map)
+        for (auto it : expression_temp_map)
         {
             std::cout << "[" << it.first.m_left << ", " << IrOpcodeToString(it.first.m_op) << ", " << it.first.m_right << "] = " << it.second.m_asString << std::endl;
         }
