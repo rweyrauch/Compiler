@@ -11,8 +11,8 @@ class Program {
     rows = callout("pgm_get_rows");
 
     size = cols * rows;
-    for i = 0, rows {
-      for j = 0, cols {
+    for (i = 0; i < rows; i += 1) {
+      for (j = 0; j < cols; j += 1) {
         image[i*303+j] = callout("pgm_get_next_pixel");
       }
     }
@@ -26,8 +26,8 @@ class Program {
     callout("pgm_open_for_write", "saman_negative.pgm", cols, rows);
 
     size = cols * rows;
-    for i = 0, rows {
-      for j = 0, cols {
+    for (i = 0; i < rows; i += 1) {
+      for (j = 0; j < cols; j += 1) {
         callout("pgm_write_next_pixel", image[i*303+j]);
       }
     }
@@ -38,8 +38,8 @@ class Program {
   void invert() {
     int i,j;
 
-    for i = 0, rows {
-      for j = 0, cols {
+    for (i = 0; i < rows; i += 1) {
+      for (j = 0; j < cols; j += 1) {
         image[i*303+j] = 255 - image[i*303+j];
       }
     }

@@ -51,25 +51,16 @@ namespace Decaf
 // }
 // LABEL_END:
 
-IrForStatement::IrForStatement(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* loopVar, IrExpression* initialExpr, IrExpression* endExpr, IrBlock* block) :
+IrForStatement::IrForStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpression* initialExpr, IrExpression* endExpr, IrExpression* loopExpr, IrBlock* block) :
     IrStatement(lineNumber, columnNumber, filename),
-    m_loopVar(std::shared_ptr<IrIdentifier>(loopVar)),
-    m_initialValue(std::shared_ptr<IrExpression>(initialExpr)),
-    m_terminatingValue(std::shared_ptr<IrExpression>(endExpr)),
+    m_initialExpr(std::shared_ptr<IrExpression>(initialExpr)),
+    m_terminatingExpr(std::shared_ptr<IrExpression>(endExpr)),
+    m_loopExpr(std::shared_ptr<IrExpression>(loopExpr)),
     m_body(std::shared_ptr<IrBlock>(block))
 {   
-    IrLocation* loopVar0 = new IrLocation(lineNumber, columnNumber, filename, loopVar, IrType::Integer);
-    m_initLoopAuto = std::shared_ptr<IrExpression>(new IrAssignExpression(lineNumber, columnNumber, filename, loopVar0, IrAssignmentOperator::Assign, initialExpr));
-    
     m_labelTop = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
     m_labelContinue = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
     m_labelEnd = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
-    
-    IrLocation* loopVar1 = new IrLocation(lineNumber, columnNumber, filename, loopVar, IrType::Integer);
-    m_terminatingExpr = std::shared_ptr<IrExpression>(new IrBooleanExpression(lineNumber, columnNumber, filename, loopVar1, IrBooleanOperator::Less, endExpr));
-
-    IrLocation* loopVar2 = new IrLocation(lineNumber, columnNumber, filename, loopVar, IrType::Integer);
-    m_incrementLoop = std::shared_ptr<IrExpression>(new IrAssignExpression(lineNumber, columnNumber, filename, loopVar2, IrAssignmentOperator::IncrementAssign, IrIntegerLiteral::GetOne().get()));
 
     m_loopGoto = std::shared_ptr<IrGotoStatement>(new IrGotoStatement(lineNumber, columnNumber, filename, m_labelTop.get()));
 }
@@ -82,18 +73,15 @@ void IrForStatement::propagateTypes(IrTraversalContext* ctx)
 {
     ctx->pushParent(this);
     
-    m_loopVar->propagateTypes(ctx);    
-    m_initialValue->propagateTypes(ctx);
-    m_terminatingValue->propagateTypes(ctx);
+    if (m_initialExpr) m_initialExpr->propagateTypes(ctx);
+    m_terminatingExpr->propagateTypes(ctx);
+    if (m_loopExpr) m_loopExpr->propagateTypes(ctx);    
     
     if (m_body) m_body->propagateTypes(ctx);
     
     m_labelTop->propagateTypes(ctx);
     m_labelContinue->propagateTypes(ctx);
     m_labelEnd->propagateTypes(ctx);
-    m_initLoopAuto->propagateTypes(ctx);
-    m_terminatingExpr->propagateTypes(ctx);
-    m_incrementLoop->propagateTypes(ctx);
     m_loopGoto->propagateTypes(ctx);
     
     ctx->popParent();
@@ -104,9 +92,9 @@ void IrForStatement::print(unsigned int depth)
     IRPRINT_INDENT(depth);
     std::cout << "For(" << getLineNumber() << "," << getColumnNumber() << ")" << std::endl;
            
-    m_loopVar->print(depth+1);
-    m_initialValue->print(depth+1);
-    m_terminatingValue->print(depth+1);
+    if (m_initialExpr) m_initialExpr->print(depth+1);
+    m_terminatingExpr->print(depth+1);
+    if (m_loopExpr) m_loopExpr->print(depth+1);
     
     if (m_body) m_body->print(depth+1);
 }
@@ -123,18 +111,25 @@ bool IrForStatement::analyze(IrTraversalContext* ctx)
             valid = false;
     }
     
-    // Initial variable and terminal value expressions must be of type integer.
-    if (m_initialValue->getType() != IrType::Integer)
+    // Initial value expression and terminal value expressions must be of type integer.
+    if (m_initialExpr && m_initialExpr->getType() != IrType::Integer)
     {
         std::stringstream msg;
-        msg << "for loop initial value expression must be of type integer.  Got: " << IrTypeToString(m_initialValue->getType()) << ".";
+        msg << "for loop initial value expression must be of type integer.  Got: " << IrTypeToString(m_initialExpr->getType()) << ".";
         ctx->error(this, msg.str());
         valid = false;
     }
-    if (m_terminatingValue->getType() != IrType::Integer)
+    if (m_terminatingExpr->getType() != IrType::Boolean)
     {
         std::stringstream msg;
-        msg << "for loop ending value expression must be of type integer.  Got: " << IrTypeToString(m_terminatingValue->getType()) << ".";
+        msg << "for loop ending expression must be of type boolean.  Got: " << IrTypeToString(m_terminatingExpr->getType()) << ".";
+        ctx->error(this, msg.str());
+        valid = false;
+    }
+    if (m_loopExpr && m_loopExpr->getType() != IrType::Integer)
+    {
+        std::stringstream msg;
+        msg << "for loop update value expression must be of type integer.  Got: " << IrTypeToString(m_loopExpr->getType()) << ".";
         ctx->error(this, msg.str());
         valid = false;
     }
@@ -142,9 +137,10 @@ bool IrForStatement::analyze(IrTraversalContext* ctx)
     m_labelTop->analyze(ctx);
     m_labelContinue->analyze(ctx);
     m_labelEnd->analyze(ctx);
-    m_initLoopAuto->analyze(ctx);
+    
+    if (m_initialExpr) m_initialExpr->analyze(ctx);
     m_terminatingExpr->analyze(ctx);
-    m_incrementLoop->analyze(ctx);
+    if (m_loopExpr) m_loopExpr->analyze(ctx);
     m_loopGoto->analyze(ctx);
         
     ctx->popParent();
@@ -167,9 +163,9 @@ bool IrForStatement::allocate(IrTraversalContext* ctx)
     m_labelTop->allocate(ctx);
     m_labelContinue->allocate(ctx);
     m_labelEnd->allocate(ctx);
-    m_initLoopAuto->allocate(ctx);
+    if (m_initialExpr) m_initialExpr->allocate(ctx);
     m_terminatingExpr->allocate(ctx);
-    m_incrementLoop->allocate(ctx);
+    if (m_loopExpr) m_loopExpr->allocate(ctx);
     m_loopGoto->allocate(ctx);
         
     ctx->popParent();
@@ -183,7 +179,7 @@ bool IrForStatement::codegen(IrTraversalContext* ctx)
         
     ctx->pushParent(this);
     
-    m_initLoopAuto->codegen(ctx);
+    if (m_initialExpr) m_initialExpr->codegen(ctx);
     m_labelTop->codegen(ctx);
     
     IrTacStmt label(IrOpcode::LABEL, getLineNumber());
@@ -203,7 +199,7 @@ bool IrForStatement::codegen(IrTraversalContext* ctx)
     label.m_src0.build(m_labelContinue.get());
     ctx->append(label);
     
-    m_incrementLoop->codegen(ctx);
+    if (m_loopExpr) m_loopExpr->codegen(ctx);
     m_loopGoto->codegen(ctx);
     
     m_labelEnd->codegen(ctx);

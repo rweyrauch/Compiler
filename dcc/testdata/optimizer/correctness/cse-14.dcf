@@ -14,7 +14,7 @@ class Program {
     c = 0; d = 0;
 
     c = a + b;
-    for i = 5, x {
+    for (i = 5; i < x; i += 1) {
       d = a + b;
     }
 

@@ -116,7 +116,7 @@ class Program
   {
     int y, z, a, b;
     int x;
-    for x = 3, 5 
+    for (x = 3; x < 5; x += 1) 
       {
 	callout("printf","Top of loop\n");
 	z = gurp(1 + x, 0-x, true, 3, 2 + x, 1 - x, true, 4 - x);

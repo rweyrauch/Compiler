@@ -17,7 +17,7 @@ class Program {
     c = 0;
     d = a+b;
 
-    for i=1,10
+    for (i=1; i < 10; i += 1)
     {
       a = 3;
       c = c+i*i*(a+b);

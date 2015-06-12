@@ -330,9 +330,9 @@ statement
     { 
         $$ = new Decaf::IrIfStatement(@1.first_line, @1.first_column, d_scanner.filename(), $3, $5, $7); 
     }
-    | FOR ident EQUAL expr COMMA expr block 
+    | FOR LPAREN expr SEMI expr SEMI expr RPAREN block 
     { 
-        $$ = new Decaf::IrForStatement(@1.first_line, @1.first_column, d_scanner.filename(), $2, $4, $6, $7); 
+        $$ = new Decaf::IrForStatement(@1.first_line, @1.first_column, d_scanner.filename(), $3, $5, $7, $9); 
     }
     | WHILE LPAREN expr RPAREN block
     {

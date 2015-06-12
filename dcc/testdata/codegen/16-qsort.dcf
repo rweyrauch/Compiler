@@ -17,16 +17,16 @@ class Program
         i = p - 1;
         j = r + 1;
 
-        for z = 0, length * length {
+        for (z = 0; z < length * length; z += 1) {
             j = j - 1;
-            for a = 0, length {
+            for (a = 0; a < length; a += 1) {
                 if (A[j] <= x) {
                     break;
                 }
                 j = j - 1;
             }
 
-            for a = i + 1, length {
+            for (a = i + 1; a < length; a += 1) {
                 if (A[a] >= x) {
                     i = a;
                     break;
@@ -65,20 +65,20 @@ class Program
 
         callout("srandom", 17);
         
-        for i = 0, length {
+        for (i = 0; i < length; i += 1) {
             temp = callout("random");
             A[i] = temp;
         }
         
         callout("printf", "\nbefore sort:\n");
-        for i = 0, length {
+        for (i = 0; i < length; i += 1) {
             callout ("printf", "%d\n", A[i]); 
         }
         
         quicksort (0, length - 1);
 
         callout("printf", "\nafter sort\n");
-        for i = 0, length {
+        for (i = 0; i < length; i += 1) {
             callout ("printf", "%d\n", A[i]); 
         }
     }

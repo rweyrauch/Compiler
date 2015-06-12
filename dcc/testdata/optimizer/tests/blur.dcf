@@ -11,7 +11,7 @@ class Program {
     rows = callout("pgm_get_rows");
 
     size = cols * rows;
-    for i = 0, size {
+    for (i = 0; i < size; i+=1) {
       image[i] = callout("pgm_get_next_pixel");
     }
 
@@ -24,7 +24,7 @@ class Program {
     callout("pgm_open_for_write", "segovia_blur.pgm", cols, rows);
 
     size = cols * rows;
-    for i = 0, size {
+    for (i = 0; i < size; i+=1) {
       callout("pgm_write_next_pixel", image[i]);
     }
 
@@ -43,19 +43,19 @@ class Program {
     kernel[5] = 54006;
     kernel[6] = 4433;
 
-    for i = 0, 7 {
+    for (i = 0; i < 7; i += 1) {
       kernel_sum = kernel_sum + kernel[i];
     }
 
     //blur in x-direction
-    for r = 0, rows {
+    for (r = 0; r < rows; r += 1) {
       int p1, p2, p3;
       
       p1 = image[r*768];
       p2 = image[r*768 + 1];
       p3 = image[r*768 + 2];
       
-      for c = 3, cols {
+      for (c = 3; c < cols; c += 1) {
         int dot;
         
 	    dot = (p1 * kernel[0]);

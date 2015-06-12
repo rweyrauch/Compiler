@@ -16,7 +16,7 @@ class Program {
     x = get_bool(true);
     c = 0;
 
-    for i=a+b,2*(a+b)
+    for (i=a+b; i < 2*(a+b); i += 1)
     {
       c = c+i*i*(a+b);
     }

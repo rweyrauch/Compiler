@@ -1,6 +1,7 @@
 class Program {
   void main() {
-    for x = false, 10 {   //initial condition must be an int
+    boolean x;
+    for (x = false; x == true; x+=1) {   //initial condition must be an int
     }
-  }							
+  }
 }

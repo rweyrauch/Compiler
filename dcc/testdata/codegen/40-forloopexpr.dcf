@@ -3,7 +3,7 @@ class Program
     void main() 
     {
         int z;        
-        for z = 0, 4 * 4
+        for (z = 0; z < 4 * 4; z += 1)
         {
             callout("printf", "Z = %d\n", z);
         }

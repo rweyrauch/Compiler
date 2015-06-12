@@ -14,7 +14,7 @@ class Program {
     c = 0; d = 0;
 
     c = a + b;
-    for i = 7, y {
+    for (i = 7; i < y; i += 1) {
       d = a + b;
       a = 1;
     }

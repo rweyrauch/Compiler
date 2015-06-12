@@ -73,7 +73,7 @@ class Program
     
     result = 0;
     field_on_stack = 100;
-    for i = 0, field_on_stack {
+    for (i = 0; i < field_on_stack; i += 1) {
         result = result + i;
     }
     callout("printf","sum from 0 to 99 is %d, should be 4950\n",result);
