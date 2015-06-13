@@ -41,7 +41,7 @@
 %token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA SEMI BANG COLON DOT
 %token MOD LOR LAND
 
-%token PLUS MINUS CEQ CNE CLT CLE CGT CGE 
+%token INCREMENT DECREMENT PLUS MINUS CEQ CNE CLT CLE CGT CGE 
 %token MUL DIV
 
 %type <classDef> class
@@ -61,7 +61,7 @@
 %type <ident> ident
 %type <identList> ident_list
 %type <token> type rel_op logic_op assign_op
-%type <literal> literal int_literal
+%type <literal> literal
 %type <stringLiteral> string_literal
 %type <location> location
 %type <locationList> location_list
@@ -104,6 +104,7 @@ member_decl
     : field_decl
     | method_decl
     ;
+
 member_decl_list
     : member_decl
     | member_decl_list member_decl
@@ -344,6 +345,10 @@ type
     { 
         $$ = (int)Decaf::IrType::Void; 
     }
+    | type LBRACKET RBRACKET
+    {
+        $$ = (int)Decaf::IrType::Array;
+    }
     ;
     
 ident_list 
@@ -427,9 +432,18 @@ statement
     ;
     
 assign_op 
-    : EQUAL { $$ = (int)Decaf::IrAssignmentOperator::Assign; }
-    | PLUSEQUAL { $$ = (int)Decaf::IrAssignmentOperator::IncrementAssign; }
-    | MINUSEQUAL { $$ = (int)Decaf::IrAssignmentOperator::DecrementAssign; }
+    : EQUAL 
+    { 
+        $$ = (int)Decaf::IrAssignmentOperator::Assign; 
+    }
+    | PLUSEQUAL 
+    { 
+        $$ = (int)Decaf::IrAssignmentOperator::IncrementAssign; 
+    }
+    | MINUSEQUAL 
+    { 
+        $$ = (int)Decaf::IrAssignmentOperator::DecrementAssign; 
+    }
     ;
     
 method_call 
@@ -487,16 +501,37 @@ location
     ;
 
 primary_expr
-    : location { $$ = $1; }
-    | literal { $$ = $1; }
-    | string_literal { $$ = $1; }
-    | method_call { $$ = $1; }
-    | LPAREN expr RPAREN { $$ = $2; }
-    | THIS { $$ = nullptr; }
+    : location 
+    { 
+        $$ = $1; 
+    }
+    | literal 
+    { 
+        $$ = $1; 
+    }
+    | string_literal 
+    { 
+        $$ = $1; 
+    }
+    | method_call 
+    { 
+        $$ = $1; 
+    }
+    | LPAREN expr RPAREN 
+    { 
+        $$ = $2; 
+    }
+    | THIS 
+    { 
+        $$ = nullptr; 
+    }
     ;
     
 unary_expr
-    : primary_expr { $$ = $1; }
+    : primary_expr 
+    { 
+        $$ = $1; 
+    }
     | MINUS unary_expr 
     { 
         Decaf::IrIntegerLiteral* intLit = dynamic_cast<Decaf::IrIntegerLiteral*>($2);
@@ -532,10 +567,21 @@ unary_expr
             $$ = $2;
         }
     }
+    | INCREMENT unary_expr
+    {
+        $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, nullptr, Decaf::IrBinaryOperator::PreIncrement, $2); 
+    }
+    | DECREMENT unary_expr
+    {
+        $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, nullptr, Decaf::IrBinaryOperator::PreDecrement, $2); 
+    }
     ;
 
 mult_expr
-    : unary_expr { $$ = $1; }
+    : unary_expr 
+    { 
+        $$ = $1; 
+    }
     | mult_expr MUL unary_expr 
     { 
         $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, $1, Decaf::IrBinaryOperator::Multiply, $3); 
@@ -551,7 +597,10 @@ mult_expr
     ;
     
 add_expr
-    : mult_expr { $$ = $1; }
+    : mult_expr 
+    { 
+        $$ = $1; 
+    }
     | add_expr PLUS mult_expr  
     { 
         $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, $1, Decaf::IrBinaryOperator::Add, $3); 
@@ -560,15 +609,32 @@ add_expr
     { 
         $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, $1, Decaf::IrBinaryOperator::Subtract, $3); 
     }
+    | mult_expr INCREMENT
+    {
+        $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, $1, Decaf::IrBinaryOperator::PostIncrement, nullptr); 
+    }
+    | mult_expr DECREMENT
+    {
+        $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, $1, Decaf::IrBinaryOperator::PostDecrement, nullptr); 
+    }
     ;
 
 rel_expr
-    : add_expr { $$ = $1; }
-    | rel_expr rel_op add_expr { $$ = new Decaf::IrBooleanExpression(@1.first_line, @1.first_column, d_scanner.filename(), $1, (Decaf::IrBooleanOperator)$2, $3); }
+    : add_expr 
+    { 
+        $$ = $1; 
+    }
+    | rel_expr rel_op add_expr 
+    { 
+        $$ = new Decaf::IrBooleanExpression(@1.first_line, @1.first_column, d_scanner.filename(), $1, (Decaf::IrBooleanOperator)$2, $3); 
+    }
     ;
  
 logic_expr
-    : rel_expr  { $$ = $1; }
+    : rel_expr  
+    { 
+        $$ = $1; 
+    }
     | logic_expr logic_op rel_expr  
     { 
         $$ = new Decaf::IrBooleanExpression(@1.first_line, @1.first_column, d_scanner.filename(), $1, (Decaf::IrBooleanOperator)$2, $3); 
@@ -576,7 +642,10 @@ logic_expr
     ;
     
 assign_expr
-    : logic_expr  { $$ = $1; }
+    : logic_expr  
+    { 
+        $$ = $1; 
+    }
     | assign_expr assign_op logic_expr
     {
         $$ = new Decaf::IrAssignExpression(@1.first_line, @1.first_column, d_scanner.filename(), $1, (Decaf::IrAssignmentOperator)$2, $3); 
@@ -584,40 +653,69 @@ assign_expr
     ;
 
 expr 
-    : assign_expr { $$ = $1; }
-    | NEW ident { $$ = nullptr; }
+    : assign_expr 
+    { 
+        $$ = $1; 
+    }
+    | NEW ident 
+    { 
+        $$ = nullptr; 
+    }
     ;
 
 expr_list 
-    : expr { $$ = new std::vector<Decaf::IrExpression*>(); $$->push_back($1); }
-    | expr_list COMMA expr { $$->push_back($3); }
+    : expr 
+    { 
+        $$ = new std::vector<Decaf::IrExpression*>(); $$->push_back($1); 
+    }
+    | expr_list COMMA expr 
+    { 
+        $$->push_back($3); 
+    }
     ;
     
 rel_op 
-    : CLT { $$ = (int)Decaf::IrBooleanOperator::Less; }
-    | CGT { $$ = (int)Decaf::IrBooleanOperator::Greater; }
-    | CLE { $$ = (int)Decaf::IrBooleanOperator::LessEqual; }
-    | CGE { $$ = (int)Decaf::IrBooleanOperator::GreaterEqual; }
-    | CEQ { $$ = (int)Decaf::IrBooleanOperator::Equal; }
-    | CNE { $$ = (int)Decaf::IrBooleanOperator::NotEqual; }
+    : CLT 
+    { 
+        $$ = (int)Decaf::IrBooleanOperator::Less; 
+    }
+    | CGT 
+    { 
+        $$ = (int)Decaf::IrBooleanOperator::Greater; 
+    }
+    | CLE 
+    { 
+        $$ = (int)Decaf::IrBooleanOperator::LessEqual; 
+    }
+    | CGE 
+    { 
+        $$ = (int)Decaf::IrBooleanOperator::GreaterEqual; 
+    }
+    | CEQ 
+    { 
+        $$ = (int)Decaf::IrBooleanOperator::Equal; 
+    }
+    | CNE 
+    { 
+        $$ = (int)Decaf::IrBooleanOperator::NotEqual; 
+    }
     ;
     
 logic_op 
-    : LAND { $$ = (int)Decaf::IrBooleanOperator::LogicalAnd; }
-    | LOR { $$ = (int)Decaf::IrBooleanOperator::LogicalOr; }
-    ;
-   
-int_literal
-    : INTEGER 
+    : LAND 
     { 
-        $$ = new Decaf::IrIntegerLiteral(@1.first_line, @1.first_column, d_scanner.filename(), d_scanner.matched()); 
+        $$ = (int)Decaf::IrBooleanOperator::LogicalAnd; 
+    }
+    | LOR 
+    { 
+        $$ = (int)Decaf::IrBooleanOperator::LogicalOr; 
     }
     ;
 
 literal 
-    : int_literal
+    : INTEGER
     {
-        $$ = $1;
+        $$ = new Decaf::IrIntegerLiteral(@1.first_line, @1.first_column, d_scanner.filename(), d_scanner.matched()); 
     }
     | BOOLEAN 
     { 

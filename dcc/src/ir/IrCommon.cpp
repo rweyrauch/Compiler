@@ -35,7 +35,10 @@ const std::string gIrTypeStrings[(int)IrType::NUM_IR_TYPES] =
     std::string("Boolean"),
     std::string("Character"),
     std::string("String"),
-    std::string("Double")
+    std::string("Double"),
+    std::string("Array"),
+    std::string("Class"),
+    std::string("Interface")
 };
 static_assert(sizeof(gIrTypeStrings)/sizeof(std::string) == (size_t)IrType::NUM_IR_TYPES, "Unexpected number of IrType strings.");
 
@@ -55,7 +58,11 @@ const std::string gIrBinaryOperatorStrings[(int)IrBinaryOperator::NUM_IR_BINARY_
     std::string("Subtract"),
     std::string("Multiply"),
     std::string("Divide"),
-    std::string("Modulo")
+    std::string("Modulo"),
+    std::string("PreIncrement"),
+    std::string("PreDecrement"),
+    std::string("PostIncrement"),
+    std::string("PostDecrement")
 };
 static_assert(sizeof(gIrBinaryOperatorStrings)/sizeof(std::string) == (size_t)IrBinaryOperator::NUM_IR_BINARY_OPERATORS, "Unexpected number of IrBinaryOperator strings.");
     

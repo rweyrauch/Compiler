@@ -39,6 +39,9 @@ enum class IrType : int
     Character,
     String,
     Double,
+    Array,
+    Class,
+    Interface,
     
     NUM_IR_TYPES
 };
@@ -52,6 +55,10 @@ enum class IrBinaryOperator : int
     Multiply,
     Divide,
     Modulo,
+    PreIncrement,
+    PreDecrement,
+    PostIncrement,
+    PostDecrement,
     
     NUM_IR_BINARY_OPERATORS
 };

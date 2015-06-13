@@ -60,6 +60,10 @@ int main(int argc, char **argv)
         {
             scanner = new Scanner();
         }
+        
+        ParserBase::LTYPE__ location;
+        scanner->setSLoc(&location);
+        
         int token = 0;
         while ((token = scanner->lex()))
         {
@@ -80,6 +84,9 @@ int main(int argc, char **argv)
                     break;
                 case Parser::BOOLEAN:
                     std::cout << "BOOLEANLITERAL ";
+                    break;
+                case Parser::DOUBLE:
+                    std::cout << "DOUBLELITERAL ";
                     break;
             }
             std::cout << scanner->matched() << std::endl;

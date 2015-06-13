@@ -99,6 +99,9 @@ false|true                      { track_column(); return (Parser::BOOLEAN); }
 "!"                             { track_column(); return (Parser::BANG); }
 "."                             { track_column(); return (Parser::DOT); }
 
+"++"                            { track_column(); return (Parser::INCREMENT); }
+"--"                            { track_column(); return (Parser::DECREMENT); }
+
 "+"                             { track_column(); return (Parser::PLUS); }
 "-"                             { track_column(); return (Parser::MINUS); }
 "*"                             { track_column(); return (Parser::MUL); }
