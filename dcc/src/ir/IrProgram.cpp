@@ -105,7 +105,43 @@ bool IrProgram::analyze(IrTraversalContext* ctx)
     
     ctx->pushSymbols(m_symbols.get());
     ctx->pushParent(this);
-
+    
+    // Rule: Valid program must contain a global "main" function with no parameters or
+    // a class named "Program" with a "main" function with no parameters.
+    bool mainFound = false;
+    for (auto it : m_method_decl_list)
+    {
+        if (it->getName() == "main" && it->getNumArguments() == 0 && it->getReturnType() == IrType::Void)
+        {
+            mainFound = true;
+            break;
+        }
+    }
+    if (!mainFound)
+    {
+        for (auto it : m_class_decl_list)
+        {
+            if (it->getIdentifier()->getIdentifier() == "Program")
+            {
+                const size_t numMethods = it->getNumMethods();
+                for (size_t i = 0; i < numMethods; i++)
+                {
+                    if (it->getMethod(i)->getName() == "main" && it->getMethod(i)->getNumArguments() == 0 && it->getMethod(i)->getReturnType() == IrType::Void)
+                    {
+                        mainFound = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
+    if (!mainFound)
+    {
+        ctx->error(this, "program must contain a method \'main\'.");
+        valid = false;
+    }
+    
     for (auto it : m_field_decl_list)
     {
         if (!it->analyze(ctx))

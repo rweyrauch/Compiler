@@ -65,6 +65,11 @@ public:
         return m_symbols.get();
     }
     
+    std::shared_ptr<IrIdentifier> getIdentifier() { return m_identifier; }
+    
+    size_t getNumMethods() const { return m_method_decl_list.size(); }
+    std::shared_ptr<IrMethodDecl> getMethod(size_t which) { return m_method_decl_list.at(which); }
+    
 protected:
     
     std::shared_ptr<IrIdentifier> m_identifier;

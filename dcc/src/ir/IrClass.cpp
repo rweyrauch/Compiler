@@ -84,29 +84,6 @@ bool IrClass::analyze(IrTraversalContext* ctx)
     ctx->pushSymbols(m_symbols.get());
     ctx->pushParent(this);
     
-    // Rule: identifier == "Program"
-    if (m_identifier->getIdentifier() != "Program")
-    {
-        ctx->error(this, "class must be named \'Program\'.");
-        valid = false;
-    }
-    
-    // Rule: Valid program must contain a main function with no parameters.
-    bool mainFound = false;
-    for (auto it : m_method_decl_list)
-    {
-        if (it->getName() == "main" && it->getNumArguments() == 0 && it->getReturnType() == IrType::Void)
-        {
-            mainFound = true;
-            break;
-        }
-    }
-    if (!mainFound)
-    {
-        ctx->error(this, "class must contain a method \'main\'.");
-        valid = false;
-    }
-    
     for (auto it : m_field_decl_list)
     {
         if (!it->analyze(ctx))
