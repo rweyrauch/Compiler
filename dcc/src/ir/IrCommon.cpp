@@ -59,10 +59,6 @@ const std::string gIrBinaryOperatorStrings[(int)IrBinaryOperator::NUM_IR_BINARY_
     std::string("Multiply"),
     std::string("Divide"),
     std::string("Modulo"),
-    std::string("PreIncrement"),
-    std::string("PreDecrement"),
-    std::string("PostIncrement"),
-    std::string("PostDecrement")
 };
 static_assert(sizeof(gIrBinaryOperatorStrings)/sizeof(std::string) == (size_t)IrBinaryOperator::NUM_IR_BINARY_OPERATORS, "Unexpected number of IrBinaryOperator strings.");
     

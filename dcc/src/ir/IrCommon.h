@@ -55,10 +55,6 @@ enum class IrBinaryOperator : int
     Multiply,
     Divide,
     Modulo,
-    PreIncrement,
-    PreDecrement,
-    PostIncrement,
-    PostDecrement,
     
     NUM_IR_BINARY_OPERATORS
 };

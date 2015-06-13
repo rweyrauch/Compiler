@@ -26,8 +26,6 @@
 #include "IrCommon.h"
 #include "IrBinaryExpr.h"
 #include "IrLiteral.h"
-#include "IrIntLiteral.h"
-#include "IrDoubleLiteral.h"
 #include "IrLocation.h"
 #include "IrIdentifier.h"
 #include "IrTravCtx.h"
@@ -41,10 +39,6 @@ static const IrOpcode g_binaryOpcodes[(int)IrBinaryOperator::NUM_IR_BINARY_OPERA
     IrOpcode::MUL,
     IrOpcode::DIV,
     IrOpcode::MOD,
-    IrOpcode::ADD,
-    IrOpcode::SUB,
-    IrOpcode::ADD,
-    IrOpcode::SUB    
 };
 
 static IrOpcode opcodeFor(IrBinaryOperator binop)
@@ -232,17 +226,6 @@ bool IrBinaryExpression::codegen(IrTraversalContext* ctx)
                  tac.m_src0.build(m_lhs->getResult().get());
             }
         }
-        else
-        {
-            if (getType() == IrType::Integer)
-            {
-                tac.m_src0.build(IrIntegerLiteral::GetOne().get());
-            }
-            else if (getType() == IrType::Double)
-            {
-                tac.m_src0.build(IrDoubleLiteral::GetOne().get());                
-            }
-        }
         if (m_rhs != nullptr)
         {
             IrLiteral* literal = dynamic_cast<IrLiteral*>(m_rhs.get());
@@ -253,17 +236,6 @@ bool IrBinaryExpression::codegen(IrTraversalContext* ctx)
             else
             {
                 tac.m_src1.build(m_rhs->getResult().get());
-            }
-        }
-        else
-        {
-            if (getType() == IrType::Integer)
-            {
-                tac.m_src0.build(IrIntegerLiteral::GetOne().get());
-            }
-            else if (getType() == IrType::Double)
-            {
-                tac.m_src0.build(IrDoubleLiteral::GetOne().get());                
             }
         }
        

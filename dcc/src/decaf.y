@@ -498,6 +498,18 @@ location
     {
         $$ = new Decaf::IrLocation(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown);     
     }
+    | ident LBRACKET expr RBRACKET DOT ident
+    {
+        $$ = new Decaf::IrLocation(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown, $3);     
+    }
+    | ident DOT ident LBRACKET expr RBRACKET 
+    {
+        $$ = new Decaf::IrLocation(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown);     
+    }
+    | ident LBRACKET expr RBRACKET DOT ident LBRACKET expr RBRACKET 
+    {
+        $$ = new Decaf::IrLocation(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown, $3);     
+    }
     ;
 
 primary_expr
@@ -567,14 +579,6 @@ unary_expr
             $$ = $2;
         }
     }
-    | INCREMENT unary_expr
-    {
-        $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, nullptr, Decaf::IrBinaryOperator::PreIncrement, $2); 
-    }
-    | DECREMENT unary_expr
-    {
-        $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, nullptr, Decaf::IrBinaryOperator::PreDecrement, $2); 
-    }
     ;
 
 mult_expr
@@ -608,14 +612,6 @@ add_expr
     | add_expr MINUS mult_expr  
     { 
         $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, $1, Decaf::IrBinaryOperator::Subtract, $3); 
-    }
-    | mult_expr INCREMENT
-    {
-        $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, $1, Decaf::IrBinaryOperator::PostIncrement, nullptr); 
-    }
-    | mult_expr DECREMENT
-    {
-        $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, $1, Decaf::IrBinaryOperator::PostDecrement, nullptr); 
     }
     ;
 
