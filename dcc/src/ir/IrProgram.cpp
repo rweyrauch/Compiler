@@ -47,6 +47,16 @@ void IrProgram::propagateTypes(IrTraversalContext* ctx)
     {
         it->propagateTypes(ctx);
     }
+ 
+    for (auto it : m_class_decl_list)
+    {
+        it->propagateTypes(ctx);
+    }
+    
+    for (auto it : m_interface_decl_list)
+    {
+        it->propagateTypes(ctx);
+    }
     
     ctx->popParent();
     ctx->popSymbols();
@@ -95,23 +105,7 @@ bool IrProgram::analyze(IrTraversalContext* ctx)
     
     ctx->pushSymbols(m_symbols.get());
     ctx->pushParent(this);
-    
-    // Rule: Valid program must contain a main function with no parameters.
-    bool mainFound = false;
-    for (auto it : m_method_decl_list)
-    {
-        if (it->getName() == "main" && it->getNumArguments() == 0 && it->getReturnType() == IrType::Void)
-        {
-            mainFound = true;
-            break;
-        }
-    }
-    if (!mainFound)
-    {
-        ctx->error(this, "program must contain a method \'main\'.");
-        valid = false;
-    }
-    
+
     for (auto it : m_field_decl_list)
     {
         if (!it->analyze(ctx))
@@ -140,6 +134,43 @@ bool IrProgram::analyze(IrTraversalContext* ctx)
     ctx->popSymbols();
     
     return valid;
+}
+
+bool IrProgram::allocate(IrTraversalContext* ctx) 
+{ 
+    bool valid = true;
+    
+    ctx->pushSymbols(m_symbols.get());
+    ctx->pushParent(this);
+    
+    for (auto it : m_field_decl_list)
+    {
+        if (!it->allocate(ctx))
+            valid = false;
+    }
+    
+    for (auto it : m_method_decl_list)
+    {
+        if (!it->allocate(ctx))
+            valid = false;
+    }
+    
+    for (auto it : m_class_decl_list)
+    {
+        if (!it->allocate(ctx))
+            valid = false;
+    }
+    
+    for (auto it : m_interface_decl_list)
+    {
+        if (!it->allocate(ctx))
+            valid = false;
+    }
+    
+    ctx->popParent();
+    ctx->popSymbols();
+    
+    return valid; 
 }
 
 bool IrProgram::codegen(IrTraversalContext* ctx) 

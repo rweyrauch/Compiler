@@ -37,12 +37,13 @@ namespace Decaf
 class IrProgram : public IrBase
 {
 public:
-    IrProgram(int lineNumber, int columnNumber, const std::string& filename) :
-        IrBase(lineNumber, columnNumber, filename),
+    IrProgram(const std::string& filename) :
+        IrBase(0, 0, filename),
         m_field_decl_list(),
         m_method_decl_list(),
         m_class_decl_list(),
-        m_interface_decl_list()
+        m_interface_decl_list(),
+        m_symbols(new IrSymbolTable())
     {
     }
     
@@ -51,7 +52,7 @@ public:
     virtual void propagateTypes(IrTraversalContext* ctx); 
     virtual void print(unsigned int depth); 
     virtual bool analyze(IrTraversalContext* ctx);
-    virtual bool allocate(IrTraversalContext* ctx) { return true; }    
+    virtual bool allocate(IrTraversalContext* ctx);    
     virtual bool codegen(IrTraversalContext* ctx);
     virtual const std::string& asString() const { return m_program; }
     

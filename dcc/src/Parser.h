@@ -32,7 +32,7 @@ class Parser: public ParserBase
     // $insert scannerobject
     Scanner d_scanner;
 
-    IrClass* d_root;
+    IrProgram* d_program;
     IrTraversalContext* d_ctx;
     IrOptimizer* d_optimizer;
     
@@ -48,7 +48,7 @@ class Parser: public ParserBase
         
         Parser(std::istream &in, std::ostream &out) :
             d_scanner(in, out),
-            d_root(nullptr),
+            d_program(nullptr),
             d_ctx(nullptr),
             d_optimizer(nullptr),
             m_blockOpts(BBOPTS_NONE),
@@ -58,10 +58,11 @@ class Parser: public ParserBase
             d_scanner.setSLoc(&d_loc__);
             d_ctx = new IrTraversalContext();
             d_optimizer = new IrOptimizer();
+            d_program = new IrProgram("");
         }
         Parser(std::string const &infile, std::string const &outfile) :
             d_scanner(infile, outfile),
-            d_root(nullptr),
+            d_program(nullptr),
             d_ctx(nullptr),
             d_optimizer(nullptr),
             m_blockOpts(BBOPTS_NONE),            
@@ -73,6 +74,7 @@ class Parser: public ParserBase
             d_ctx = new IrTraversalContext();
             d_ctx->setSource(infile, &d_source);
             d_optimizer = new IrOptimizer();
+            d_program = new IrProgram(infile);
         }
         virtual ~Parser() 
         {
@@ -120,11 +122,11 @@ class Parser: public ParserBase
         int parse();
         bool codegen()
         {
-            if (d_root)
+            if (d_program)
             {
-                d_root->allocate(d_ctx);
+                d_program->allocate(d_ctx);
     
-                d_root->codegen(d_ctx);
+                d_program->codegen(d_ctx);
                 
                 // convert generated TAC into basic blocks and optimize
                 std::vector<IrTacStmt> statements = optimize(d_ctx->getStatements());
@@ -152,15 +154,15 @@ class Parser: public ParserBase
         }
         void dumpAST() 
         { 
-            if (d_root) 
-                d_root->print(0); 
+            if (d_program) 
+                d_program->print(0); 
         }
         bool semanticChecks() 
         { 
-            if (d_root) 
+            if (d_program) 
             {
-                d_root->propagateTypes(d_ctx);
-                return d_root->analyze(d_ctx); 
+                d_program->propagateTypes(d_ctx);
+                return d_program->analyze(d_ctx); 
             }
             return false; 
         }
@@ -193,7 +195,7 @@ class Parser: public ParserBase
                                         // lexical scanner. 
         void print();                   // use, e.g., d_token, d_loc
 
-        void setRoot(IrClass* root) { d_root = root; }
+        IrProgram* getProgram() { return d_program; }
         
         const std::string& line(size_t line_num) const;
         

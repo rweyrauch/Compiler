@@ -73,26 +73,37 @@
 %%
 
 program
-	: program_decl_list
-	;
+    : program_decl_list
+    ;
 
 program_decl_list
-	: program_decl
-	| program_decl_list program_decl
-	;
-	
+    : program_decl
+    | program_decl_list program_decl
+    ;
+
 program_decl
-	: class
-	| interface
-	| field_decl
-	| method_decl
-	;
-	
+    : class
+    {
+        getProgram()->addClassDecl($1);
+    }
+    | interface
+    {
+        getProgram()->addInterfaceDecl($1);
+    }
+    | field_decl
+    {
+        getProgram()->addFieldDecl(*$1);
+    }
+    | method_decl
+    {
+        getProgram()->addMethodDecl($1);
+    }
+    ;
+    
 class
     : CLASS ident LBRACE field_decl_list method_decl_list RBRACE 
     { 
         $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
-        setRoot($$); 
         for (auto it : *$4)
         {
             $$->addFieldDecl(it); 
@@ -102,7 +113,6 @@ class
     | CLASS ident LBRACE field_decl_list RBRACE  
     { 
         $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
-        setRoot($$); 
         for (auto it : *$4)
         {
             $$->addFieldDecl(it); 
@@ -111,23 +121,19 @@ class
     | CLASS ident LBRACE method_decl_list RBRACE  
     { 
         $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
-        setRoot($$); 
         $$->addMethodDecl(*$4); 
     }
     | CLASS ident LBRACE RBRACE  
     { 
         $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
-        setRoot($$); 
     }
     | CLASS ident EXTENDS ident LBRACE RBRACE
     { 
         $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
-        setRoot($$); 
     }
     | CLASS ident IMPLEMENTS ident LBRACE RBRACE
     { 
         $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
-        setRoot($$); 
     }     
     ;
     
@@ -426,14 +432,14 @@ method_call
     { 
         $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown); 
     }
-	| ident DOT ident LPAREN expr_list RPAREN
-	{
+    | ident DOT ident LPAREN expr_list RPAREN
+    {
         $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown);
         for (auto it : *$5) 
         {
             $$->addArgument(it);
-        }	
-	}
+        }
+    }
     | ident DOT ident LPAREN RPAREN
     {
         $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown); 
