@@ -24,11 +24,11 @@ class Program
                 d = tester(a);
                 break;
             }
-            Print("Loop ", a, "\n");
+            callout("printf", "Loop %d\n", a);
             a = a + 1;
         }
         d[0] = 0;
-        Print(d[d[0]], "\n", d.length(), "\n");
+        callout("printf", "%d\n%d\n", d[d[0]], d.length());
     }
 }
 

@@ -11,7 +11,7 @@ class Cow
 
     void Moo() 
     {
-        Print(this.height, " ", this.weight, "\n");
+        callout("printf", "%d %d\n", this.height, this.weight);
     } 
 } 
  

@@ -33,7 +33,7 @@ class Program
         s.Push(3);
         s.Push(7);
         s.Push(4);
-        Print(s.NumElems(), " ", s.Pop(), " ", s.Pop(), " ", s.Pop(), " ", s.NumElems());
+        callout("printf", "%d %d %d %d %d\n", s.NumElems(), s.Pop(), s.Pop(), s.Pop(), s.NumElems());
     } 
 } 
  

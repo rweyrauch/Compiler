@@ -7,18 +7,18 @@ class Program
                 
         while (a != 10) 
         {
-            Print(a, " ");
+            callout("printf","%d ", a);
             a = a + 1;
         }
                 
-        Print("\na now = ", a, " which is ");
+        callout("printf", "\na now = %d which is ", a);
         if (a % 2 == 0)
         {
-            Print("even");
+            callout("printf", "even");
         }
         else
         {
-            Print("odd");
+            callout("printf", "odd");
         }
         
         a = 0;
@@ -29,11 +29,11 @@ class Program
         
         while (a != 10) 
         {
-            Print(a, " ");
+            callout("printf", "%d ", a);
             a = a + 1;
             if (a == 7)
             {
-                Print(a);
+                callout("printf","%d", a);
             }
             else
             {
@@ -44,7 +44,7 @@ class Program
         a = 0;
         while (a != 10)
         {
-            Print(a, " ");
+            callout("printf", "%d ", a);
             a = a + 1;
             if (a > 7)
             {

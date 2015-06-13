@@ -16,7 +16,7 @@ class Program
         {
             a = a * 5;
         }
-        Print(c, " ", a, globalCounter);
+        callout("printf", "%d %d %d\n", c, a, globalCounter);
     }
 }
 

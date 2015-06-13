@@ -49,7 +49,7 @@ class Program
         betsy.InitCow(5, null, true);
         b = betsy;  
         b.GetMom();  
-        Print("spots: ", betsy.IsSpottedCow(), "    height: ", b.GetHeight());
+        callout("printf", "spots: %d    height: %d\n", betsy.IsSpottedCow(), b.GetHeight());
     } 
 } 
 

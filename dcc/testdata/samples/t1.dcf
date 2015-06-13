@@ -2,6 +2,6 @@ class Program
 {
     void main()
     {
-        Print("hello world");
+        callout("printf", "hello world");
     }
 } 

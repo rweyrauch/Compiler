@@ -16,9 +16,9 @@ class Matrix {
         {  
             for (j = 0; j < 10; j = j + 1) 
             {   
-                Print(Get(i, j), "\t");
+                callout("printf", "%d\t", Get(i, j));
             }
-            Print("\n"); 
+            callout("printf", "\n"); 
         }
     }
      
@@ -166,13 +166,13 @@ class Program
     void main() 
     {      
         Matrix m;      
-        Print("Dense Rep \n");      
+        callout("printf", "Dense Rep \n");      
         m = new DenseMatrix;       
         m.Init();      
         m.SeedMatrix();       
         m.PrintMatrix();       
              
-        Print("Sparse Rep \n");       
+        callout("printf", "Sparse Rep \n");       
         m = new SparseMatrix;       
         m.Init();       
         m.SeedMatrix();       

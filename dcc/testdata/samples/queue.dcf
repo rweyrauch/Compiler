@@ -51,7 +51,7 @@ class Queue {
     int DeQueue() {
         int val;
         if (this.head.GetPrev() == this.head) {
-            Print("Queue Is Empty");
+            callout("printf", "Queue Is Empty");
             return 0;
         } else {
             QueueItem temp;
@@ -79,9 +79,9 @@ class Program
      
         for (i = 0; i != 4; i = i + 1)
         {
-            Print(q.DeQueue(), " ");
+            callout("printf", "%d ", q.DeQueue());
         }
-        Print("\n");
+        callout("printf", "\n");
 
         for (i = 0; i != 10; i = i + 1)
         {
@@ -90,9 +90,9 @@ class Program
      
         for (i = 0; i != 17; i = i + 1)
         {  
-            Print(q.DeQueue(), " ");
+            callout("printf", "%d ", q.DeQueue());
         }
-        Print("\n");
+        callout("printf", "\n");
     }
 }
 

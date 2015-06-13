@@ -13,7 +13,7 @@ class Program
         s = "hello";
         c = test(4, 5);
 
-        Print(c);
-        Print(s);
+        callout("printf","%d\n", c);
+        callout("printf", "%s\n", s);
     } 
 } 

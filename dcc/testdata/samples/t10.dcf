@@ -1,6 +1,6 @@
 void Grow(int a)
 {
-  Print("mmm... veggies!\n");
+  callout("printf", "mmm... veggies!\n");
 } 
 
 class Seeds 
@@ -18,7 +18,7 @@ class Vegetable {
     int[][] w;
 
     color = 5 % 2;
-    Print("Yum! ", color, "\n");
+    callout("printf", "Yum! %d\n", color);
     
     veg.Grow(s, w);
     
@@ -27,7 +27,7 @@ class Vegetable {
   
   void Grow(Seeds[]seeds, int[][]water) 
   {
-    Print("Grow, little vegetables, grow!\n");
+    callout("printf", "Grow, little vegetables, grow!\n");
     Eat(this);
   } 
 } 
@@ -35,8 +35,8 @@ class Vegetable {
 class Squash extends Vegetable {
   void Grow(Seeds[]seeds, int[][]water) 
   {
-    Print("But I don't like squash\n");
-    Print(10 * 5);
+    callout("printf","But I don't like squash\n");
+    callout("printf", "%d", 10 * 5);
   } 
 } 
 
