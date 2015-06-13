@@ -10,11 +10,12 @@ class Program
         string[]arr;
         
         a = "hello";
-        Print(3.5, a, Pi(10));
+        callout("printf", "%f %d %d\n", 3.5, a, Pi(10));
         a = 10 + main;
         arr = NewArray(2, string);
-        for (a = 0; a < arr.length(); a = a + 1)
-            Print(arr[a], a.length());
+        for (a = 0; a < arr.length(); a = a + 1) {
+            callout("printf", "%d %d\n", arr[a], a.length());
+        }
     }
 }
 

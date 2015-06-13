@@ -3,7 +3,7 @@ class Program
     void main() 
     {
         int x;     
-        bool b;
+        boolean b;
                
         b = true;     
         b = (x > 5) && b;    

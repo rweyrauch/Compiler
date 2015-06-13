@@ -46,7 +46,7 @@ class Deck {
 
   int GetCard() {
     int result;
-    if (current >= 52) return 0;
+    if (current >= 52) { return 0; }
     result = cards[current];
     current = current + 1;
     return result;
@@ -70,14 +70,14 @@ class BJDeck {
   int DealCard() {
     int c;
     c = 0;
-    if (numdealt >= 8*52) return 11;
+    if (numdealt >= 8*52) { return 11; }
     while (c == 0) {
       int d;
       d = gRnd.RndInt(8);
       c = decks[d].GetCard();
     }
-    if (c > 10) c = 10;
-    else if (c == 1) c = 11;
+    if (c > 10) { c = 10; }
+    else if (c == 1) { c = 11; }
     numdealt = numdealt + 1;
     return c;
   }
@@ -86,9 +86,9 @@ class BJDeck {
     int i;
 
     callout("printf","Shuffling...");
-    for (i = 0; i < 8; i = i + 1)
+    for (i = 0; i < 8; i = i + 1) {
       decks[i].Shuffle();
-
+    }
     numdealt = 0;
     callout("printf","done.\n");
   }
@@ -119,16 +119,16 @@ class Player {
     callout("printf", "%s was dealt a %d.\n", name, card,);
     total = total + card;
     numcards = numcards + 1;
-    if (card == 11) aces = aces + 1;
+    if (card == 11) { aces = aces + 1; }
     while ((total > 21) && (aces > 0)) {
       total = total - 10;
       aces = aces - 1;
     }
   }
 
-  bool DoubleDown(BJDeck deck) {
+  boolean DoubleDown(BJDeck deck) {
     int result;
-    if ((total != 10) && (total != 11)) return false;
+    if ((total != 10) && (total != 11)) { return false; }
     if (GetYesOrNo("Would you like to double down?")) {
       bet = bet * 2;
       Hit(deck);
@@ -139,7 +139,7 @@ class Player {
   }
 
   void TakeTurn(BJDeck deck) {
-    bool stillGoing;
+    boolean stillGoing;
 
     callout("printf","\n%s's turn.\n", name);
     total = 0;
@@ -152,14 +152,14 @@ class Player {
       while (total <= 21 && stillGoing) {
         callout("printf", "%s, your total is %d.\n", name, total);
         stillGoing = GetYesOrNo("Would you like a hit?");
-        if (stillGoing) Hit(deck);
+        if (stillGoing) { Hit(deck); }
       }
     }
-    if (total > 21) callout("printf", "%s busts with the big %d!\n", name, total);
-    else callout("printf", "%s stays at %d.\n", name, total);
+    if (total > 21) { callout("printf", "%s busts with the big %d!\n", name, total); }
+    else { callout("printf", "%s stays at %d.\n", name, total); }
   }
 
-  bool HasMoney() { return money > 0; }
+  boolean HasMoney() { return money > 0; }
 
   void PrintMoney() {
     callout("printf", "%s, you have $%d.\n", name, money);
@@ -179,14 +179,14 @@ class Player {
   void Resolve(int dealer) {
     int win; int lose;
     win = 0; lose = 0;
-    if ((total == 21) && (numcards == 2)) win = 2;
-    else if (total > 21) lose = 1;
-    else if (dealer > 21) win = 1;
-    else if (total > dealer) win = 1;
-    else if (dealer > total) lose = 1;
-    if (win >= 1) callout("printf", "%s, you won $%d.\n", name, bet);
-    else if (lose >= 1) callout("printf", "%s, you lost $%d.\n", name, bet);
-    else callout("printf", "%s, you push!\n", name);
+    if ((total == 21) && (numcards == 2)) { win = 2; }
+    else if (total > 21) { lose = 1; }
+    else if (dealer > 21) { win = 1; }
+    else if (total > dealer) { win = 1; }
+    else if (dealer > total) { lose = 1; }
+    if (win >= 1) { callout("printf", "%s, you won $%d.\n", name, bet); }
+    else if (lose >= 1) { callout("printf", "%s, you lost $%d.\n", name, bet); }
+    else { callout("printf", "%s, you push!\n", name); }
     win = win * bet;
     lose = lose * bet;
     money = money + win - lose;
@@ -207,8 +207,8 @@ class Dealer extends Player {
     while (total <= 16) {
       Hit(deck);
     }
-    if (total > 21) callout("printf", "%s busts with the big %d!\n", name, total);
-    else callout("printf", "%s stays at %d.\n", name, total);
+    if (total > 21) { callout("printf", "%s busts with the big %d!\n", name, total); }
+    else { callout("printf", "%s stays at %d.\n", name, total); }
   }
 }
 
@@ -248,35 +248,39 @@ class House {
   void TakeAllBets() {
     int i;
     callout("printf", "\nFirst, let's take bets.\n");
-    for (i = 0; i < players.length(); i = i + 1)
-      if (players[i].HasMoney()) players[i].PlaceBet();
+    for (i = 0; i < players.length(); i = i + 1) {
+      if (players[i].HasMoney()) { players[i].PlaceBet(); }
+    }
   }
 
   void TakeAllTurns() {
     int i;
-    for (i = 0; i < players.length(); i = i + 1)
-      if (players[i].HasMoney()) players[i].TakeTurn(deck);
+    for (i = 0; i < players.length(); i = i + 1) {
+      if (players[i].HasMoney()) { players[i].TakeTurn(deck); }
+    }
   }
 
   void ResolveAllPlayers() {
     int i;
 
     callout("printf", "\nTime to resolve bets.\n");
-    for (i = 0; i < players.length(); i = i + 1)
-      if (players[i].HasMoney())
+    for (i = 0; i < players.length(); i = i + 1) {
+      if (players[i].HasMoney()) {
         players[i].Resolve(dealer.GetTotal());
+        }
+    }
   }
 
   void PrintAllMoney() {
     int i;
 
-    for (i = 0; i < players.length(); i = i + 1)
+    for (i = 0; i < players.length(); i = i + 1) {
       players[i].PrintMoney();
-
+    }
   }
 
   void PlayOneGame() {
-    if (deck.NumCardsRemaining() < 26) deck.Shuffle();
+    if (deck.NumCardsRemaining() < 26) { deck.Shuffle(); }
     TakeAllBets();
     callout("printf", "\nDealer starts. ");
     dealer.Init(0);
@@ -288,7 +292,7 @@ class House {
 
 }
 
-bool GetYesOrNo(string prompt)
+boolean GetYesOrNo(string prompt)
 {
    string answer;
    callout("printf", "%s (y/n) ", prompt);
@@ -297,7 +301,7 @@ bool GetYesOrNo(string prompt)
 }
 
 void main() {
-  bool keepPlaying;
+  boolean keepPlaying;
   House house;
   keepPlaying = true;
   house = new House;

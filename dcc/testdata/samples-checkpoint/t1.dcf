@@ -1,4 +1,4 @@
 void main() {
-  callout("printf", "hello world");
+  callout("printf", "hello world\n");
 }
 

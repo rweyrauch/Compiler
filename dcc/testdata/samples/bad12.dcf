@@ -5,7 +5,7 @@ class Cow extends Animal
  
 class Wacky implements Trick, Treat, Halloween 
 {    
-    bool lost;
+    boolean lost;
 } 
  
 interface Treat 

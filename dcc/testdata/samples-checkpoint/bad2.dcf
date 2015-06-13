@@ -1,8 +1,8 @@
-int Rutabaga(int a, double b, bool c) {
+int Rutabaga(int a, double b, boolean c) {
   return a + 2;
 }
 
-int Rutabaga(int a, double b, bool c) {
+int Rutabaga(int a, double b, boolean c) {
   return a + 2;
 }
 

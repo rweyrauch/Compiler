@@ -8,7 +8,7 @@ class Program
     {
         if (function() == function()) 
         {
-            Print("I like comparing void values!");
+            callout("printf", "I like comparing void values!\n");
         }
     }
 }

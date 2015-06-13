@@ -8,7 +8,7 @@ class Base implements Binkyable {
     string field2;
     int Method1(int a, double b) {}
     int Method2(int[] a, Base c) {}
-    void Method3(bool a) {}
+    void Method3(boolean a) {}
 }
 
 interface Binkyable

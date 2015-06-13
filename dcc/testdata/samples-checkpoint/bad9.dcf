@@ -1,7 +1,7 @@
 class Vegetable {
   int stalk;
 
-  bool IsRipe() {
+  boolean IsRipe() {
     return true;
   }
 }
@@ -12,7 +12,7 @@ class Potato extends Vegetable {
   void root() {
     callout("printf", "Huh?");
   }
-  bool IsRipe(int weight, double weather) {
+  boolean IsRipe(int weight, double weather) {
     return weight > 100;
   }
 }

@@ -1,5 +1,5 @@
 interface Comparable {
-  bool equals(Comparable other);
+  boolean equals(Comparable other);
   Streamable GetStream();
 }
 
@@ -9,7 +9,7 @@ interface Streamable {
 
 class Ruler implements Streamable,Comparable {
    void Stream(int b) {}
-   bool equals(Comparable other) { return false; }
+   boolean equals(Comparable other) { return false; }
    Streamable GetStream() { return this; }
 }
 

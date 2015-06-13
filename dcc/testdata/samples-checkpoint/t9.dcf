@@ -20,12 +20,12 @@ class Animal {
 }
 
 class Cow extends Animal {
-  bool isSpotted;
-  void InitCow(int h, Animal m, bool spot) {
+  boolean isSpotted;
+  void InitCow(int h, Animal m, boolean spot) {
     isSpotted = spot;
     InitAnimal(h,m);
   }
-  bool IsSpottedCow () {
+  boolean IsSpottedCow () {
     return isSpotted;
   }
 }

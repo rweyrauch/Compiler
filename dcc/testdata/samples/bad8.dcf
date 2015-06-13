@@ -8,7 +8,7 @@ class Car {
 class Honda extends Car {
     int trunk;
     
-    bool Park() {
+    boolean Park() {
         return trunk == wheels;
     }
 }
@@ -26,8 +26,9 @@ class Program
  
         red = new Honda;
         red.wheels = 2;
-        if (red.Park())
+        if (red.Park()) {
             red.horn = 1.0;
+        }
         red.Honk();
         red = (blue < red && blue == null);
     }

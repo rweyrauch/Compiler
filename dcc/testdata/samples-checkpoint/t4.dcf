@@ -7,7 +7,7 @@ int[] tester(int d) {
 
 void main() {
   int a;
-  bool b;
+  boolean b;
   int[] d;
 
   while (true) {

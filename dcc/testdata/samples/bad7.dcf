@@ -1,8 +1,7 @@
 class Program 
 {
-    int Binky(int x, double y, bool z) {
-    if (z)
-        return x;
+    int Binky(int x, double y, boolean z) {
+        if (z) { return x;}
     }
 
     void main() {

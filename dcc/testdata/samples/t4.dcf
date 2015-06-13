@@ -12,7 +12,7 @@ class Program
     void main() 
     {
         int a;
-        bool b;
+        boolean b;
         int[] d;
         
         a = 1;

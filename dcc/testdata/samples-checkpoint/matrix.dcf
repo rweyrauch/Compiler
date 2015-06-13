@@ -12,17 +12,20 @@ class Matrix {
     int i;
     int j;
     for (i = 0; i < 10; i = i + 1) {
-      for (j = 0; j < 10; j = j + 1) 
+      for (j = 0; j < 10; j = j + 1) {
 	   callout("printf", "%d\t", Get(i,j));
+      }
       callout("printf", "\n");
     }
   }
   void SeedMatrix() {
     int i;
     int j;
-    for (i = 0; i < 5; i = i + 1) 
-      for (j = 0; j < 5; j = j + 1) 
+    for (i = 0; i < 5; i = i + 1) {
+      for (j = 0; j < 5; j = j + 1) { 
 	   Set(i,j, i+j);
+      }
+    }
     Set(2,3,4);
     Set(4,6,2);
     Set(2,3,5);
@@ -42,13 +45,15 @@ class DenseMatrix extends Matrix {
 
     // create mem
     m = NewArray(10, int[]);
-    for (i = 0; i < 10; i = i +1) 
+    for (i = 0; i < 10; i = i +1) {
       m[i] = NewArray(10, int);
-
+    }
     // set all to 0.
-    for (i = 0; i < 10; i = i + 1) 
-      for (j = 0; j < 10; j = j + 1) 
+    for (i = 0; i < 10; i = i + 1) { 
+      for (j = 0; j < 10; j = j + 1) { 
 		m[i][j] = 0;
+      }
+    }
   }
   void Set(int x, int y, int value) {
     m[x][y] = value;
@@ -83,9 +88,9 @@ class SparseMatrix extends Matrix {
 
     // create mem
     m = NewArray(10, SparseItem);
-    for (i = 0; i < 10; i = i + 1)
+    for (i = 0; i < 10; i = i + 1) {
       m[i] = null;
-
+    }
   }
   
   SparseItem Find(int x, int y) {
@@ -93,7 +98,7 @@ class SparseMatrix extends Matrix {
     elem = m[x];
     while (elem != null) {
       if (elem.GetY() == y) {
-	return elem;
+        return elem;
       }
       elem = elem.GetNext();
     }

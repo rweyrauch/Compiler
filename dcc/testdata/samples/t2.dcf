@@ -7,7 +7,7 @@ class Program
     {
         int a;
         string b;
-        bool c;
+        boolean c;
         
         c = true;
         b = "wow!";

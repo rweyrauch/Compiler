@@ -100,6 +100,15 @@ program_decl
     }
     ;
     
+member_decl
+    : field_decl
+    | method_decl
+    ;
+member_decl_list
+    : member_decl
+    | member_decl_list member_decl
+    ;
+
 class
     : CLASS ident LBRACE field_decl_list method_decl_list RBRACE 
     { 
@@ -127,11 +136,15 @@ class
     { 
         $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
     }
-    | CLASS ident EXTENDS ident LBRACE RBRACE
+    | CLASS ident EXTENDS ident LBRACE member_decl_list RBRACE
     { 
         $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
     }
-    | CLASS ident IMPLEMENTS ident LBRACE RBRACE
+    | CLASS ident IMPLEMENTS ident_list LBRACE member_decl_list RBRACE
+    { 
+        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
+    }     
+    | CLASS ident EXTENDS ident IMPLEMENTS ident_list LBRACE member_decl_list RBRACE
     { 
         $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
     }     
