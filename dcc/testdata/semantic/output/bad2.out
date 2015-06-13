@@ -1,0 +1,6 @@
+testdata/semantic/bad2.dcf:10:10: error: lhs and rhs of assigment operator must be of the same type.
+        x = b;    
+          ^
+testdata/semantic/bad2.dcf:12:16: error: lhs and rhs of binary expression must have the same type.
+        x = 4 + 1.0 / 5 * 3;
+                ^

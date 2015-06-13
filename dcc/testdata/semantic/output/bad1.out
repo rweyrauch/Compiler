@@ -1,0 +1,6 @@
+testdata/semantic/bad1.dcf:10:14: error: lhs and rhs of binary expression must have the same type.
+        y = x - 3.5;
+              ^
+testdata/semantic/bad1.dcf:10:10: error: lhs and rhs of assigment operator must be of the same type.
+        y = x - 3.5;
+          ^

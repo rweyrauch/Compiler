@@ -142,6 +142,18 @@ bool IrBinaryExpression::analyze(IrTraversalContext* ctx)
     
     if (valid)
     {
+        if (m_rhs && m_lhs)
+        {
+            if (m_rhs->getType() != m_lhs->getType())
+            {
+                ctx->error(this, "lhs and rhs of binary expression must have the same type.");
+                valid = false;
+            }
+        }
+    }
+    
+    if (valid)
+    {
         assert(m_result == nullptr);
         // allocate a temporary variable for the result of this expression
         m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());
