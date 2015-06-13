@@ -44,7 +44,6 @@
 %token PLUS MINUS CEQ CNE CLT CLE CGT CGE 
 %token MUL DIV
 
-%type <classDef> program
 %type <classDef> class
 %type <interfaceDef> interface
 %type <block> block
@@ -73,7 +72,23 @@
 
 %%
 
-program 
+program
+	: program_decl_list
+	;
+
+program_decl_list
+	: program_decl
+	| program_decl_list program_decl
+	;
+	
+program_decl
+	: class
+	| interface
+	| field_decl
+	| method_decl
+	;
+	
+class
     : CLASS ident LBRACE field_decl_list method_decl_list RBRACE 
     { 
         $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
@@ -104,6 +119,16 @@ program
         $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
         setRoot($$); 
     }
+    | CLASS ident EXTENDS ident LBRACE RBRACE
+    { 
+        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
+        setRoot($$); 
+    }
+    | CLASS ident IMPLEMENTS ident LBRACE RBRACE
+    { 
+        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
+        setRoot($$); 
+    }     
     ;
     
 interface
@@ -401,6 +426,18 @@ method_call
     { 
         $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown); 
     }
+	| ident DOT ident LPAREN expr_list RPAREN
+	{
+        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown);
+        for (auto it : *$5) 
+        {
+            $$->addArgument(it);
+        }	
+	}
+    | ident DOT ident LPAREN RPAREN
+    {
+        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown); 
+    }    
     | CALLOUT LPAREN string_literal COMMA expr_list RPAREN
     {
         $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $3, Decaf::IrType::Integer);
@@ -424,6 +461,10 @@ location
     { 
         $$ = new Decaf::IrLocation(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown, $3); 
     }
+    | ident DOT ident
+    {
+        $$ = new Decaf::IrLocation(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown);     
+    }
     ;
 
 primary_expr
@@ -432,6 +473,7 @@ primary_expr
     | string_literal { $$ = $1; }
     | method_call { $$ = $1; }
     | LPAREN expr RPAREN { $$ = $2; }
+    | THIS { $$ = nullptr; }
     ;
     
 unary_expr
@@ -524,6 +566,7 @@ assign_expr
 
 expr 
     : assign_expr { $$ = $1; }
+    | NEW ident { $$ = nullptr; }
     ;
 
 expr_list 
