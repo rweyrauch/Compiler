@@ -195,6 +195,17 @@ field_decl
             $$->push_back(decl); 
         } 
     }
+    | ident location_list SEMI
+    {
+        $$ = new std::vector<Decaf::IrFieldDecl*>(); 
+        for (auto it = $2->begin(); it != $2->end(); ++it) 
+        { 
+            Decaf::IrLocation* location = *it; 
+            location->setAsDeclaration();
+            Decaf::IrFieldDecl* decl = new Decaf::IrFieldDecl(@1.first_line, @1.first_column, d_scanner.filename(), location, Decaf::IrType::Class); 
+            $$->push_back(decl); 
+        } 
+    }
     ;
 
 method_decl_list 
@@ -243,6 +254,20 @@ method_decl
         $$ = new Decaf::IrMethodDecl(@1.first_line, @1.first_column, d_scanner.filename(), $2, (Decaf::IrType)$1);
         $$->addBlock($5);
     }
+    | ident ident LPAREN argument_decl_list RPAREN block
+    { 
+        $$ = new Decaf::IrMethodDecl(@1.first_line, @1.first_column, d_scanner.filename(), $2, Decaf::IrType::Class); 
+        for (auto it : *$4)
+        {
+            $$->addArgument(it);
+        }
+        $$->addBlock($6);
+    }
+    | ident ident LPAREN RPAREN block 
+    { 
+        $$ = new Decaf::IrMethodDecl(@1.first_line, @1.first_column, d_scanner.filename(), $2, Decaf::IrType::Class);
+        $$->addBlock($5);
+    }
     ;
 
 block 
@@ -284,6 +309,10 @@ var_decl
     : type ident_list SEMI 
     { 
         $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), *$2, (Decaf::IrType)$1); 
+    }
+    | ident ident_list SEMI
+    {
+        $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), *$2, Decaf::IrType::Class); 
     }
     ;
 
@@ -368,6 +397,10 @@ ident
     { 
         $$ = new Decaf::IrIdentifier(@1.first_line, @1.first_column, d_scanner.filename(), d_scanner.matched()); 
     }
+    | THIS 
+    { 
+        $$ = new Decaf::IrIdentifier(@1.first_line, @1.first_column, d_scanner.filename(), d_scanner.matched()); // create IrThisIdentifier();
+    }
     ;
 
 statement 
@@ -379,15 +412,15 @@ statement
     { 
         $$ = new Decaf::IrIfStatement(@1.first_line, @1.first_column, d_scanner.filename(), $3, $5, $7); 
     }
-    | FOR LPAREN expr SEMI expr SEMI expr RPAREN block 
+    | FOR LPAREN expr SEMI expr SEMI expr RPAREN statement 
     { 
         $$ = new Decaf::IrForStatement(@1.first_line, @1.first_column, d_scanner.filename(), $3, $5, $7, $9); 
     }
-    | WHILE LPAREN expr RPAREN block
+    | WHILE LPAREN expr RPAREN statement
     {
         $$ = new Decaf::IrWhileStatement(@1.first_line, @1.first_column, d_scanner.filename(), $3, $5); 
     }
-    | DO block WHILE LPAREN expr RPAREN
+    | DO statement WHILE LPAREN expr RPAREN
     {
         $$ = new Decaf::IrDoWhileStatement(@1.first_line, @1.first_column, d_scanner.filename(), $5, $2); 
     }
@@ -483,6 +516,10 @@ method_call
     {
         $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $3, Decaf::IrType::Integer);
     }
+    | NEW ident 
+    { 
+        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $2, Decaf::IrType::Unknown); // create IrNewCall();
+    }
     ;
     
 location 
@@ -532,10 +569,6 @@ primary_expr
     | LPAREN expr RPAREN 
     { 
         $$ = $2; 
-    }
-    | THIS 
-    { 
-        $$ = nullptr; 
     }
     ;
     
@@ -652,10 +685,6 @@ expr
     : assign_expr 
     { 
         $$ = $1; 
-    }
-    | NEW ident 
-    { 
-        $$ = nullptr; 
     }
     ;
 

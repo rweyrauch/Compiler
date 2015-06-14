@@ -45,10 +45,10 @@ namespace Decaf
 // }
 // LABEL_END:
 
-IrWhileStatement::IrWhileStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpression* loopExpr, IrBlock* block) :
+IrWhileStatement::IrWhileStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpression* loopExpr, IrStatement* block) :
     IrStatement(lineNumber, columnNumber, filename),
     m_loopExpr(loopExpr),
-    m_body(std::shared_ptr<IrBlock>(block))
+    m_body(std::shared_ptr<IrStatement>(block))
 {
     m_labelTop = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
     m_labelContinue = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());

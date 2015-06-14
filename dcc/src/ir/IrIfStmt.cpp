@@ -35,11 +35,11 @@
 namespace Decaf
 {
     
-IrIfStatement::IrIfStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpression* condition, IrBlock* trueBlock, IrBlock* falseBlock) :
+IrIfStatement::IrIfStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpression* condition, IrStatement* trueBlock, IrStatement* falseBlock) :
     IrStatement(lineNumber, columnNumber, filename),
     m_condition(std::shared_ptr<IrExpression>(condition)),
-    m_trueBlock(std::shared_ptr<IrBlock>(trueBlock)),
-    m_falseBlock(std::shared_ptr<IrBlock>(falseBlock)),
+    m_trueBlock(std::shared_ptr<IrStatement>(trueBlock)),
+    m_falseBlock(std::shared_ptr<IrStatement>(falseBlock)),
     m_labelTrue(nullptr),
     m_labelFalse(nullptr),
     m_labelEnd(nullptr)

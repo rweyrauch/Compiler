@@ -37,7 +37,7 @@ class IrWhileStatement : public IrStatement
 {
 public:
     IrWhileStatement(int lineNumber, int columnNumber, const std::string& filename,
-                     IrExpression* expr, IrBlock* block = nullptr);
+                     IrExpression* expr, IrStatement* block = nullptr);
     
     virtual ~IrWhileStatement();
     
@@ -57,7 +57,7 @@ public:
 protected:    
     
     std::shared_ptr<IrExpression> m_loopExpr;
-    std::shared_ptr<IrBlock> m_body;
+    std::shared_ptr<IrStatement> m_body;
     
     std::shared_ptr<IrIdentifier> m_labelTop;
     std::shared_ptr<IrIdentifier> m_labelContinue;

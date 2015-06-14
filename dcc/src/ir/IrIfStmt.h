@@ -35,7 +35,7 @@ class IrIdentifier;
 class IrIfStatement : public IrStatement
 {
 public:
-    IrIfStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpression* condition, IrBlock* trueBlock, IrBlock* falseBlock = nullptr);
+    IrIfStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpression* condition, IrStatement* trueBlock, IrStatement* falseBlock = nullptr);
     
     virtual ~IrIfStatement();
     
@@ -52,8 +52,8 @@ public:
 protected:    
     
     std::shared_ptr<IrExpression> m_condition;
-    std::shared_ptr<IrBlock> m_trueBlock;
-    std::shared_ptr<IrBlock> m_falseBlock;
+    std::shared_ptr<IrStatement> m_trueBlock;
+    std::shared_ptr<IrStatement> m_falseBlock;
     
     std::shared_ptr<IrIdentifier> m_labelTrue;
     std::shared_ptr<IrIdentifier> m_labelFalse;

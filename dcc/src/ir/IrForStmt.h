@@ -39,7 +39,7 @@ class IrForStatement : public IrStatement
 {
 public:
     IrForStatement(int lineNumber, int columnNumber, const std::string& filename, 
-        IrExpression* initialExpr, IrExpression* endExpr, IrExpression* loopExpr, IrBlock* block = nullptr);
+        IrExpression* initialExpr, IrExpression* endExpr, IrExpression* loopExpr, IrStatement* block = nullptr);
     
     virtual ~IrForStatement();
     
@@ -61,7 +61,7 @@ protected:
     std::shared_ptr<IrExpression> m_initialExpr;
     std::shared_ptr<IrExpression> m_terminatingExpr;
     std::shared_ptr<IrExpression> m_loopExpr;
-    std::shared_ptr<IrBlock> m_body;
+    std::shared_ptr<IrStatement> m_body;
     
     std::shared_ptr<IrIdentifier> m_labelTop;
     std::shared_ptr<IrIdentifier> m_labelContinue;
