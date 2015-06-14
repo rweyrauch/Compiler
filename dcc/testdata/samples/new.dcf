@@ -11,8 +11,8 @@ class Program
     void main()
     {
         int[] a;
-                test(3.0 * 5.6 - 1.0);        NewArray(true && false, boolean);
-        if (NewArray(5, int))
+                test(3.0 * 5.6 - 1.0);        new boolean[true && false];
+        if (new int[5])
         {
             1;
         }        if (ReadInteger())

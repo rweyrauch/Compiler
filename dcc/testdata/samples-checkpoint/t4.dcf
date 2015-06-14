@@ -2,7 +2,7 @@ int a;
 string[] b;
 
 int[] tester(int d) {
-  return NewArray(d, int);
+  return new int[d];
 }
 
 void main() {

@@ -26,7 +26,7 @@ class Deck {
   int[] cards;
 
   void Init() {
-    cards = NewArray(52, int);
+    cards = new int[52];
   }
 
   void Shuffle() {
@@ -60,7 +60,7 @@ class BJDeck {
 
   void Init() {
     int i;
-    decks = NewArray(8, Deck);
+    decks = new Deck[8];
     for (i = 0; i < 8; i = i + 1) {
       decks[i] = new Deck;
       decks[i].Init();
@@ -238,7 +238,7 @@ class House {
     int numPlayers;
     callout("printf", "How many players do we have today? ");
     numPlayers = ReadInteger();
-    players = NewArray(numPlayers, Player);
+    players = new Player[numPlayers];
     for (i = 0; i < players.length(); i = i + 1) {
       players[i] = new Player;
       players[i].Init(i+1);

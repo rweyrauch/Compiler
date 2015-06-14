@@ -52,11 +52,11 @@ class DenseMatrix extends Matrix {
         int j;
          
         // create mem
-        m = NewArray(10, int[]);
+        m = new int[10];
          
         for (i = 0; i < 10; i = i + 1)
         {
-            m[i] = NewArray(10, int);
+            m[i] = new int[10];
         }
          
         // set all to 0.
@@ -112,7 +112,7 @@ class SparseMatrix extends Matrix {
         int i;
  
         // create mem
-        m = NewArray(10, SparseItem);
+        m = new SparseItem[10];
          
         for (i = 0; i < 10; i = i + 1) 
         {         

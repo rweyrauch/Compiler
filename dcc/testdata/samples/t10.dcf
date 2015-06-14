@@ -46,7 +46,7 @@ class Program
   {
     Vegetable[]veggies;
     
-    veggies = NewArray(2, Vegetable);
+    veggies = new Vegetable[2];
     veggies[0] = new Squash;
     veggies[1] = new Vegetable;
     

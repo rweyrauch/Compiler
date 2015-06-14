@@ -237,6 +237,14 @@ argument_decl
     { 
         $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), $2, (Decaf::IrType)$1); 
     }
+    | ident ident 
+    { 
+        $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), $2, Decaf::IrType::Class); 
+    }
+    | ident LBRACKET RBRACKET ident 
+    { 
+        $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), $4, Decaf::IrType::Class); 
+    }
     ;
     
 method_decl 
@@ -313,6 +321,10 @@ var_decl
     | ident ident_list SEMI
     {
         $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), *$2, Decaf::IrType::Class); 
+    }
+    | ident LBRACKET RBRACKET ident_list SEMI
+    {
+        $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), *$4, Decaf::IrType::Class); 
     }
     ;
 
@@ -517,6 +529,14 @@ method_call
         $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $3, Decaf::IrType::Integer);
     }
     | NEW ident 
+    { 
+        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $2, Decaf::IrType::Unknown); // create IrNewCall();
+    }
+    | NEW type LBRACKET expr RBRACKET 
+    { 
+        $$ = nullptr; // create IrNewCall();
+    }
+    | NEW ident LBRACKET expr RBRACKET 
     { 
         $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $2, Decaf::IrType::Unknown); // create IrNewCall();
     }

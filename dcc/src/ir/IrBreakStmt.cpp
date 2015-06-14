@@ -26,6 +26,8 @@
 #include "IrBreakStmt.h"
 #include "IrTravCtx.h"
 #include "IrForStmt.h"
+#include "IrWhileStmt.h"
+#include "IrDoWhileStmt.h"
 #include "IrIdentifier.h"
 
 namespace Decaf
@@ -46,11 +48,13 @@ bool IrBreakStatement::analyze(IrTraversalContext* ctx)
 {
     bool valid = false;
     
-    // Walk up the parent list, looking for a for-loop statement.
+    // Walk up the parent list, looking for a loop (for, while, do-while) statement.
     for (size_t i = 0; i < ctx->getNumParents(); i++)
     {
         const IrForStatement* forloop = dynamic_cast<const IrForStatement*>(ctx->getParent(i));
-        if (forloop)
+        const IrWhileStatement* whileloop = dynamic_cast<const IrWhileStatement*>(ctx->getParent(i));
+        const IrDoWhileStatement* doloop = dynamic_cast<const IrDoWhileStatement*>(ctx->getParent(i));
+        if (forloop || whileloop || doloop)
         {
             m_parentLoop = forloop;
             valid = true;
@@ -60,7 +64,7 @@ bool IrBreakStatement::analyze(IrTraversalContext* ctx)
     
     if (!valid)
     {
-        ctx->error(this, "break statement not found in a for-loop.");
+        ctx->error(this, "break statement not found in a loop.");
     }
     return valid;
 }

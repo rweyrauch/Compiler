@@ -5,8 +5,8 @@ class Program
 
     int[] tester(int d) 
     {
-        b = NewArray(1, string);
-        return NewArray(d, int);
+        b = new string[1];
+        return new int[d];
     }             
 
     void main() 
