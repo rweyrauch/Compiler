@@ -33,7 +33,7 @@
 
 %token RETURN CALLOUT
 %token BOOLTYPE INTTYPE DOUBLETYPE STRINGTYPE CLASS VOID
-%token IF ELSE SWITCH CASE DEFAULT FOR DO CONTINUE BREAK GOTO WHILE
+%token IF SWITCH CASE DEFAULT FOR DO CONTINUE BREAK GOTO WHILE
 %token INTERFACE NULLVALUE EXTENDS IMPLEMENTS THIS NEW
 
 %token IDENTIFIER INTEGER BOOLEAN CHARACTER STRING DOUBLE
@@ -43,6 +43,9 @@
 
 %token INCREMENT DECREMENT PLUS MINUS CEQ CNE CLT CLE CGT CGE 
 %token MUL DIV
+
+%nonassoc IFX
+%nonassoc ELSE
 
 %type <classDef> class
 %type <interfaceDef> interface
@@ -438,11 +441,11 @@ ident
     ;
 
 statement 
-    : IF LPAREN expr RPAREN block 
+    : IF LPAREN expr RPAREN statement %prec IFX
     { 
         $$ = new Decaf::IrIfStatement(@1.first_line, @1.first_column, d_scanner.filename(), $3, $5); 
     }
-    | IF LPAREN expr RPAREN block ELSE statement  
+    | IF LPAREN expr RPAREN statement ELSE statement  
     { 
         $$ = new Decaf::IrIfStatement(@1.first_line, @1.first_column, d_scanner.filename(), $3, $5, $7); 
     }

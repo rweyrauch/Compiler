@@ -116,7 +116,7 @@ class Player {
   void Hit(BJDeck deck) {
     int card;
     card = deck.DealCard();
-    callout("printf", "%s was dealt a %d.\n", name, card,);
+    callout("printf", "%s was dealt a %d.\n", name, card);
     total = total + card;
     numcards = numcards + 1;
     if (card == 11) { aces = aces + 1; }
@@ -141,7 +141,7 @@ class Player {
   void TakeTurn(BJDeck deck) {
     boolean stillGoing;
 
-    callout("printf","\n%s's turn.\n", name);
+    callout("printf","\n%s\'s turn.\n", name);
     total = 0;
     aces = 0;
     numcards = 0;
@@ -203,7 +203,7 @@ class Dealer extends Player {
   }
 
   void TakeTurn(BJDeck deck) {
-    callout("printf","\n", "%s's turn.\n", name);
+    callout("printf","\n", "%s\'s turn.\n", name);
     while (total <= 16) {
       Hit(deck);
     }
