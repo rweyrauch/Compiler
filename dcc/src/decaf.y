@@ -47,7 +47,7 @@
 %type <classDef> class
 %type <interfaceDef> interface
 %type <block> block
-%type <methodDecl> method_decl
+%type <methodDecl> method_decl method_signature
 %type <methodDeclList> method_decl_list
 %type <fieldDeclList> field_decl
 %type <fieldDeclListList> field_decl_list
@@ -152,10 +152,9 @@ class
     ;
     
 interface
-    : INTERFACE ident LBRACE method_decl_list RBRACE
+    : INTERFACE ident LBRACE method_prototype_list RBRACE
     {
         $$ = new Decaf::IrInterface(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
-        $$->addMethodDecl(*$4); 
     }
     ;
 
@@ -206,6 +205,17 @@ field_decl
             $$->push_back(decl); 
         } 
     }
+    | ident LBRACKET RBRACKET location_list SEMI
+    {
+        $$ = new std::vector<Decaf::IrFieldDecl*>(); 
+        for (auto it = $4->begin(); it != $4->end(); ++it) 
+        { 
+            Decaf::IrLocation* location = *it; 
+            location->setAsDeclaration();
+            Decaf::IrFieldDecl* decl = new Decaf::IrFieldDecl(@1.first_line, @1.first_column, d_scanner.filename(), location, Decaf::IrType::Class); 
+            $$->push_back(decl); 
+        } 
+    }
     ;
 
 method_decl_list 
@@ -247,35 +257,47 @@ argument_decl
     }
     ;
     
-method_decl 
-    : type ident LPAREN argument_decl_list RPAREN block 
+method_signature
+    : type ident LPAREN argument_decl_list RPAREN 
     { 
         $$ = new Decaf::IrMethodDecl(@1.first_line, @1.first_column, d_scanner.filename(), $2, (Decaf::IrType)$1); 
         for (auto it : *$4)
         {
             $$->addArgument(it);
         }
-        $$->addBlock($6);
     }
-    | type ident LPAREN RPAREN block 
+    | type ident LPAREN RPAREN 
     { 
         $$ = new Decaf::IrMethodDecl(@1.first_line, @1.first_column, d_scanner.filename(), $2, (Decaf::IrType)$1);
-        $$->addBlock($5);
     }
-    | ident ident LPAREN argument_decl_list RPAREN block
+    | ident ident LPAREN argument_decl_list RPAREN
     { 
         $$ = new Decaf::IrMethodDecl(@1.first_line, @1.first_column, d_scanner.filename(), $2, Decaf::IrType::Class); 
         for (auto it : *$4)
         {
             $$->addArgument(it);
         }
-        $$->addBlock($6);
     }
-    | ident ident LPAREN RPAREN block 
+    | ident ident LPAREN RPAREN 
     { 
         $$ = new Decaf::IrMethodDecl(@1.first_line, @1.first_column, d_scanner.filename(), $2, Decaf::IrType::Class);
-        $$->addBlock($5);
     }
+    ;
+
+method_decl 
+    : method_signature block
+    {
+        $1->addBlock($2);
+    }
+    ;
+
+method_prototype_list
+    : method_prototype
+    | method_prototype_list method_prototype
+    ;
+
+method_prototype
+    : method_signature SEMI
     ;
 
 block 
@@ -420,7 +442,7 @@ statement
     { 
         $$ = new Decaf::IrIfStatement(@1.first_line, @1.first_column, d_scanner.filename(), $3, $5); 
     }
-    | IF LPAREN expr RPAREN block ELSE block  
+    | IF LPAREN expr RPAREN block ELSE statement  
     { 
         $$ = new Decaf::IrIfStatement(@1.first_line, @1.first_column, d_scanner.filename(), $3, $5, $7); 
     }
@@ -513,6 +535,10 @@ method_call
         }
     }
     | ident DOT ident LPAREN RPAREN
+    {
+        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown); 
+    }    
+    | ident LBRACKET expr RBRACKET DOT ident LPAREN RPAREN
     {
         $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown); 
     }    
