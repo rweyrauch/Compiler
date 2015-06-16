@@ -37,9 +37,19 @@ public:
     IrFieldDecl(int lineNumber, int columnNumber, const std::string& filename, IrLocation* location, IrType type) :
         IrBase(lineNumber, columnNumber, filename),
         m_location(location),
-        m_type(type)
+        m_type(type),
+        m_typeIdent(nullptr)
     {
         m_location->setType(type);
+    }
+    IrFieldDecl(int lineNumber, int columnNumber, const std::string& filename, IrLocation* location, IrIdentifier* type) :
+        IrBase(lineNumber, columnNumber, filename),
+        m_location(location),
+        m_type(IrType::Class),
+        m_typeIdent(type)
+    {
+        m_location->setType(m_type);
+        m_location->setTypeIdent(m_typeIdent);
     }
     
     virtual ~IrFieldDecl()
@@ -59,6 +69,7 @@ protected:
     
     std::shared_ptr<IrLocation> m_location;
     IrType m_type; 
+    std::shared_ptr<IrIdentifier> m_typeIdent;
     
 private:
     IrFieldDecl() = delete;

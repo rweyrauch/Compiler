@@ -142,15 +142,15 @@ class
     }
     | CLASS ident EXTENDS ident LBRACE member_decl_list RBRACE
     { 
-        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
+        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2, $4); 
     }
     | CLASS ident IMPLEMENTS ident_list LBRACE member_decl_list RBRACE
     { 
-        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
+        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2, nullptr, $4); 
     }     
     | CLASS ident EXTENDS ident IMPLEMENTS ident_list LBRACE member_decl_list RBRACE
     { 
-        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
+        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2, $4, $6); 
     }     
     ;
     
@@ -204,7 +204,7 @@ field_decl
         { 
             Decaf::IrLocation* location = *it; 
             location->setAsDeclaration();
-            Decaf::IrFieldDecl* decl = new Decaf::IrFieldDecl(@1.first_line, @1.first_column, d_scanner.filename(), location, Decaf::IrType::Class); 
+            Decaf::IrFieldDecl* decl = new Decaf::IrFieldDecl(@1.first_line, @1.first_column, d_scanner.filename(), location, $1); 
             $$->push_back(decl); 
         } 
     }
@@ -215,7 +215,7 @@ field_decl
         { 
             Decaf::IrLocation* location = *it; 
             location->setAsDeclaration();
-            Decaf::IrFieldDecl* decl = new Decaf::IrFieldDecl(@1.first_line, @1.first_column, d_scanner.filename(), location, Decaf::IrType::Class); 
+            Decaf::IrFieldDecl* decl = new Decaf::IrFieldDecl(@1.first_line, @1.first_column, d_scanner.filename(), location, $1); 
             $$->push_back(decl); 
         } 
     }

@@ -39,10 +39,30 @@ public:
     IrClass(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident) :
         IrBase(lineNumber, columnNumber, filename),
         m_identifier(ident),
+        m_extends(nullptr),
+        m_implements(),
         m_field_decl_list(),
         m_method_decl_list(),
         m_symbols(new IrSymbolTable())
     {
+    }
+
+    IrClass(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrIdentifier* extends, std::vector<Decaf::IrIdentifier*>* implements = nullptr) :
+        IrBase(lineNumber, columnNumber, filename),
+        m_identifier(ident),
+        m_extends(extends),
+        m_implements(),
+        m_field_decl_list(),
+        m_method_decl_list(),
+        m_symbols(new IrSymbolTable())
+    {
+        if (implements)
+        {
+            for (auto it : *implements)
+            {
+                m_implements.push_back(std::shared_ptr<IrIdentifier>(it));
+            }
+        }
     }
     
     virtual ~IrClass();
@@ -73,6 +93,8 @@ public:
 protected:
     
     std::shared_ptr<IrIdentifier> m_identifier;
+    std::shared_ptr<IrIdentifier> m_extends;
+    std::vector<std::shared_ptr<Decaf::IrIdentifier>> m_implements;
     
     std::vector<std::shared_ptr<IrFieldDecl>> m_field_decl_list;
     std::vector<std::shared_ptr<IrMethodDecl>> m_method_decl_list;

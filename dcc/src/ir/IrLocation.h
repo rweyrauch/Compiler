@@ -34,18 +34,12 @@ class IrLocation : public IrExpression
 {
 public:
      
-    IrLocation(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType type) :
-        IrExpression(lineNumber, columnNumber, filename, type),
-        m_identifier(std::shared_ptr<IrIdentifier>(ident)),
-        m_index(nullptr),
-        m_asDeclaration(false)
-    {}
-
-    IrLocation(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType type, IrExpression* index) :
+    IrLocation(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType type, IrExpression* index = nullptr) :
         IrExpression(lineNumber, columnNumber, filename, type),
         m_identifier(std::shared_ptr<IrIdentifier>(ident)),
         m_index(index),
-        m_asDeclaration(false)
+        m_asDeclaration(false),
+        m_typeIdent(nullptr)
     {}
     
     virtual ~IrLocation()
@@ -61,6 +55,7 @@ public:
     void setAsDeclaration() { m_asDeclaration = true; }
     bool usedAsDeclaration() const { return m_asDeclaration; }
     
+    void setTypeIdent(std::shared_ptr<IrIdentifier> typeIdent) { m_typeIdent = typeIdent; }
     std::shared_ptr<IrIdentifier> getIdentifier() const { return m_identifier; }
     std::shared_ptr<IrExpression> getIndex() const { return m_index; }
     
@@ -69,6 +64,7 @@ protected:
     std::shared_ptr<IrIdentifier> m_identifier;
     std::shared_ptr<IrExpression> m_index;
     bool m_asDeclaration;
+    std::shared_ptr<IrIdentifier> m_typeIdent;
     
     static int s_tempLocationCounter;
     
