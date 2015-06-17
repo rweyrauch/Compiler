@@ -32,9 +32,9 @@ class IrIdentifier;
 class IrGotoStatement : public IrStatement
 {
 public:
-    IrGotoStatement(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* label) :
+    IrGotoStatement(int lineNumber, int columnNumber, const std::string& filename, IrIdentifierPtr label) :
         IrStatement(lineNumber, columnNumber, filename),
-        m_label(std::shared_ptr<IrIdentifier>(label))
+        m_label(label)
     {}
     
     virtual ~IrGotoStatement()
@@ -48,7 +48,7 @@ public:
     virtual const std::string& asString() const { return m_goto; }
     
 protected:    
-    std::shared_ptr<IrIdentifier> m_label;
+    IrIdentifierPtr m_label;
     const std::string m_goto = "goto";
     
 private:

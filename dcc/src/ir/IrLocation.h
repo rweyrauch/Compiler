@@ -22,7 +22,6 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <memory>
 #include "IrExpression.h"
 
 namespace Decaf
@@ -34,9 +33,9 @@ class IrLocation : public IrExpression
 {
 public:
      
-    IrLocation(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType type, IrExpression* index = nullptr) :
+    IrLocation(int lineNumber, int columnNumber, const std::string& filename, IrIdentifierPtr ident, IrType type, IrExpressionPtr index = nullptr) :
         IrExpression(lineNumber, columnNumber, filename, type),
-        m_identifier(std::shared_ptr<IrIdentifier>(ident)),
+        m_identifier(ident),
         m_index(index),
         m_asDeclaration(false),
         m_typeIdent(nullptr)
@@ -55,16 +54,16 @@ public:
     void setAsDeclaration() { m_asDeclaration = true; }
     bool usedAsDeclaration() const { return m_asDeclaration; }
     
-    void setTypeIdent(std::shared_ptr<IrIdentifier> typeIdent) { m_typeIdent = typeIdent; }
-    std::shared_ptr<IrIdentifier> getIdentifier() const { return m_identifier; }
-    std::shared_ptr<IrExpression> getIndex() const { return m_index; }
+    void setTypeIdent(IrIdentifierPtr typeIdent) { m_typeIdent = typeIdent; }
+    IrIdentifierPtr getIdentifier() const { return m_identifier; }
+    IrExpressionPtr getIndex() const { return m_index; }
     
 protected:
     
-    std::shared_ptr<IrIdentifier> m_identifier;
-    std::shared_ptr<IrExpression> m_index;
+    IrIdentifierPtr m_identifier;
+    IrExpressionPtr m_index;
     bool m_asDeclaration;
-    std::shared_ptr<IrIdentifier> m_typeIdent;
+    IrIdentifierPtr m_typeIdent;
     
     static int s_tempLocationCounter;
     

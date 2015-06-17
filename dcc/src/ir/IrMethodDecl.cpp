@@ -86,7 +86,7 @@ bool IrMethodDecl::analyze(IrTraversalContext* ctx)
 {
     bool valid = true;
  
-    ctx->addString(IrIdentifier::CreateLabel(), getName());
+    ctx->addString(IrIdentifier::CreateLabel().get(), getName());
     
     ctx->pushSymbols(m_symbols.get());
     ctx->pushParent(this);
@@ -100,7 +100,7 @@ bool IrMethodDecl::analyze(IrTraversalContext* ctx)
         const size_t numStmts = m_block->getNumStatements();
         for (size_t i = 0; i < numStmts; i++)
         {
-            const IrReturnStatement* retStmt = dynamic_cast<const IrReturnStatement*>(m_block->getStatement(i));
+            const IrReturnStatement* retStmt = dynamic_cast<const IrReturnStatement*>(m_block->getStatement(i).get());
             if (retStmt)
             {
                 if (retStmt->getReturnType() != m_returnType)
@@ -125,7 +125,7 @@ bool IrMethodDecl::analyze(IrTraversalContext* ctx)
             else
             {
                 // add the implied return statement
-                m_block->addStatement(new IrReturnStatement(m_block->getLineNumber(), m_block->getColumnNumber(), m_block->getFilename()));
+                m_block->addStatement(IrStatementPtr(new IrReturnStatement(m_block->getLineNumber(), m_block->getColumnNumber(), m_block->getFilename())));
             }
         }
         // patch up child symbol addresses

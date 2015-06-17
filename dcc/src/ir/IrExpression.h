@@ -54,7 +54,7 @@ public:
     void setAsWrite(bool write ) { m_asWrite = write; }
     bool usedAsWrite() const { return m_asWrite; }
     
-    std::shared_ptr<IrIdentifier> getResult() const { return m_result; }
+    IrIdentifierPtr getResult() const { return m_result; }
     
 protected:
     
@@ -62,7 +62,7 @@ protected:
     bool m_isArray;
     bool m_asWrite;
     
-    std::shared_ptr<IrIdentifier> m_result;
+    IrIdentifierPtr m_result;
     
 private:
     IrExpression() = delete;

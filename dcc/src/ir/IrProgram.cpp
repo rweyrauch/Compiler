@@ -237,48 +237,48 @@ bool IrProgram::codegen(IrTraversalContext* ctx)
     return true; 
 }
 
-void IrProgram::addFieldDecl(IrFieldDecl* field)
+void IrProgram::addFieldDecl(IrFieldDeclPtr field)
 {
-    m_field_decl_list.push_back(std::shared_ptr<IrFieldDecl>(field));
+    m_field_decl_list.push_back(field);
     
-    m_symbols->addVariable(field);    
+    m_symbols->addVariable(field.get());    
 }
 
 void IrProgram::addFieldDecl(const std::vector<IrFieldDecl*>& fields)
 {
     for (auto it : fields)
     {
-        addFieldDecl(it);
+        addFieldDecl(IrFieldDeclPtr(it));
     }
 }
 
-void IrProgram::addMethodDecl(IrMethodDecl* method)
+void IrProgram::addMethodDecl(IrMethodDeclPtr method)
 {
-    m_method_decl_list.push_back(std::shared_ptr<IrMethodDecl>(method));
+    m_method_decl_list.push_back(method);
     
-    m_symbols->addMethod(method);    
+    m_symbols->addMethod(method.get());    
 }
 
 void IrProgram::addMethodDecl(const std::vector<IrMethodDecl*>& methods)
 {
     for (auto it : methods)
     {
-        addMethodDecl(it);
+        addMethodDecl(IrMethodDeclPtr(it));
     }
 }
 
-void IrProgram::addClassDecl(IrClass* classDecl)
+void IrProgram::addClassDecl(IrClassPtr classDecl)
 {
-    m_class_decl_list.push_back(std::shared_ptr<IrClass>(classDecl));
+    m_class_decl_list.push_back(IrClassPtr(classDecl));
     
-    m_symbols->addClass(classDecl);        
+    m_symbols->addClass(classDecl.get());        
 }
 
 void IrProgram::addClassDecl(const std::vector<IrClass*>& classes)
 {
     for (auto it : classes)
     {
-        addClassDecl(it);
+        addClassDecl(IrClassPtr(it));
     }
 }
 

@@ -34,7 +34,7 @@ namespace Decaf
 class IrSwitchStatement : public IrStatement
 {
 public:
-    IrSwitchStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpression* expr) :
+    IrSwitchStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpressionPtr expr) :
         IrStatement(lineNumber, columnNumber, filename),
         m_expression(expr)
     {}
@@ -49,22 +49,22 @@ public:
     virtual bool codegen(IrTraversalContext* ctx);
     virtual const std::string& asString() const { return m_switch; }
   
-    void addStatement(IrCaseStatement* stmt)
+    void addStatement(IrCaseStatementPtr stmt)
     {
-        m_statements.push_back(std::shared_ptr<IrCaseStatement>(stmt));
+        m_statements.push_back(stmt);
     }
     void addStatements(const std::vector<IrCaseStatement*>& statements)
     {
         for (auto it : statements)
         {
-            addStatement(it);
+            addStatement(IrCaseStatementPtr(it));
         }
     }
    
  protected:    
     
-    std::shared_ptr<IrExpression> m_expression;
-    std::vector<std::shared_ptr<IrCaseStatement>> m_statements;
+    IrExpressionPtr m_expression;
+    std::vector<IrCaseStatementPtr> m_statements;
     
     const std::string m_switch = "switch";
     

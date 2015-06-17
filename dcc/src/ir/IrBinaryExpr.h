@@ -32,7 +32,7 @@ namespace Decaf
 class IrBinaryExpression : public IrExpression
 {
 public:
-    IrBinaryExpression(int lineNumber, int columnNumber, const std::string& filename, IrType type, IrExpression* lhs, IrBinaryOperator binaryOp, IrExpression* rhs) :
+    IrBinaryExpression(int lineNumber, int columnNumber, const std::string& filename, IrType type, IrExpressionPtr lhs, IrBinaryOperator binaryOp, IrExpressionPtr rhs) :
         IrExpression(lineNumber, columnNumber, filename, type),
         m_operator(binaryOp),
         m_lhs(lhs),
@@ -50,14 +50,14 @@ public:
     virtual const std::string& asString() const;
     
     IrBinaryOperator getOperator() const { return m_operator; }
-    IrExpression* getLeftHandSide() const { return m_lhs.get(); }
-    IrExpression* getRightHandSide() const { return m_rhs.get(); }
+    IrExpressionPtr getLeftHandSide() const { return m_lhs; }
+    IrExpressionPtr getRightHandSide() const { return m_rhs; }
    
 protected:
     
     IrBinaryOperator m_operator;
-    std::shared_ptr<IrExpression> m_lhs;
-    std::shared_ptr<IrExpression> m_rhs;
+    IrExpressionPtr m_lhs;
+    IrExpressionPtr m_rhs;
     
 private:
     IrBinaryExpression() = delete;

@@ -34,7 +34,7 @@ namespace Decaf
 class IrInterface : public IrBase
 {
 public:
-    IrInterface(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident) :
+    IrInterface(int lineNumber, int columnNumber, const std::string& filename, IrIdentifierPtr ident) :
         IrBase(lineNumber, columnNumber, filename),
         m_identifier(ident),
         m_method_decl_list()
@@ -50,14 +50,14 @@ public:
     virtual bool codegen(IrTraversalContext* ctx);
     virtual const std::string& asString() const { return m_interface; }
     
-    void addMethodDecl(IrMethodDecl* method);
+    void addMethodDecl(IrMethodDeclPtr method);
     void addMethodDecl(const std::vector<IrMethodDecl*>& methods);
     
 protected:
     
-    std::shared_ptr<IrIdentifier> m_identifier;
+    IrIdentifierPtr m_identifier;
     
-    std::vector<std::shared_ptr<IrMethodDecl>> m_method_decl_list;
+    std::vector<IrMethodDeclPtr> m_method_decl_list;
     const std::string m_interface = "interface";
     
 private:

@@ -87,7 +87,7 @@ program_decl_list
 program_decl
     : class
     {
-        getProgram()->addClassDecl($1);
+        getProgram()->addClassDecl(IrClassPtr($1));
     }
     | interface
     {
@@ -99,7 +99,7 @@ program_decl
     }
     | method_decl
     {
-        getProgram()->addMethodDecl($1);
+        getProgram()->addMethodDecl(IrMethodDeclPtr($1));
     }
     ;
     
@@ -116,7 +116,7 @@ member_decl_list
 class
     : CLASS ident LBRACE field_decl_list method_decl_list RBRACE 
     { 
-        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
+        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2)); 
         for (auto it : *$4)
         {
             $$->addFieldDecl(it); 
@@ -125,7 +125,7 @@ class
     }
     | CLASS ident LBRACE field_decl_list RBRACE  
     { 
-        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
+        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2)); 
         for (auto it : *$4)
         {
             $$->addFieldDecl(it); 
@@ -133,31 +133,31 @@ class
     }
     | CLASS ident LBRACE method_decl_list RBRACE  
     { 
-        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
+        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2)); 
         $$->addMethodDecl(*$4); 
     }
     | CLASS ident LBRACE RBRACE  
     { 
-        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
+        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2)); 
     }
     | CLASS ident EXTENDS ident LBRACE member_decl_list RBRACE
     { 
-        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2, $4); 
+        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2), IrIdentifierPtr($4)); 
     }
     | CLASS ident IMPLEMENTS ident_list LBRACE member_decl_list RBRACE
     { 
-        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2, nullptr, $4); 
+        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2), nullptr, $4); 
     }     
     | CLASS ident EXTENDS ident IMPLEMENTS ident_list LBRACE member_decl_list RBRACE
     { 
-        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), $2, $4, $6); 
+        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2), IrIdentifierPtr($4), $6); 
     }     
     ;
     
 interface
     : INTERFACE ident LBRACE method_prototype_list RBRACE
     {
-        $$ = new Decaf::IrInterface(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
+        $$ = new Decaf::IrInterface(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2)); 
     }
     ;
 
@@ -191,7 +191,7 @@ field_decl
         $$ = new std::vector<Decaf::IrFieldDecl*>(); 
         for (auto it = $2->begin(); it != $2->end(); ++it) 
         { 
-            Decaf::IrLocation* location = *it; 
+            Decaf::IrLocationPtr location(*it); 
             location->setAsDeclaration();
             Decaf::IrFieldDecl* decl = new Decaf::IrFieldDecl(@1.first_line, @1.first_column, d_scanner.filename(), location, (Decaf::IrType)$1); 
             $$->push_back(decl); 
@@ -202,9 +202,9 @@ field_decl
         $$ = new std::vector<Decaf::IrFieldDecl*>(); 
         for (auto it = $2->begin(); it != $2->end(); ++it) 
         { 
-            Decaf::IrLocation* location = *it; 
+            Decaf::IrLocationPtr location(*it); 
             location->setAsDeclaration();
-            Decaf::IrFieldDecl* decl = new Decaf::IrFieldDecl(@1.first_line, @1.first_column, d_scanner.filename(), location, $1); 
+            Decaf::IrFieldDecl* decl = new Decaf::IrFieldDecl(@1.first_line, @1.first_column, d_scanner.filename(), location, IrIdentifierPtr($1)); 
             $$->push_back(decl); 
         } 
     }
@@ -213,9 +213,9 @@ field_decl
         $$ = new std::vector<Decaf::IrFieldDecl*>(); 
         for (auto it = $4->begin(); it != $4->end(); ++it) 
         { 
-            Decaf::IrLocation* location = *it; 
+            Decaf::IrLocationPtr location(*it); 
             location->setAsDeclaration();
-            Decaf::IrFieldDecl* decl = new Decaf::IrFieldDecl(@1.first_line, @1.first_column, d_scanner.filename(), location, $1); 
+            Decaf::IrFieldDecl* decl = new Decaf::IrFieldDecl(@1.first_line, @1.first_column, d_scanner.filename(), location, IrIdentifierPtr($1)); 
             $$->push_back(decl); 
         } 
     }
@@ -248,49 +248,49 @@ argument_decl_list
 argument_decl 
     : type ident 
     { 
-        $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), $2, (Decaf::IrType)$1); 
+        $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2), (Decaf::IrType)$1); 
     }
     | ident ident 
     { 
-        $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), $2, $1); 
+        $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2), IrIdentifierPtr($1)); 
     }
     | ident LBRACKET RBRACKET ident 
     { 
-        $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), $4, $1); 
+        $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($4), IrIdentifierPtr($1)); 
     }
     ;
     
 method_signature
     : type ident LPAREN argument_decl_list RPAREN 
     { 
-        $$ = new Decaf::IrMethodDecl(@1.first_line, @1.first_column, d_scanner.filename(), $2, (Decaf::IrType)$1); 
+        $$ = new Decaf::IrMethodDecl(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2), (Decaf::IrType)$1); 
         for (auto it : *$4)
         {
-            $$->addArgument(it);
+            $$->addArgument(IrVariableDeclPtr(it));
         }
     }
     | type ident LPAREN RPAREN 
     { 
-        $$ = new Decaf::IrMethodDecl(@1.first_line, @1.first_column, d_scanner.filename(), $2, (Decaf::IrType)$1);
+        $$ = new Decaf::IrMethodDecl(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2), (Decaf::IrType)$1);
     }
     | ident ident LPAREN argument_decl_list RPAREN
     { 
-        $$ = new Decaf::IrMethodDecl(@1.first_line, @1.first_column, d_scanner.filename(), $2, Decaf::IrType::Class); 
+        $$ = new Decaf::IrMethodDecl(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2), Decaf::IrType::Class); 
         for (auto it : *$4)
         {
-            $$->addArgument(it);
+            $$->addArgument(IrVariableDeclPtr(it));
         }
     }
     | ident ident LPAREN RPAREN 
     { 
-        $$ = new Decaf::IrMethodDecl(@1.first_line, @1.first_column, d_scanner.filename(), $2, Decaf::IrType::Class);
+        $$ = new Decaf::IrMethodDecl(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2), Decaf::IrType::Class);
     }
     ;
 
 method_decl 
     : method_signature block
     {
-        $1->addBlock($2);
+        $1->addBlock(IrBlockPtr($2));
     }
     ;
 
@@ -345,11 +345,11 @@ var_decl
     }
     | ident ident_list SEMI
     {
-        $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), *$2, $1); 
+        $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), *$2, IrIdentifierPtr($1)); 
     }
     | ident LBRACKET RBRACKET ident_list SEMI
     {
-        $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), *$4, $1); 
+        $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), *$4, IrIdentifierPtr($1)); 
     }
     ;
 
@@ -443,27 +443,27 @@ ident
 statement 
     : IF LPAREN expr RPAREN statement %prec IFX
     { 
-        $$ = new Decaf::IrIfStatement(@1.first_line, @1.first_column, d_scanner.filename(), $3, $5); 
+        $$ = new Decaf::IrIfStatement(@1.first_line, @1.first_column, d_scanner.filename(), IrExpressionPtr($3), IrStatementPtr($5)); 
     }
     | IF LPAREN expr RPAREN statement ELSE statement  
     { 
-        $$ = new Decaf::IrIfStatement(@1.first_line, @1.first_column, d_scanner.filename(), $3, $5, $7); 
+        $$ = new Decaf::IrIfStatement(@1.first_line, @1.first_column, d_scanner.filename(), IrExpressionPtr($3), IrStatementPtr($5), IrStatementPtr($7)); 
     }
     | FOR LPAREN expr SEMI expr SEMI expr RPAREN statement 
     { 
-        $$ = new Decaf::IrForStatement(@1.first_line, @1.first_column, d_scanner.filename(), $3, $5, $7, $9); 
+        $$ = new Decaf::IrForStatement(@1.first_line, @1.first_column, d_scanner.filename(), IrExpressionPtr($3), IrExpressionPtr($5), IrExpressionPtr($7), IrStatementPtr($9)); 
     }
     | WHILE LPAREN expr RPAREN statement
     {
-        $$ = new Decaf::IrWhileStatement(@1.first_line, @1.first_column, d_scanner.filename(), $3, $5); 
+        $$ = new Decaf::IrWhileStatement(@1.first_line, @1.first_column, d_scanner.filename(), IrExpressionPtr($3), IrStatementPtr($5)); 
     }
     | DO statement WHILE LPAREN expr RPAREN
     {
-        $$ = new Decaf::IrDoWhileStatement(@1.first_line, @1.first_column, d_scanner.filename(), $5, $2); 
+        $$ = new Decaf::IrDoWhileStatement(@1.first_line, @1.first_column, d_scanner.filename(), IrExpressionPtr($5), IrStatementPtr($2)); 
     }
     | SWITCH LPAREN expr RPAREN LBRACE case_list RBRACE
     {
-        Decaf::IrSwitchStatement* stmt = new Decaf::IrSwitchStatement(@1.first_line, @1.first_column, d_scanner.filename(), $3);
+        Decaf::IrSwitchStatement* stmt = new Decaf::IrSwitchStatement(@1.first_line, @1.first_column, d_scanner.filename(), IrExpressionPtr($3));
         stmt->addStatements(*$6); 
         $$ = stmt;
     }
@@ -473,7 +473,7 @@ statement
     }
     | RETURN expr SEMI 
     { 
-        $$ = new Decaf::IrReturnStatement(@1.first_line, @1.first_column, d_scanner.filename(), $2); 
+        $$ = new Decaf::IrReturnStatement(@1.first_line, @1.first_column, d_scanner.filename(), IrExpressionPtr($2)); 
     }
     | BREAK SEMI 
     { 
@@ -485,15 +485,15 @@ statement
     }
     | expr SEMI 
     { 
-        $$ = new Decaf::IrExpressionStatement(@1.first_line, @1.first_column, d_scanner.filename(), $1); 
+        $$ = new Decaf::IrExpressionStatement(@1.first_line, @1.first_column, d_scanner.filename(), IrExpressionPtr($1)); 
     }
     | GOTO ident SEMI
     {
-        $$ = new Decaf::IrGotoStatement(@1.first_line, @1.first_column, d_scanner.filename(), $2);
+        $$ = new Decaf::IrGotoStatement(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2));
     }
     | ident COLON
     {
-        $$ = new Decaf::IrLabelStatement(@1.first_line, @1.first_column, d_scanner.filename(), $1);
+        $$ = new Decaf::IrLabelStatement(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($1));
     }
     | block 
     { 
@@ -519,38 +519,38 @@ assign_op
 method_call 
     : ident LPAREN expr_list RPAREN 
     { 
-        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown);
+        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($1), Decaf::IrType::Unknown);
         for (auto it : *$3) 
         {
-            $$->addArgument(it);
+            $$->addArgument(IrExpressionPtr(it));
         }
     }
     | ident LPAREN RPAREN 
     { 
-        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown); 
+        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($1), Decaf::IrType::Unknown); 
     }
     | ident DOT ident LPAREN expr_list RPAREN
     {
-        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown);
+        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($1), Decaf::IrType::Unknown);
         for (auto it : *$5) 
         {
-            $$->addArgument(it);
+            $$->addArgument(IrExpressionPtr(it));
         }
     }
     | ident DOT ident LPAREN RPAREN
     {
-        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown); 
+        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($1), Decaf::IrType::Unknown); 
     }    
     | ident LBRACKET expr RBRACKET DOT ident LPAREN RPAREN
     {
-        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown); 
+        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($1), Decaf::IrType::Unknown); 
     }    
     | CALLOUT LPAREN string_literal COMMA expr_list RPAREN
     {
         $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $3, Decaf::IrType::Integer);
         for (auto it : *$5) 
         {
-            $$->addArgument(it);
+            $$->addArgument(IrExpressionPtr(it));
         }
     }
     | CALLOUT LPAREN string_literal RPAREN
@@ -559,7 +559,7 @@ method_call
     }
     | NEW ident 
     { 
-        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $2, Decaf::IrType::Unknown); // create IrNewCall();
+        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2), Decaf::IrType::Unknown); // create IrNewCall();
     }
     | NEW type LBRACKET expr RBRACKET 
     { 
@@ -567,34 +567,34 @@ method_call
     }
     | NEW ident LBRACKET expr RBRACKET 
     { 
-        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $2, Decaf::IrType::Unknown); // create IrNewCall();
+        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2), Decaf::IrType::Unknown); // create IrNewCall();
     }
     ;
     
 location 
     : ident 
     { 
-        $$ = new Decaf::IrLocation(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown); 
+        $$ = new Decaf::IrLocation(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($1), Decaf::IrType::Unknown); 
     }
     | ident LBRACKET expr RBRACKET 
     { 
-        $$ = new Decaf::IrLocation(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown, $3); 
+        $$ = new Decaf::IrLocation(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($1), Decaf::IrType::Unknown, IrExpressionPtr($3)); 
     }
     | ident DOT ident
     {
-        $$ = new Decaf::IrLocation(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown);     
+        $$ = new Decaf::IrLocation(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($1), Decaf::IrType::Unknown);     
     }
     | ident LBRACKET expr RBRACKET DOT ident
     {
-        $$ = new Decaf::IrLocation(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown, $3);     
+        $$ = new Decaf::IrLocation(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($1), Decaf::IrType::Unknown, IrExpressionPtr($3));     
     }
     | ident DOT ident LBRACKET expr RBRACKET 
     {
-        $$ = new Decaf::IrLocation(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown);     
+        $$ = new Decaf::IrLocation(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($1), Decaf::IrType::Unknown);     
     }
     | ident LBRACKET expr RBRACKET DOT ident LBRACKET expr RBRACKET 
     {
-        $$ = new Decaf::IrLocation(@1.first_line, @1.first_column, d_scanner.filename(), $1, Decaf::IrType::Unknown, $3);     
+        $$ = new Decaf::IrLocation(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($1), Decaf::IrType::Unknown, IrExpressionPtr($3));     
     }
     ;
 
@@ -644,7 +644,7 @@ unary_expr
         }
         else
         {
-            $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, nullptr, Decaf::IrBinaryOperator::Subtract, $2); 
+            $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, nullptr, Decaf::IrBinaryOperator::Subtract, IrExpressionPtr($2)); 
         }
     }
     | BANG unary_expr  
@@ -652,7 +652,7 @@ unary_expr
         Decaf::IrBooleanLiteral* boolLit = dynamic_cast<Decaf::IrBooleanLiteral*>($2);
         if (boolLit == nullptr)
         {
-            $$ = new Decaf::IrBooleanExpression(@1.first_line, @1.first_column, d_scanner.filename(), nullptr, Decaf::IrBooleanOperator::Not, $2); 
+            $$ = new Decaf::IrBooleanExpression(@1.first_line, @1.first_column, d_scanner.filename(), nullptr, Decaf::IrBooleanOperator::Not, IrExpressionPtr($2)); 
         }
         else
         {
@@ -670,15 +670,15 @@ mult_expr
     }
     | mult_expr MUL unary_expr 
     { 
-        $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, $1, Decaf::IrBinaryOperator::Multiply, $3); 
+        $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, IrExpressionPtr($1), Decaf::IrBinaryOperator::Multiply, IrExpressionPtr($3)); 
     }
     | mult_expr DIV unary_expr 
     { 
-        $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, $1, Decaf::IrBinaryOperator::Divide, $3); 
+        $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, IrExpressionPtr($1), Decaf::IrBinaryOperator::Divide, IrExpressionPtr($3)); 
     }
     | mult_expr MOD unary_expr 
     { 
-        $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, $1, Decaf::IrBinaryOperator::Modulo, $3); 
+        $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, IrExpressionPtr($1), Decaf::IrBinaryOperator::Modulo, IrExpressionPtr($3)); 
     }
     ;
     
@@ -689,11 +689,11 @@ add_expr
     }
     | add_expr PLUS mult_expr  
     { 
-        $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, $1, Decaf::IrBinaryOperator::Add, $3); 
+        $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, IrExpressionPtr($1), Decaf::IrBinaryOperator::Add, IrExpressionPtr($3)); 
     }
     | add_expr MINUS mult_expr  
     { 
-        $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, $1, Decaf::IrBinaryOperator::Subtract, $3); 
+        $$ = new Decaf::IrBinaryExpression(@1.first_line, @1.first_column, d_scanner.filename(), Decaf::IrType::Unknown, IrExpressionPtr($1), Decaf::IrBinaryOperator::Subtract, IrExpressionPtr($3)); 
     }
     ;
 
@@ -704,7 +704,7 @@ rel_expr
     }
     | rel_expr rel_op add_expr 
     { 
-        $$ = new Decaf::IrBooleanExpression(@1.first_line, @1.first_column, d_scanner.filename(), $1, (Decaf::IrBooleanOperator)$2, $3); 
+        $$ = new Decaf::IrBooleanExpression(@1.first_line, @1.first_column, d_scanner.filename(), IrExpressionPtr($1), (Decaf::IrBooleanOperator)$2, IrExpressionPtr($3)); 
     }
     ;
  
@@ -715,7 +715,7 @@ logic_expr
     }
     | logic_expr logic_op rel_expr  
     { 
-        $$ = new Decaf::IrBooleanExpression(@1.first_line, @1.first_column, d_scanner.filename(), $1, (Decaf::IrBooleanOperator)$2, $3); 
+        $$ = new Decaf::IrBooleanExpression(@1.first_line, @1.first_column, d_scanner.filename(), IrExpressionPtr($1), (Decaf::IrBooleanOperator)$2, IrExpressionPtr($3)); 
     }
     ;
     
@@ -726,7 +726,7 @@ assign_expr
     }
     | assign_expr assign_op logic_expr
     {
-        $$ = new Decaf::IrAssignExpression(@1.first_line, @1.first_column, d_scanner.filename(), $1, (Decaf::IrAssignmentOperator)$2, $3); 
+        $$ = new Decaf::IrAssignExpression(@1.first_line, @1.first_column, d_scanner.filename(), IrExpressionPtr($1), (Decaf::IrAssignmentOperator)$2, IrExpressionPtr($3)); 
     }
     ;
 

@@ -146,33 +146,33 @@ bool IrClass::codegen(IrTraversalContext* ctx)
     return true; 
 }
 
-void IrClass::addFieldDecl(IrFieldDecl* field)
+void IrClass::addFieldDecl(IrFieldDeclPtr field)
 {
-    m_field_decl_list.push_back(std::shared_ptr<IrFieldDecl>(field));
+    m_field_decl_list.push_back(field);
     
-    m_symbols->addVariable(field);    
+    m_symbols->addVariable(field.get());    
 }
 
 void IrClass::addFieldDecl(const std::vector<IrFieldDecl*>& fields)
 {
     for (auto it : fields)
     {
-        addFieldDecl(it);
+        addFieldDecl(IrFieldDeclPtr(it));
     }
 }
 
-void IrClass::addMethodDecl(IrMethodDecl* method)
+void IrClass::addMethodDecl(IrMethodDeclPtr method)
 {
-    m_method_decl_list.push_back(std::shared_ptr<IrMethodDecl>(method));
+    m_method_decl_list.push_back(method);
     
-    m_symbols->addMethod(method);    
+    m_symbols->addMethod(method.get());    
 }
 
 void IrClass::addMethodDecl(const std::vector<IrMethodDecl*>& methods)
 {
     for (auto it : methods)
     {
-        addMethodDecl(it);
+        addMethodDecl(IrMethodDeclPtr(it));
     }
 }
 

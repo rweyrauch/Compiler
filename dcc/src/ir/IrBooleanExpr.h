@@ -32,7 +32,7 @@ namespace Decaf
 class IrBooleanExpression : public IrExpression
 {
 public:
-    IrBooleanExpression(int lineNumber, int columnNumber, const std::string& filename, IrExpression* lhs, IrBooleanOperator boolOp, IrExpression* rhs) :
+    IrBooleanExpression(int lineNumber, int columnNumber, const std::string& filename, IrExpressionPtr lhs, IrBooleanOperator boolOp, IrExpressionPtr rhs) :
         IrExpression(lineNumber, columnNumber, filename, IrType::Boolean),
         m_operator(boolOp),
         m_lhs(lhs),
@@ -50,14 +50,14 @@ public:
     virtual const std::string& asString() const;
     
     IrBooleanOperator getOperator() const { return m_operator; }
-    std::shared_ptr<IrExpression> getLeftHandSide() const { return m_lhs; }
-    std::shared_ptr<IrExpression> getRightHandSide() const { return m_rhs; }
+    IrExpressionPtr getLeftHandSide() const { return m_lhs; }
+    IrExpressionPtr getRightHandSide() const { return m_rhs; }
     
 protected:
     
     IrBooleanOperator m_operator;
-    std::shared_ptr<IrExpression> m_lhs;
-    std::shared_ptr<IrExpression> m_rhs;
+    IrExpressionPtr m_lhs;
+    IrExpressionPtr m_rhs;
     
 private:
     IrBooleanExpression() = delete;

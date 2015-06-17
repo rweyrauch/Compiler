@@ -35,9 +35,9 @@ class IrStringLiteral;
 class IrMethodCall : public IrExpression
 {
 public:
-    IrMethodCall(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType type) :
+    IrMethodCall(int lineNumber, int columnNumber, const std::string& filename, IrIdentifierPtr ident, IrType type) :
         IrExpression(lineNumber, columnNumber, filename, type),
-        m_identifier(std::shared_ptr<IrIdentifier>(ident)),
+        m_identifier(ident),
         m_externFuncName(nullptr),
         m_externalFunction(false),
         m_arguments()
@@ -54,22 +54,22 @@ public:
     virtual bool codegen(IrTraversalContext* ctx);
     virtual const std::string& asString() const;
     
-    void addArgument(IrExpression* arg)
+    void addArgument(IrExpressionPtr arg)
     {
-        m_arguments.push_back(std::shared_ptr<IrExpression>(arg));
+        m_arguments.push_back(arg);
     }
     
     bool isExternal() const { return m_externalFunction; }
-    const IrIdentifier* getIdentifier() const { return m_identifier.get(); }
+    const IrIdentifierPtr getIdentifier() const { return m_identifier; }
     size_t getNumArguments() const { return m_arguments.size(); }
     IrType getArgumentType(size_t which) const { return m_arguments.at(which)->getType(); }
     
 protected:    
     
-    std::shared_ptr<IrIdentifier> m_identifier;
+    IrIdentifierPtr m_identifier;
     std::shared_ptr<IrStringLiteral> m_externFuncName;
     bool m_externalFunction;
-    std::vector<std::shared_ptr<IrExpression>> m_arguments;
+    std::vector<IrExpressionPtr> m_arguments;
     
 private:
     IrMethodCall() = delete;

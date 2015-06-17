@@ -169,18 +169,18 @@ bool IrBlock::codegen(IrTraversalContext* ctx)
     return valid; 
 }
     
-void IrBlock::addVariableDecl(IrVariableDecl* var)
+void IrBlock::addVariableDecl(IrVariableDeclPtr var)
 {
-    m_variables.push_back(std::shared_ptr<IrVariableDecl>(var));
+    m_variables.push_back(var);
     
-    m_symbols->addVariable(var);
+    m_symbols->addVariable(var.get());
 }
 
 void IrBlock::addVariableDecl(const std::vector<IrVariableDecl*>& variables)
 {
     for (auto it : variables)
     {
-        addVariableDecl(it);
+        addVariableDecl(IrVariableDeclPtr(it));
     }
 }
  

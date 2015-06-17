@@ -51,23 +51,23 @@ public:
     virtual bool allocate(IrTraversalContext* ctx);       
     virtual bool codegen(IrTraversalContext* ctx);
     
-    void addVariableDecl(IrVariableDecl* var);
+    void addVariableDecl(IrVariableDeclPtr var);
     void addVariableDecl(const std::vector<IrVariableDecl*>& variables);
     
-    void addStatement(IrStatement* stmt)
+    void addStatement(IrStatementPtr stmt)
     {
-        m_statements.push_back(std::shared_ptr<IrStatement>(stmt));
+        m_statements.push_back(stmt);
     }
     void addStatements(const std::vector<IrStatement*>& statements)
     {
         for (auto it : statements)
         {
-            addStatement(it);
+            addStatement(IrStatementPtr(it));
         }
     }
   
     size_t getNumStatements() const { return m_statements.size(); }
-    const IrStatement* getStatement(size_t which) const { return m_statements.at(which).get(); }
+    const IrStatementPtr getStatement(size_t which) const { return m_statements.at(which); }
     
     IrSymbolTable* getSymbols()
     {
@@ -79,8 +79,8 @@ public:
 
 protected:    
     
-    std::vector<std::shared_ptr<IrVariableDecl>> m_variables;
-    std::vector<std::shared_ptr<IrStatement>> m_statements;
+    std::vector<IrVariableDeclPtr> m_variables;
+    std::vector<IrStatementPtr> m_statements;
     
     std::unique_ptr<IrSymbolTable> m_symbols;
     

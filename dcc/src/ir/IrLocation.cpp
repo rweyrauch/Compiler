@@ -143,7 +143,7 @@ bool IrLocation::analyze(IrTraversalContext* ctx)
         
         assert(m_result == nullptr);
         // allocate a temporary variable for the result of this expression
-        m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());
+        m_result = IrIdentifier::CreateTemporary();
     }
     else
     {

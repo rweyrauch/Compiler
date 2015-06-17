@@ -93,16 +93,16 @@ bool IrInterface::codegen(IrTraversalContext* ctx)
     return true; 
 }
 
-void IrInterface::addMethodDecl(IrMethodDecl* method)
+void IrInterface::addMethodDecl(IrMethodDeclPtr method)
 {
-    m_method_decl_list.push_back(std::shared_ptr<IrMethodDecl>(method));
+    m_method_decl_list.push_back(method);
 }
 
 void IrInterface::addMethodDecl(const std::vector<IrMethodDecl*>& methods)
 {
     for (auto it : methods)
     {
-        addMethodDecl(it);
+        addMethodDecl(IrMethodDeclPtr(it));
     }
 }
 

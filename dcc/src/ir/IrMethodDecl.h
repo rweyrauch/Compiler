@@ -38,7 +38,7 @@ class IrIntegerLiteral;
 class IrMethodDecl : public IrBase
 {
 public:
-    IrMethodDecl(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType returnType) :
+    IrMethodDecl(int lineNumber, int columnNumber, const std::string& filename, IrIdentifierPtr ident, IrType returnType) :
         IrBase(lineNumber, columnNumber, filename),
         m_identifier(ident),
         m_returnType(returnType),
@@ -58,27 +58,27 @@ public:
     virtual bool codegen(IrTraversalContext* ctx);
     virtual const std::string& asString() const;
      
-    void addArgument(IrVariableDecl* arg)
+    void addArgument(IrVariableDeclPtr arg)
     {
-        m_argument_list.push_back(std::shared_ptr<IrVariableDecl>(arg));
-        m_symbols->addVariable(arg);
+        m_argument_list.push_back(arg);
+        m_symbols->addVariable(arg.get());
     }
-    void addBlock(IrBlock* block)
+    void addBlock(IrBlockPtr block)
     {
-        m_block = std::shared_ptr<IrBlock>(block);
+        m_block = block;
     }
     
     const std::string& getName() const { return m_identifier->getIdentifier(); }
     size_t getNumArguments() const { return m_argument_list.size(); }
-    IrVariableDecl* getArgument(size_t which) { return m_argument_list.at(which).get(); }
+    IrVariableDeclPtr getArgument(size_t which) { return m_argument_list.at(which); }
     IrType getReturnType() const { return m_returnType; }
     
 protected:
     
-    std::shared_ptr<IrIdentifier> m_identifier;
+    IrIdentifierPtr m_identifier;
     IrType m_returnType;
-    std::vector<std::shared_ptr<IrVariableDecl>> m_argument_list;
-    std::shared_ptr<IrBlock> m_block;
+    std::vector<IrVariableDeclPtr> m_argument_list;
+    IrBlockPtr m_block;
     std::unique_ptr<IrSymbolTable> m_symbols;
     size_t m_stackSize;
  

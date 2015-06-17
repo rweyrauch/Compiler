@@ -192,7 +192,7 @@ bool IrSymbolTable::addMethod(IrMethodDecl* method)
         SVariableSymbol argInfo;
         for (size_t i = 0; i < method->getNumArguments(); i++)
         {
-            const IrVariableDecl* arg = method->getArgument(i);
+            const IrVariableDeclPtr arg = method->getArgument(i);
             argInfo.m_name = arg->getVariable(0)->getIdentifier();
             argInfo.m_type = arg->getType();
             argInfo.m_count = 1;

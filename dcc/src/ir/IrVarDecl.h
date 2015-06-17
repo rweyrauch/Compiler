@@ -35,21 +35,21 @@ namespace Decaf
 class IrVariableDecl : public IrBase
 {
 public:
-    IrVariableDecl(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType type) :
+    IrVariableDecl(int lineNumber, int columnNumber, const std::string& filename, IrIdentifierPtr ident, IrType type) :
         IrBase(lineNumber, columnNumber, filename),
         m_type(type),
         m_identifiers(),
         m_typeIdent(nullptr)
     {
-        m_identifiers.push_back(std::shared_ptr<IrIdentifier>(ident));
+        m_identifiers.push_back(ident);
     }
-    IrVariableDecl(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrIdentifier* typeIdent) :
+    IrVariableDecl(int lineNumber, int columnNumber, const std::string& filename, IrIdentifierPtr ident, IrIdentifierPtr typeIdent) :
         IrBase(lineNumber, columnNumber, filename),
         m_type(IrType::Class),
         m_identifiers(),
         m_typeIdent(typeIdent)
     {
-        m_identifiers.push_back(std::shared_ptr<IrIdentifier>(ident));
+        m_identifiers.push_back(ident);
     }
     IrVariableDecl(int lineNumber, int columnNumber, const std::string& filename, const std::vector<IrIdentifier*> ident_list, IrType type) :
         IrBase(lineNumber, columnNumber, filename),
@@ -59,10 +59,10 @@ public:
     {
         for (auto it : ident_list)
         {
-            m_identifiers.push_back(std::shared_ptr<IrIdentifier>(it));
+            m_identifiers.push_back(IrIdentifierPtr(it));
         }
     }
-    IrVariableDecl(int lineNumber, int columnNumber, const std::string& filename, const std::vector<IrIdentifier*> ident_list, IrIdentifier* typeIdent) :
+    IrVariableDecl(int lineNumber, int columnNumber, const std::string& filename, const std::vector<IrIdentifier*> ident_list, IrIdentifierPtr typeIdent) :
         IrBase(lineNumber, columnNumber, filename),
         m_type(IrType::Class),
         m_identifiers(),
@@ -70,7 +70,7 @@ public:
     {
         for (auto it : ident_list)
         {
-            m_identifiers.push_back(std::shared_ptr<IrIdentifier>(it));
+            m_identifiers.push_back(IrIdentifierPtr(it));
         }
     }
     
@@ -84,15 +84,15 @@ public:
     virtual bool codegen(IrTraversalContext* ctx);
         
     size_t getNumVariables() const { return m_identifiers.size(); }
-    std::shared_ptr<IrIdentifier> getVariable(size_t which) const;
+    IrIdentifierPtr getVariable(size_t which) const;
     IrType getType() const { return m_type; }
-    std::shared_ptr<IrIdentifier> getTypeIdentifier() const { return m_typeIdent; }
+    IrIdentifierPtr getTypeIdentifier() const { return m_typeIdent; }
     
 protected:
     
     IrType m_type;
-    std::vector<std::shared_ptr<IrIdentifier>> m_identifiers;
-    std::shared_ptr<IrIdentifier> m_typeIdent;
+    std::vector<IrIdentifierPtr> m_identifiers;
+    IrIdentifierPtr m_typeIdent;
     
 private:
     IrVariableDecl() = delete;

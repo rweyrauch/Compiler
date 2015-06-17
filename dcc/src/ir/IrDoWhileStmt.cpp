@@ -45,16 +45,16 @@ namespace Decaf
 // }
 // LABEL_END:
 
-IrDoWhileStatement::IrDoWhileStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpression* loopExpr, IrStatement* block) :
+IrDoWhileStatement::IrDoWhileStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpressionPtr loopExpr, IrStatementPtr block) :
     IrStatement(lineNumber, columnNumber, filename),
     m_loopExpr(loopExpr),
-    m_body(std::shared_ptr<IrStatement>(block))
+    m_body(IrStatementPtr(block))
 {
-    m_labelTop = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
-    m_labelContinue = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
-    m_labelEnd = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
+    m_labelTop = IrIdentifier::CreateLabel();
+    m_labelContinue = IrIdentifier::CreateLabel();
+    m_labelEnd = IrIdentifier::CreateLabel();
 
-    m_loopGoto = std::shared_ptr<IrGotoStatement>(new IrGotoStatement(lineNumber, columnNumber, filename, m_labelTop.get()));        
+    m_loopGoto = IrGotoStatementPtr(new IrGotoStatement(lineNumber, columnNumber, filename, m_labelTop));        
 }
     
 IrDoWhileStatement::~IrDoWhileStatement()

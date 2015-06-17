@@ -58,26 +58,26 @@ public:
     virtual bool codegen(IrTraversalContext* ctx);
     virtual const std::string& asString() const { return m_case; }
     
-    void addStatement(IrStatement* stmt)
+    void addStatement(IrStatementPtr stmt)
     {
-        m_statements.push_back(std::shared_ptr<IrStatement>(stmt));
+        m_statements.push_back(stmt);
     }
     void addStatements(const std::vector<IrStatement*>& statements)
     {
         for (auto it : statements)
         {
-            addStatement(it);
+            addStatement(IrStatementPtr(it));
         }
     }
   
     size_t getNumStatements() const { return m_statements.size(); }
-    const IrStatement* getStatement(size_t which) const { return m_statements.at(which).get(); }
+    const IrStatementPtr getStatement(size_t which) const { return m_statements.at(which); }
 
 protected:    
     
     bool m_isDefault;
     std::shared_ptr<IrLiteral> m_value;
-    std::vector<std::shared_ptr<IrStatement>> m_statements;
+    std::vector<IrStatementPtr> m_statements;
     const std::string m_case = "case";
     
 private:

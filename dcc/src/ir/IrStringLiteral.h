@@ -45,10 +45,10 @@ public:
     virtual bool codegen(IrTraversalContext* ctx);
     
     const std::string& getValue() const { return m_valueAsString; }
-    std::shared_ptr<IrIdentifier> getIdentifier() const { return m_label; }
+    IrIdentifierPtr getIdentifier() const { return m_label; }
     
 protected:
-    std::shared_ptr<IrIdentifier> m_label;
+    IrIdentifierPtr m_label;
     
 private:
     IrStringLiteral() = delete;

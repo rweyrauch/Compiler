@@ -36,7 +36,7 @@ namespace Decaf
 class IrClass : public IrBase
 {
 public:
-    IrClass(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident) :
+    IrClass(int lineNumber, int columnNumber, const std::string& filename, IrIdentifierPtr ident) :
         IrBase(lineNumber, columnNumber, filename),
         m_identifier(ident),
         m_extends(nullptr),
@@ -47,7 +47,7 @@ public:
     {
     }
 
-    IrClass(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrIdentifier* extends, std::vector<Decaf::IrIdentifier*>* implements = nullptr) :
+    IrClass(int lineNumber, int columnNumber, const std::string& filename, IrIdentifierPtr ident, IrIdentifierPtr extends, std::vector<IrIdentifier*>* implements = nullptr) :
         IrBase(lineNumber, columnNumber, filename),
         m_identifier(ident),
         m_extends(extends),
@@ -60,7 +60,7 @@ public:
         {
             for (auto it : *implements)
             {
-                m_implements.push_back(std::shared_ptr<IrIdentifier>(it));
+                m_implements.push_back(IrIdentifierPtr(it));
             }
         }
     }
@@ -74,10 +74,10 @@ public:
     virtual bool codegen(IrTraversalContext* ctx);
     virtual const std::string& asString() const { return m_class; }
      
-    void addFieldDecl(IrFieldDecl* field);
+    void addFieldDecl(IrFieldDeclPtr field);
     void addFieldDecl(const std::vector<IrFieldDecl*>& fields);
     
-    void addMethodDecl(IrMethodDecl* method);
+    void addMethodDecl(IrMethodDeclPtr method);
     void addMethodDecl(const std::vector<IrMethodDecl*>& methods);
     
     IrSymbolTable* getSymbols()
@@ -85,19 +85,19 @@ public:
         return m_symbols.get();
     }
     
-    std::shared_ptr<IrIdentifier> getIdentifier() { return m_identifier; }
+    IrIdentifierPtr getIdentifier() { return m_identifier; }
     
     size_t getNumMethods() const { return m_method_decl_list.size(); }
-    std::shared_ptr<IrMethodDecl> getMethod(size_t which) { return m_method_decl_list.at(which); }
+    IrMethodDeclPtr getMethod(size_t which) { return m_method_decl_list.at(which); }
     
 protected:
     
-    std::shared_ptr<IrIdentifier> m_identifier;
-    std::shared_ptr<IrIdentifier> m_extends;
-    std::vector<std::shared_ptr<Decaf::IrIdentifier>> m_implements;
+    IrIdentifierPtr m_identifier;
+    IrIdentifierPtr m_extends;
+    std::vector<IrIdentifierPtr> m_implements;
     
-    std::vector<std::shared_ptr<IrFieldDecl>> m_field_decl_list;
-    std::vector<std::shared_ptr<IrMethodDecl>> m_method_decl_list;
+    std::vector<IrFieldDeclPtr> m_field_decl_list;
+    std::vector<IrMethodDeclPtr> m_method_decl_list;
     
     std::unique_ptr<IrSymbolTable> m_symbols;
     

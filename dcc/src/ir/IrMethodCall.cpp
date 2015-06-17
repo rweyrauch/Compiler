@@ -41,7 +41,7 @@ IrMethodCall::IrMethodCall(int lineNumber, int columnNumber, const std::string& 
     m_externalFunction(true),
     m_arguments()
 {
-    m_identifier = std::shared_ptr<IrIdentifier>(new IrIdentifier(lineNumber, columnNumber, filename, name->getValue()));
+    m_identifier = IrIdentifierPtr(new IrIdentifier(lineNumber, columnNumber, filename, name->getValue()));
 }
  
 IrMethodCall::~IrMethodCall()
@@ -129,7 +129,7 @@ bool IrMethodCall::analyze(IrTraversalContext* ctx)
     if (getType() != IrType::Void)
     {
         assert(m_result == nullptr);
-        m_result = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateTemporary());      
+        m_result = IrIdentifier::CreateTemporary();      
     }
    
     ctx->popParent();

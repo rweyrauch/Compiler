@@ -33,9 +33,9 @@ namespace Decaf
 class IrReturnStatement : public IrStatement
 {
 public:
-    IrReturnStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpression* returnValue = nullptr) :
+    IrReturnStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpressionPtr returnValue = nullptr) :
         IrStatement(lineNumber, columnNumber, filename),
-        m_returnValue(std::shared_ptr<IrExpression>(returnValue))
+        m_returnValue(returnValue)
     {}
     
     virtual ~IrReturnStatement()
@@ -59,7 +59,7 @@ public:
     
 protected:    
     
-    std::shared_ptr<IrExpression> m_returnValue;
+    IrExpressionPtr m_returnValue;
     
     const std::string m_return = "return";
     

@@ -35,7 +35,7 @@ class IrIdentifier;
 class IrIfStatement : public IrStatement
 {
 public:
-    IrIfStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpression* condition, IrStatement* trueBlock, IrStatement* falseBlock = nullptr);
+    IrIfStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpressionPtr condition, IrStatementPtr trueBlock, IrStatementPtr falseBlock = nullptr);
     
     virtual ~IrIfStatement();
     
@@ -51,16 +51,16 @@ public:
     
 protected:    
     
-    std::shared_ptr<IrExpression> m_condition;
-    std::shared_ptr<IrStatement> m_trueBlock;
-    std::shared_ptr<IrStatement> m_falseBlock;
+    IrExpressionPtr m_condition;
+    IrStatementPtr m_trueBlock;
+    IrStatementPtr m_falseBlock;
     
-    std::shared_ptr<IrIdentifier> m_labelTrue;
-    std::shared_ptr<IrIdentifier> m_labelFalse;
-    std::shared_ptr<IrIdentifier> m_labelEnd;
+    IrIdentifierPtr m_labelTrue;
+    IrIdentifierPtr m_labelFalse;
+    IrIdentifierPtr m_labelEnd;
     
 private:
-    static bool isBooleanLiteral(const IrExpression* expr);
+    static bool isBooleanLiteral(const IrExpressionPtr expr);
     
     const std::string m_if = "if";
 private:

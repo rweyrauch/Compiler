@@ -56,13 +56,13 @@ public:
     virtual bool codegen(IrTraversalContext* ctx);
     virtual const std::string& asString() const { return m_program; }
     
-    void addFieldDecl(IrFieldDecl* field);
+    void addFieldDecl(IrFieldDeclPtr field);
     void addFieldDecl(const std::vector<IrFieldDecl*>& fields);
     
-    void addMethodDecl(IrMethodDecl* method);
+    void addMethodDecl(IrMethodDeclPtr method);
     void addMethodDecl(const std::vector<IrMethodDecl*>& methods);
 
-    void addClassDecl(IrClass* classDecl);
+    void addClassDecl(IrClassPtr classDecl);
     void addClassDecl(const std::vector<IrClass*>& classes);
 
     void addInterfaceDecl(IrInterface* interfaceDecl);
@@ -75,9 +75,9 @@ public:
     
 protected:
         
-    std::vector<std::shared_ptr<IrFieldDecl>> m_field_decl_list;
-    std::vector<std::shared_ptr<IrMethodDecl>> m_method_decl_list;
-    std::vector<std::shared_ptr<IrClass>> m_class_decl_list;
+    std::vector<IrFieldDeclPtr> m_field_decl_list;
+    std::vector<IrMethodDeclPtr> m_method_decl_list;
+    std::vector<IrClassPtr> m_class_decl_list;
     std::vector<std::shared_ptr<IrInterface>> m_interface_decl_list;
     
     std::unique_ptr<IrSymbolTable> m_symbols;

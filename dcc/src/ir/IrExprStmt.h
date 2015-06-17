@@ -22,7 +22,6 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <memory>
 #include "IrCommon.h"
 #include "IrStatement.h"
 #include "IrExpression.h"
@@ -33,7 +32,7 @@ namespace Decaf
 class IrExpressionStatement : public IrStatement
 {
 public:
-    IrExpressionStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpression* expr) :
+    IrExpressionStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpressionPtr expr) :
         IrStatement(lineNumber, columnNumber, filename),
         m_expression(expr)
     {}
@@ -49,7 +48,7 @@ public:
   
  protected:    
     
-    std::shared_ptr<IrExpression> m_expression;
+    IrExpressionPtr m_expression;
     
 private:
     IrExpressionStatement() = delete;

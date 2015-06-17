@@ -140,4 +140,37 @@ struct SDoubleSymbol
     double m_value;
 };
 
+class IrIdentifier;
+typedef std::shared_ptr<IrIdentifier> IrIdentifierPtr;
+
+class IrLocation;
+typedef std::shared_ptr<IrLocation> IrLocationPtr;
+
+class IrExpression;
+typedef std::shared_ptr<IrExpression> IrExpressionPtr;
+
+class IrStatement;
+typedef std::shared_ptr<IrStatement> IrStatementPtr;
+
+class IrBlock;
+typedef std::shared_ptr<IrBlock> IrBlockPtr;
+ 
+class IrGotoStatement;
+typedef std::shared_ptr<IrGotoStatement> IrGotoStatementPtr;
+
+class IrCaseStatement;
+typedef std::shared_ptr<IrCaseStatement> IrCaseStatementPtr;
+
+class IrVariableDecl;
+typedef std::shared_ptr<IrVariableDecl> IrVariableDeclPtr;
+
+class IrFieldDecl;
+typedef std::shared_ptr<IrFieldDecl> IrFieldDeclPtr;
+
+class IrMethodDecl;
+typedef std::shared_ptr<IrMethodDecl> IrMethodDeclPtr;
+
+class IrClass;
+typedef std::shared_ptr<IrClass> IrClassPtr;
+
 } // namespace Decaf

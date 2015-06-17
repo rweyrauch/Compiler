@@ -23,8 +23,6 @@
 //
 #pragma once
 #include <string>
-#include <memory>
-#include <vector>
 #include "IrExpression.h"
 
 namespace Decaf
@@ -33,7 +31,7 @@ namespace Decaf
 class IrAssignExpression : public IrExpression
 {
 public:
-    IrAssignExpression(int lineNumber, int columnNumber, const std::string& filename, IrExpression* lhs, IrAssignmentOperator assignOp, IrExpression* rhs) :
+    IrAssignExpression(int lineNumber, int columnNumber, const std::string& filename, IrExpressionPtr lhs, IrAssignmentOperator assignOp, IrExpressionPtr rhs) :
         IrExpression(lineNumber, columnNumber, filename, lhs->getType()),
         m_operator(assignOp),
         m_lhs(lhs),
@@ -53,8 +51,8 @@ public:
 protected:    
   
     IrAssignmentOperator m_operator;
-    std::shared_ptr<IrExpression> m_lhs;
-    std::shared_ptr<IrExpression> m_rhs;
+    IrExpressionPtr m_lhs;
+    IrExpressionPtr m_rhs;
     
 private:
     IrAssignExpression() = delete;

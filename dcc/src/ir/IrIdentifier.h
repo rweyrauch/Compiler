@@ -34,8 +34,8 @@ class IrIdentifier : public IrBase
 {
 public:
        
-    static IrIdentifier* CreateTemporary();    
-    static IrIdentifier* CreateLabel();
+    static IrIdentifierPtr CreateTemporary();    
+    static IrIdentifierPtr CreateLabel();
     
     IrIdentifier(int lineNumber, int columnNumber, const std::string& filename, const std::string& ident, bool isLabel = false) :
         IrBase(lineNumber, columnNumber, filename),

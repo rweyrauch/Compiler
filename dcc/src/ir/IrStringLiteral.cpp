@@ -56,7 +56,7 @@ bool IrStringLiteral::codegen(IrTraversalContext* ctx)
     SStringSymbol symbol;
     if (!ctx->lookup(getValue(), symbol))
     {
-        m_label = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
+        m_label = IrIdentifier::CreateLabel();
         ok = ctx->addString(m_label.get(), getValue());
         if (!ok)
         {
@@ -66,7 +66,7 @@ bool IrStringLiteral::codegen(IrTraversalContext* ctx)
     }
     else
     {
-        m_label = std::shared_ptr<IrIdentifier>(new IrIdentifier(getLineNumber(), getColumnNumber(), getFilename(), symbol.m_name, true));
+        m_label = IrIdentifierPtr(new IrIdentifier(getLineNumber(), getColumnNumber(), getFilename(), symbol.m_name, true));
     }
     
     return ok;

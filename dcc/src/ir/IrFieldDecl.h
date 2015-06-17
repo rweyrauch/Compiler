@@ -34,7 +34,7 @@ namespace Decaf
 class IrFieldDecl : public IrBase
 {
 public:
-    IrFieldDecl(int lineNumber, int columnNumber, const std::string& filename, IrLocation* location, IrType type) :
+    IrFieldDecl(int lineNumber, int columnNumber, const std::string& filename, IrLocationPtr location, IrType type) :
         IrBase(lineNumber, columnNumber, filename),
         m_location(location),
         m_type(type),
@@ -42,7 +42,7 @@ public:
     {
         m_location->setType(type);
     }
-    IrFieldDecl(int lineNumber, int columnNumber, const std::string& filename, IrLocation* location, IrIdentifier* type) :
+    IrFieldDecl(int lineNumber, int columnNumber, const std::string& filename, IrLocationPtr location, IrIdentifierPtr type) :
         IrBase(lineNumber, columnNumber, filename),
         m_location(location),
         m_type(IrType::Class),
@@ -61,16 +61,16 @@ public:
     virtual bool allocate(IrTraversalContext* ctx);
     virtual bool codegen(IrTraversalContext* ctx);
    
-    IrLocation* getLocation() const { return m_location.get(); }
+    IrLocationPtr getLocation() const { return m_location; }
     const std::string& getName() const { return m_location->getIdentifier()->getIdentifier(); }
     IrType getType() const { return m_type; }
-    std::shared_ptr<IrIdentifier> getTypeIdentifier() const { return m_typeIdent; }
+    IrIdentifierPtr getTypeIdentifier() const { return m_typeIdent; }
     
 protected:
     
-    std::shared_ptr<IrLocation> m_location;
+    IrLocationPtr m_location;
     IrType m_type; 
-    std::shared_ptr<IrIdentifier> m_typeIdent;
+    IrIdentifierPtr m_typeIdent;
     
 private:
     IrFieldDecl() = delete;

@@ -37,7 +37,7 @@ class IrDoWhileStatement : public IrStatement
 {
 public:
     IrDoWhileStatement(int lineNumber, int columnNumber, const std::string& filename,
-                       IrExpression* expr, IrStatement* block = nullptr);
+                       IrExpressionPtr expr, IrStatementPtr block = nullptr);
     
     virtual ~IrDoWhileStatement();
     
@@ -51,18 +51,18 @@ public:
     virtual size_t getAllocationSize() const;
     virtual void setSymbolStartAddress(size_t addr);
      
-    std::shared_ptr<IrIdentifier> getLoopContinue() const { return m_labelContinue; }
-    std::shared_ptr<IrIdentifier> getLoopEnd() const { return m_labelEnd; }
+    IrIdentifierPtr getLoopContinue() const { return m_labelContinue; }
+    IrIdentifierPtr getLoopEnd() const { return m_labelEnd; }
     
 protected:    
     
-    std::shared_ptr<IrExpression> m_loopExpr;
-    std::shared_ptr<IrStatement> m_body;
+    IrExpressionPtr m_loopExpr;
+    IrStatementPtr m_body;
     
-    std::shared_ptr<IrIdentifier> m_labelTop;
-    std::shared_ptr<IrIdentifier> m_labelContinue;
-    std::shared_ptr<IrIdentifier> m_labelEnd;
-    std::shared_ptr<IrGotoStatement> m_loopGoto;
+    IrIdentifierPtr m_labelTop;
+    IrIdentifierPtr m_labelContinue;
+    IrIdentifierPtr m_labelEnd;
+    IrGotoStatementPtr m_loopGoto;
     
     const std::string m_dowhile = "do-while";
     

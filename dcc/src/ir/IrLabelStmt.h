@@ -32,9 +32,9 @@ class IrIdentifier;
 class IrLabelStatement : public IrStatement
 {
 public:
-    IrLabelStatement(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* label) :
+    IrLabelStatement(int lineNumber, int columnNumber, const std::string& filename, IrIdentifierPtr label) :
         IrStatement(lineNumber, columnNumber, filename),
-        m_label(std::shared_ptr<IrIdentifier>(label))
+        m_label(label)
     {}
     
     virtual ~IrLabelStatement()
@@ -48,7 +48,7 @@ public:
     virtual const std::string& asString() const;
     
 protected:    
-    std::shared_ptr<IrIdentifier> m_label;
+    IrIdentifierPtr m_label;
     
 private:
     IrLabelStatement() = delete;

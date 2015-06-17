@@ -35,18 +35,18 @@
 namespace Decaf
 {
     
-IrIfStatement::IrIfStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpression* condition, IrStatement* trueBlock, IrStatement* falseBlock) :
+IrIfStatement::IrIfStatement(int lineNumber, int columnNumber, const std::string& filename, IrExpressionPtr condition, IrStatementPtr trueBlock, IrStatementPtr falseBlock) :
     IrStatement(lineNumber, columnNumber, filename),
-    m_condition(std::shared_ptr<IrExpression>(condition)),
-    m_trueBlock(std::shared_ptr<IrStatement>(trueBlock)),
-    m_falseBlock(std::shared_ptr<IrStatement>(falseBlock)),
+    m_condition(condition),
+    m_trueBlock(trueBlock),
+    m_falseBlock(falseBlock),
     m_labelTrue(nullptr),
     m_labelFalse(nullptr),
     m_labelEnd(nullptr)
 {
-    m_labelTrue = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());
-    m_labelFalse = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());  
-    m_labelEnd = std::shared_ptr<IrIdentifier>(IrIdentifier::CreateLabel());    
+    m_labelTrue = IrIdentifier::CreateLabel();
+    m_labelFalse = IrIdentifier::CreateLabel();  
+    m_labelEnd = IrIdentifier::CreateLabel();    
 }
 
 IrIfStatement::~IrIfStatement()
@@ -165,7 +165,7 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
                 valid = false;
             
             tac.m_opcode = IrOpcode::IFZ;
-            if (isBooleanLiteral(boolexpr->getLeftHandSide().get()))
+            if (isBooleanLiteral(boolexpr->getLeftHandSide()))
             {
                 tac.m_src0.build(dynamic_cast<IrBooleanLiteral*>(boolexpr->getLeftHandSide().get()));
             }
@@ -183,7 +183,7 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
                 valid = false;
             
             tac.m_opcode = IrOpcode::IFZ;
-            if (isBooleanLiteral(boolexpr->getRightHandSide().get()))
+            if (isBooleanLiteral(boolexpr->getRightHandSide()))
             {
                 tac.m_src0.build(dynamic_cast<IrBooleanLiteral*>(boolexpr->getRightHandSide().get()));
             }
@@ -206,7 +206,7 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
                 valid = false;
             
             tac.m_opcode = IrOpcode::IFNZ;
-            if (isBooleanLiteral(boolexpr->getLeftHandSide().get()))
+            if (isBooleanLiteral(boolexpr->getLeftHandSide()))
             {
                 tac.m_src0.build(dynamic_cast<IrBooleanLiteral*>(boolexpr->getLeftHandSide().get()));
             }
@@ -224,7 +224,7 @@ bool IrIfStatement::codegen(IrTraversalContext* ctx)
                 valid = false;
             
             tac.m_opcode = IrOpcode::IFZ;
-            if (isBooleanLiteral(boolexpr->getRightHandSide().get()))
+            if (isBooleanLiteral(boolexpr->getRightHandSide()))
             {
                 tac.m_src0.build(dynamic_cast<IrBooleanLiteral*>(boolexpr->getRightHandSide().get()));
             }
@@ -335,9 +335,9 @@ void IrIfStatement::setSymbolStartAddress(size_t addr)
     }
 }
 
-bool IrIfStatement::isBooleanLiteral(const IrExpression* expr)
+bool IrIfStatement::isBooleanLiteral(const IrExpressionPtr expr)
 {
-    const IrBooleanLiteral* literal = dynamic_cast<const IrBooleanLiteral*>(expr);
+    const IrBooleanLiteral* literal = dynamic_cast<const IrBooleanLiteral*>(expr.get());
     return (literal != nullptr) ? true : false;
 }
 
