@@ -252,11 +252,11 @@ argument_decl
     }
     | ident ident 
     { 
-        $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), $2, Decaf::IrType::Class); 
+        $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), $2, $1); 
     }
     | ident LBRACKET RBRACKET ident 
     { 
-        $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), $4, Decaf::IrType::Class); 
+        $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), $4, $1); 
     }
     ;
     
@@ -345,11 +345,11 @@ var_decl
     }
     | ident ident_list SEMI
     {
-        $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), *$2, Decaf::IrType::Class); 
+        $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), *$2, $1); 
     }
     | ident LBRACKET RBRACKET ident_list SEMI
     {
-        $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), *$4, Decaf::IrType::Class); 
+        $$ = new Decaf::IrVariableDecl(@1.first_line, @1.first_column, d_scanner.filename(), *$4, $1); 
     }
     ;
 

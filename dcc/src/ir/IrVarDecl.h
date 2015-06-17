@@ -38,14 +38,35 @@ public:
     IrVariableDecl(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrType type) :
         IrBase(lineNumber, columnNumber, filename),
         m_type(type),
-        m_identifiers()
+        m_identifiers(),
+        m_typeIdent(nullptr)
+    {
+        m_identifiers.push_back(std::shared_ptr<IrIdentifier>(ident));
+    }
+    IrVariableDecl(int lineNumber, int columnNumber, const std::string& filename, IrIdentifier* ident, IrIdentifier* typeIdent) :
+        IrBase(lineNumber, columnNumber, filename),
+        m_type(IrType::Class),
+        m_identifiers(),
+        m_typeIdent(typeIdent)
     {
         m_identifiers.push_back(std::shared_ptr<IrIdentifier>(ident));
     }
     IrVariableDecl(int lineNumber, int columnNumber, const std::string& filename, const std::vector<IrIdentifier*> ident_list, IrType type) :
         IrBase(lineNumber, columnNumber, filename),
         m_type(type),
-        m_identifiers()
+        m_identifiers(),
+        m_typeIdent(nullptr)
+    {
+        for (auto it : ident_list)
+        {
+            m_identifiers.push_back(std::shared_ptr<IrIdentifier>(it));
+        }
+    }
+    IrVariableDecl(int lineNumber, int columnNumber, const std::string& filename, const std::vector<IrIdentifier*> ident_list, IrIdentifier* typeIdent) :
+        IrBase(lineNumber, columnNumber, filename),
+        m_type(IrType::Class),
+        m_identifiers(),
+        m_typeIdent(typeIdent)
     {
         for (auto it : ident_list)
         {
@@ -65,12 +86,14 @@ public:
     size_t getNumVariables() const { return m_identifiers.size(); }
     std::shared_ptr<IrIdentifier> getVariable(size_t which) const;
     IrType getType() const { return m_type; }
+    std::shared_ptr<IrIdentifier> getTypeIdentifier() const { return m_typeIdent; }
     
 protected:
     
     IrType m_type;
     std::vector<std::shared_ptr<IrIdentifier>> m_identifiers;
-     
+    std::shared_ptr<IrIdentifier> m_typeIdent;
+    
 private:
     IrVariableDecl() = delete;
     IrVariableDecl(const IrVariableDecl& rhs) = delete;

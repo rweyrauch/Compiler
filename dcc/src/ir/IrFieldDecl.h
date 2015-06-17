@@ -64,6 +64,7 @@ public:
     IrLocation* getLocation() const { return m_location.get(); }
     const std::string& getName() const { return m_location->getIdentifier()->getIdentifier(); }
     IrType getType() const { return m_type; }
+    std::shared_ptr<IrIdentifier> getTypeIdentifier() const { return m_typeIdent; }
     
 protected:
     
