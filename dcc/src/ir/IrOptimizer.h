@@ -27,12 +27,12 @@
 #include <memory>
 #include <list>
 #include "IrCommon.h"
+#include "IrBasicBlock.h"
 #include "IrTAC.h"
 
 namespace Decaf
 {
 class IrTraversalContext;
-class IrBasicBlock;
 
 class IrOptimizer
 {
@@ -58,19 +58,19 @@ protected:
 
 protected:
     
-    std::vector<std::shared_ptr<IrBasicBlock>> m_blocks;
+    std::vector<IrBasicBlockPtr> m_blocks;
     std::vector<IrTacStmt> m_statements;
    
     // A node in the control flow graph, a block and a list of all of its following blocks.
     struct ControlFlowNode
     {
-        std::shared_ptr<IrBasicBlock> m_block;
+        IrBasicBlockPtr m_block;
         std::vector<ControlFlowNode*> m_next_nodes, m_previous_nodes;
     };
     
     std::list<ControlFlowNode*> m_control_graphs; // each function gets its own graph
  
-    void insertBlock(std::shared_ptr<IrBasicBlock> block, ControlFlowNode* graph);
+    void insertBlock(IrBasicBlockPtr block, ControlFlowNode* graph);
      
 private:
     IrOptimizer(const IrOptimizer& rhs) = delete;

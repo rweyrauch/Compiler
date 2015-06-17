@@ -29,8 +29,8 @@
 namespace Decaf
 {
  
-std::shared_ptr<IrDoubleLiteral> IrDoubleLiteral::s_zero_literal = std::shared_ptr<IrDoubleLiteral>(new IrDoubleLiteral(__LINE__, 0, __FILE__, "0.0"));
-std::shared_ptr<IrDoubleLiteral> IrDoubleLiteral::s_one_literal = std::shared_ptr<IrDoubleLiteral>(new IrDoubleLiteral(__LINE__, 0, __FILE__, "1.0"));
+IrDoubleLiteralPtr IrDoubleLiteral::s_zero_literal(new IrDoubleLiteral(__LINE__, 0, __FILE__, "0.0"));
+IrDoubleLiteralPtr IrDoubleLiteral::s_one_literal(new IrDoubleLiteral(__LINE__, 0, __FILE__, "1.0"));
     
 IrDoubleLiteral::IrDoubleLiteral(int lineNumber, int columnNumber, const std::string& filename, const std::string& value) :
         IrLiteral(lineNumber, columnNumber, filename, IrType::Double, value)

@@ -27,8 +27,8 @@
 namespace Decaf
 {
 
-std::shared_ptr<IrBooleanLiteral> IrBooleanLiteral::s_false_literal = std::shared_ptr<IrBooleanLiteral>(new IrBooleanLiteral(__LINE__, 0, __FILE__, "false"));
-std::shared_ptr<IrBooleanLiteral> IrBooleanLiteral::s_true_literal = std::shared_ptr<IrBooleanLiteral>(new IrBooleanLiteral(__LINE__, 0, __FILE__, "true"));
+IrBooleanLiteralPtr IrBooleanLiteral::s_false_literal(new IrBooleanLiteral(__LINE__, 0, __FILE__, "false"));
+IrBooleanLiteralPtr IrBooleanLiteral::s_true_literal(new IrBooleanLiteral(__LINE__, 0, __FILE__, "true"));
     
 IrBooleanLiteral::IrBooleanLiteral(int lineNumber, int columnNumber, const std::string& filename, const std::string& value) :
     IrLiteral(lineNumber, columnNumber, filename, IrType::Boolean, value)

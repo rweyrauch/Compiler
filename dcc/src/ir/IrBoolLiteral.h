@@ -22,7 +22,6 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <memory>
 #include "IrCommon.h"
 #include "IrLiteral.h"
 
@@ -49,15 +48,15 @@ public:
         else m_valueAsString = "false"; 
     }
      
-    static std::shared_ptr<IrBooleanLiteral> GetFalse() { return s_false_literal; }
-    static std::shared_ptr<IrBooleanLiteral> GetTrue() { return s_true_literal; }
+    static IrBooleanLiteralPtr GetFalse() { return s_false_literal; }
+    static IrBooleanLiteralPtr GetTrue() { return s_true_literal; }
      
 protected:
     
     bool m_value;
     
-    static std::shared_ptr<IrBooleanLiteral> s_false_literal;
-    static std::shared_ptr<IrBooleanLiteral> s_true_literal;
+    static IrBooleanLiteralPtr s_false_literal;
+    static IrBooleanLiteralPtr s_true_literal;
     
 private:
     IrBooleanLiteral() = delete;

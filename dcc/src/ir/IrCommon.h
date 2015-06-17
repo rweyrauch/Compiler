@@ -173,4 +173,19 @@ typedef std::shared_ptr<IrMethodDecl> IrMethodDeclPtr;
 class IrClass;
 typedef std::shared_ptr<IrClass> IrClassPtr;
 
+class IrInterface;
+typedef std::shared_ptr<IrInterface> IrInterfacePtr;
+
+class IrDoubleLiteral;
+typedef std::shared_ptr<IrDoubleLiteral> IrDoubleLiteralPtr;
+
+class IrIntegerLiteral;
+typedef std::shared_ptr<IrIntegerLiteral> IrIntegerLiteralPtr;
+
+class IrBooleanLiteral;
+typedef std::shared_ptr<IrBooleanLiteral> IrBooleanLiteralPtr;
+
+class IrStringLiteral;
+typedef std::shared_ptr<IrStringLiteral> IrStringLiteralPtr;
+
 } // namespace Decaf

@@ -33,6 +33,8 @@
 namespace Decaf
 {
 class IrTraversalContext;
+class IrBasicBlock;
+typedef std::shared_ptr<IrBasicBlock> IrBasicBlockPtr;
 
 class IrBasicBlock
 {

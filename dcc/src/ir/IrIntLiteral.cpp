@@ -28,8 +28,8 @@
 namespace Decaf
 {
 
-std::shared_ptr<IrIntegerLiteral> IrIntegerLiteral::s_zero_literal = std::shared_ptr<IrIntegerLiteral>(new IrIntegerLiteral(__LINE__, 0, __FILE__, "0"));
-std::shared_ptr<IrIntegerLiteral> IrIntegerLiteral::s_one_literal = std::shared_ptr<IrIntegerLiteral>(new IrIntegerLiteral(__LINE__, 0, __FILE__, "1"));
+IrIntegerLiteralPtr IrIntegerLiteral::s_zero_literal(new IrIntegerLiteral(__LINE__, 0, __FILE__, "0"));
+IrIntegerLiteralPtr IrIntegerLiteral::s_one_literal(new IrIntegerLiteral(__LINE__, 0, __FILE__, "1"));
     
 IrIntegerLiteral::IrIntegerLiteral(int lineNumber, int columnNumber, const std::string& filename, const std::string& value) :
     IrLiteral(lineNumber, columnNumber, filename, IrType::Integer, value)

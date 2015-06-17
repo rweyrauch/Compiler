@@ -33,7 +33,7 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
     
     m_blocks.clear();
     
-    auto curBlock = std::shared_ptr<IrBasicBlock>(new IrBasicBlock());;
+    auto curBlock = IrBasicBlockPtr(new IrBasicBlock());
     m_blocks.push_back(curBlock);
     
     for (auto it : statements)
@@ -41,7 +41,7 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
         // start a new block when a leader statement is found
         if (isLeader(it))
         {
-            curBlock = std::shared_ptr<IrBasicBlock>(new IrBasicBlock());
+            curBlock = IrBasicBlockPtr(new IrBasicBlock());
             m_blocks.push_back(curBlock);
         }
         
@@ -50,7 +50,7 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
         // start a new block when a leader statement is found
         if (isLeaderPost(it))
         {
-            curBlock = std::shared_ptr<IrBasicBlock>(new IrBasicBlock());
+            curBlock = IrBasicBlockPtr(new IrBasicBlock());
             m_blocks.push_back(curBlock);
         }
     }
@@ -153,7 +153,7 @@ void IrOptimizer::print(std::ostream& stream)
     }
 }
 
-void IrOptimizer::insertBlock(std::shared_ptr<IrBasicBlock> block, ControlFlowNode* graph)
+void IrOptimizer::insertBlock(IrBasicBlockPtr block, ControlFlowNode* graph)
 {
 }
 

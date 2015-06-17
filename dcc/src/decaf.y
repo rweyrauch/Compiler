@@ -26,6 +26,7 @@
     Decaf::IrVariableDecl *varDecl;
     std::vector<Decaf::IrVariableDecl*> *varDeclList;
     Decaf::IrLiteral *literal;
+    Decaf::IrIntegerLiteral *intLiteral;
     Decaf::IrStringLiteral *stringLiteral;
     std::string *string;
     int token;
@@ -64,7 +65,8 @@
 %type <ident> ident
 %type <identList> ident_list
 %type <token> type rel_op logic_op assign_op
-%type <literal> literal
+%type <literal> literal 
+%type <intLiteral> int_literal
 %type <stringLiteral> string_literal
 %type <location> location
 %type <locationList> location_list
@@ -91,7 +93,7 @@ program_decl
     }
     | interface
     {
-        getProgram()->addInterfaceDecl($1);
+        getProgram()->addInterfaceDecl(IrInterfacePtr($1));
     }
     | field_decl
     {
@@ -366,9 +368,9 @@ case_list
     ;
 
 case_statement
-    : CASE literal COLON statement_list
+    : CASE int_literal COLON statement_list
     {
-        $$ = new Decaf::IrCaseStatement(@1.first_line, @1.first_column, d_scanner.filename(), $2);
+        $$ = new Decaf::IrCaseStatement(@1.first_line, @1.first_column, d_scanner.filename(), IrIntegerLiteralPtr($2));
         $$->addStatements(*$4); 
     }
     | DEFAULT COLON statement_list
@@ -547,7 +549,7 @@ method_call
     }    
     | CALLOUT LPAREN string_literal COMMA expr_list RPAREN
     {
-        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $3, Decaf::IrType::Integer);
+        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), IrStringLiteralPtr($3), Decaf::IrType::Integer);
         for (auto it : *$5) 
         {
             $$->addArgument(IrExpressionPtr(it));
@@ -555,7 +557,7 @@ method_call
     }
     | CALLOUT LPAREN string_literal RPAREN
     {
-        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), $3, Decaf::IrType::Integer);
+        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), IrStringLiteralPtr($3), Decaf::IrType::Integer);
     }
     | NEW ident 
     { 
@@ -786,11 +788,18 @@ logic_op
     }
     ;
 
-literal 
+int_literal
     : INTEGER
     {
         $$ = new Decaf::IrIntegerLiteral(@1.first_line, @1.first_column, d_scanner.filename(), d_scanner.matched()); 
     }
+    ;
+    
+literal 
+	: int_literal
+	{
+		$$ = $1;
+	}
     | BOOLEAN 
     { 
         $$ = new Decaf::IrBooleanLiteral(@1.first_line, @1.first_column, d_scanner.filename(), d_scanner.matched()); 

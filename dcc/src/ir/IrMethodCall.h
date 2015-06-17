@@ -22,7 +22,6 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <memory>
 #include <string>
 #include <vector>
 #include "IrExpression.h"
@@ -43,7 +42,7 @@ public:
         m_arguments()
     {}
 
-    IrMethodCall(int lineNumber, int columnNumber, const std::string& filename, IrStringLiteral* name, IrType type);
+    IrMethodCall(int lineNumber, int columnNumber, const std::string& filename, IrStringLiteralPtr name, IrType type);
     
     virtual ~IrMethodCall();
     
@@ -67,7 +66,7 @@ public:
 protected:    
     
     IrIdentifierPtr m_identifier;
-    std::shared_ptr<IrStringLiteral> m_externFuncName;
+    IrStringLiteralPtr m_externFuncName;
     bool m_externalFunction;
     std::vector<IrExpressionPtr> m_arguments;
     

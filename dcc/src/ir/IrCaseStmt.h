@@ -24,7 +24,6 @@
 #pragma once
 #include <string>
 #include <vector>
-#include <memory>
 #include "IrStatement.h"
 #include "IrLiteral.h"
 
@@ -34,7 +33,7 @@ namespace Decaf
 class IrCaseStatement : public IrStatement
 {
 public:
-    IrCaseStatement(int lineNumber, int columnNumber, const std::string& filename, IrLiteral* value) :
+    IrCaseStatement(int lineNumber, int columnNumber, const std::string& filename, IrIntegerLiteralPtr value) :
         IrStatement(lineNumber, columnNumber, filename),
         m_isDefault(false),
         m_value(value),
@@ -76,7 +75,7 @@ public:
 protected:    
     
     bool m_isDefault;
-    std::shared_ptr<IrLiteral> m_value;
+    IrIntegerLiteralPtr m_value;
     std::vector<IrStatementPtr> m_statements;
     const std::string m_case = "case";
     

@@ -65,7 +65,7 @@ public:
     void addClassDecl(IrClassPtr classDecl);
     void addClassDecl(const std::vector<IrClass*>& classes);
 
-    void addInterfaceDecl(IrInterface* interfaceDecl);
+    void addInterfaceDecl(IrInterfacePtr interfaceDecl);
     void addInterfaceDecl(const std::vector<IrInterface*>& interfaces);
     
     IrSymbolTable* getSymbols()
@@ -78,7 +78,7 @@ protected:
     std::vector<IrFieldDeclPtr> m_field_decl_list;
     std::vector<IrMethodDeclPtr> m_method_decl_list;
     std::vector<IrClassPtr> m_class_decl_list;
-    std::vector<std::shared_ptr<IrInterface>> m_interface_decl_list;
+    std::vector<IrInterfacePtr> m_interface_decl_list;
     
     std::unique_ptr<IrSymbolTable> m_symbols;
     

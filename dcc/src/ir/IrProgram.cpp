@@ -282,18 +282,18 @@ void IrProgram::addClassDecl(const std::vector<IrClass*>& classes)
     }
 }
 
-void IrProgram::addInterfaceDecl(IrInterface* interfaceDecl)
+void IrProgram::addInterfaceDecl(IrInterfacePtr interfaceDecl)
 {
-    m_interface_decl_list.push_back(std::shared_ptr<IrInterface>(interfaceDecl));
+    m_interface_decl_list.push_back(interfaceDecl);
     
-    m_symbols->addInterface(interfaceDecl);        
+    m_symbols->addInterface(interfaceDecl.get());        
 }
 
 void IrProgram::addInterfaceDecl(const std::vector<IrInterface*>& interfaces)
 {
     for (auto it : interfaces)
     {
-        addInterfaceDecl(it);
+        addInterfaceDecl(IrInterfacePtr(it));
     }
 }
 

@@ -34,10 +34,10 @@
 namespace Decaf
 {
 
-IrMethodCall::IrMethodCall(int lineNumber, int columnNumber, const std::string& filename, IrStringLiteral* name, IrType type) :
+IrMethodCall::IrMethodCall(int lineNumber, int columnNumber, const std::string& filename, IrStringLiteralPtr name, IrType type) :
     IrExpression(lineNumber, columnNumber, filename, type),
     m_identifier(nullptr),
-    m_externFuncName(std::shared_ptr<IrStringLiteral>(name)),
+    m_externFuncName(name),
     m_externalFunction(true),
     m_arguments()
 {

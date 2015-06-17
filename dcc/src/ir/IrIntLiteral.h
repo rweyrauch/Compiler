@@ -22,7 +22,6 @@
 // THE SOFTWARE.
 //
 #pragma once
-#include <memory>
 #include "IrCommon.h"
 #include "IrLiteral.h"
 
@@ -44,15 +43,15 @@ public:
     int getValue() const { return m_value; }
     void setValue(int value);
 
-    static std::shared_ptr<IrIntegerLiteral> GetZero() { return s_zero_literal; }
-    static std::shared_ptr<IrIntegerLiteral> GetOne() { return s_one_literal; }
+    static IrIntegerLiteralPtr GetZero() { return s_zero_literal; }
+    static IrIntegerLiteralPtr GetOne() { return s_one_literal; }
     
 protected:
     
     int m_value;
     
-    static std::shared_ptr<IrIntegerLiteral> s_zero_literal;
-    static std::shared_ptr<IrIntegerLiteral> s_one_literal;
+    static IrIntegerLiteralPtr s_zero_literal;
+    static IrIntegerLiteralPtr s_one_literal;
     
 private:
     IrIntegerLiteral() = delete;
