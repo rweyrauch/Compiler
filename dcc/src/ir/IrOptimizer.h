@@ -64,12 +64,14 @@ protected:
     // A node in the control flow graph, a block and a list of all of its following blocks.
     struct ControlFlowNode
     {
-        IrBasicBlock* m_block;
-        std::vector<IrBasicBlock*> m_next_blocks;
+        std::shared_ptr<IrBasicBlock> m_block;
+        std::vector<ControlFlowNode*> m_next_nodes, m_previous_nodes;
     };
     
-    std::list<ControlFlowNode> m_control_graphs; // each function gets its own graph
+    std::list<ControlFlowNode*> m_control_graphs; // each function gets its own graph
  
+    void insertBlock(std::shared_ptr<IrBasicBlock> block, ControlFlowNode* graph);
+     
 private:
     IrOptimizer(const IrOptimizer& rhs) = delete;
 };

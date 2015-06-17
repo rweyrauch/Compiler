@@ -26,7 +26,7 @@
 
 namespace Decaf
 {
-
+	
 void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
 {
     m_statements = statements;
@@ -56,31 +56,25 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
     }
     
     // Generate control flow graph from list of blocks
-    for (auto it : m_blocks)
+    for (auto it = m_blocks.cbegin(); it != m_blocks.cend(); ++it)
     {
-        const std::vector<IrTacStmt>& stmts = it->getStatements();
+        const std::vector<IrTacStmt>& stmts = (*it)->getStatements();
         if (stmts.empty()) continue;
         
         // Create a root control graph for each function/procedure in the block list.
-        if (stmts.begin()->m_opcode == IrOpcode::FBEGIN)
+        if (stmts.front().m_opcode == IrOpcode::FBEGIN)
         {
-            ControlFlowNode node;
-            node.m_block = it.get();
-            node.m_next_blocks.clear();
-            
+            ControlFlowNode* node = new ControlFlowNode;
+            node->m_block = *it;           
             m_control_graphs.push_back(node);
         }
-        else if (stmts.begin()->m_opcode == IrOpcode::LABEL)
+        else 
         {
-            // TODO: find the parent of this block looking for the LABEL in IFZ, IFNZ and JUMP statements
-            if (!m_control_graphs.empty())
-                m_control_graphs.back().m_next_blocks.push_back(it.get());
-        }
-        else
-        {
-            if (!m_control_graphs.empty())
-                m_control_graphs.back().m_next_blocks.push_back(it.get());
-        }
+			if (!m_control_graphs.empty()) 
+			{
+				insertBlock(*it, m_control_graphs.back());
+			}
+		}  
     }
 }
 
@@ -88,10 +82,10 @@ void IrOptimizer::basicBlocksOptimizations(IrBasicBlockOpts which)
 {
     for (auto it : m_control_graphs)
     {
-        it.m_block->optimize(which);
-        for (auto bit : it.m_next_blocks)
+        it->m_block->optimize(which);
+        for (auto bit : it->m_next_nodes)
         {
-            bit->optimize(which);
+            bit->m_block->optimize(which);
         }
     }
     
@@ -151,12 +145,16 @@ void IrOptimizer::print(std::ostream& stream)
     for (auto it : m_control_graphs)
     {
         stream << "Procedure Start" << std::endl;
-        it.m_block->print(stream);
-        for (auto nit : it.m_next_blocks)
+        it->m_block->print(stream);
+        for (auto nit : it->m_next_nodes)
         {
-            nit->print(stream);
+            nit->m_block->print(stream);
         }
     }
+}
+
+void IrOptimizer::insertBlock(std::shared_ptr<IrBasicBlock> block, ControlFlowNode* graph)
+{
 }
 
 } // namespace Decaf
