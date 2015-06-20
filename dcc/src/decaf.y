@@ -52,16 +52,16 @@
 %type <interfaceDef> interface
 %type <block> block
 %type <methodDecl> method_decl method_signature
-%type <methodDeclList> method_decl_list
+%type <methodDeclList> method_decl_list opt_method_decl_list
 %type <fieldDeclList> field_decl
 %type <fieldDeclListList> field_decl_list
 %type <methodCall> method_call
 %type <stmt> statement
-%type <stmtList> statement_list
+%type <stmtList> statement_list opt_statement_list
 %type <caseStmt> case_statement
 %type <caseList> case_list
 %type <varDecl> var_decl argument_decl
-%type <varDeclList> var_decl_list argument_decl_list
+%type <varDeclList> var_decl_list argument_decl_list opt_argument_decl_list
 %type <ident> ident
 %type <identList> ident_list
 %type <token> type rel_op logic_op assign_op
@@ -70,7 +70,7 @@
 %type <stringLiteral> string_literal
 %type <location> location
 %type <locationList> location_list
-%type <exprList> expr_list
+%type <exprList> expr_list opt_expr_list
 %type <expression> expr primary_expr unary_expr mult_expr add_expr rel_expr logic_expr assign_expr
 
 %start program
@@ -104,60 +104,92 @@ program_decl
         getProgram()->addMethodDecl(IrMethodDeclPtr($1));
     }
     ;
-    
-member_decl
-    : field_decl
-    | method_decl
-    ;
-
-member_decl_list
-    : member_decl
-    | member_decl_list member_decl
-    ;
 
 class
-    : CLASS ident LBRACE field_decl_list method_decl_list RBRACE 
+    : CLASS ident LBRACE field_decl_list opt_method_decl_list RBRACE 
     { 
         $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2)); 
         for (auto it : *$4)
         {
             $$->addFieldDecl(it); 
         }
-        $$->addMethodDecl(*$5); 
-    }
-    | CLASS ident LBRACE field_decl_list RBRACE  
-    { 
-        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2)); 
-        for (auto it : *$4)
+        if ($5 != nullptr)
         {
-            $$->addFieldDecl(it); 
+            $$->addMethodDecl(*$5); 
         }
     }
-    | CLASS ident LBRACE method_decl_list RBRACE  
+    | CLASS ident LBRACE opt_method_decl_list RBRACE  
     { 
         $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2)); 
-        $$->addMethodDecl(*$4); 
+        if ($4 != nullptr)
+        {
+            $$->addMethodDecl(*$4); 
+        }
     }
-    | CLASS ident LBRACE RBRACE  
-    { 
-        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2)); 
-    }
-    | CLASS ident EXTENDS ident LBRACE member_decl_list RBRACE
+    | CLASS ident EXTENDS ident LBRACE field_decl_list opt_method_decl_list RBRACE
     { 
         $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2), IrIdentifierPtr($4)); 
+        for (auto it : *$6)
+        {
+            $$->addFieldDecl(it); 
+        }
+        if ($7 != nullptr)
+        {
+            $$->addMethodDecl(*$7); 
+        }
     }
-    | CLASS ident IMPLEMENTS ident_list LBRACE member_decl_list RBRACE
+    | CLASS ident EXTENDS ident LBRACE opt_method_decl_list RBRACE
+    { 
+        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2), IrIdentifierPtr($4)); 
+        if ($6 != nullptr)
+        {
+            $$->addMethodDecl(*$6); 
+        }
+    }
+    | CLASS ident IMPLEMENTS ident_list LBRACE field_decl_list opt_method_decl_list RBRACE
     { 
         $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2), nullptr, $4); 
+        for (auto it : *$6)
+        {
+            $$->addFieldDecl(it); 
+        }
+        if ($7 != nullptr)
+        {
+            $$->addMethodDecl(*$7); 
+        }
     }     
-    | CLASS ident EXTENDS ident IMPLEMENTS ident_list LBRACE member_decl_list RBRACE
+    | CLASS ident IMPLEMENTS ident_list LBRACE opt_method_decl_list RBRACE
+    { 
+        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2), nullptr, $4); 
+        if ($6 != nullptr)
+        {
+            $$->addMethodDecl(*$6); 
+        }
+    }     
+    | CLASS ident EXTENDS ident IMPLEMENTS ident_list LBRACE field_decl_list opt_method_decl_list RBRACE
     { 
         $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2), IrIdentifierPtr($4), $6); 
+        for (auto it : *$8)
+        {
+            $$->addFieldDecl(it); 
+        }
+        if ($9 != nullptr)
+        {
+            $$->addMethodDecl(*$9); 
+        }
+    }     
+    | CLASS ident EXTENDS ident IMPLEMENTS ident_list LBRACE opt_method_decl_list RBRACE
+    { 
+        $$ = new Decaf::IrClass(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2), IrIdentifierPtr($4), $6); 
+        if ($8 != nullptr)
+        {
+            $$->addMethodDecl(*$8); 
+        }
     }     
     ;
     
 interface
-    : INTERFACE ident LBRACE method_prototype_list RBRACE
+    : INTERFACE ident LBRACE opt_method_prototype_list RBRACE
     {
         $$ = new Decaf::IrInterface(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2)); 
     }
@@ -223,6 +255,17 @@ field_decl
     }
     ;
 
+opt_method_decl_list
+    : // empty
+    {
+        $$ = nullptr;
+    }
+    | method_decl_list
+    {
+        $$ = $1;
+    }
+    ;
+
 method_decl_list 
     : method_decl 
     { 
@@ -235,6 +278,17 @@ method_decl_list
     }
     ;
     
+opt_argument_decl_list
+    : // empty
+    {
+        $$ = nullptr;
+    }
+    | argument_decl_list
+    {
+        $$ = $1;
+    }
+    ;
+
 argument_decl_list 
     : argument_decl 
     { 
@@ -263,29 +317,27 @@ argument_decl
     ;
     
 method_signature
-    : type ident LPAREN argument_decl_list RPAREN 
-    { 
-        $$ = new Decaf::IrMethodDecl(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2), (Decaf::IrType)$1); 
-        for (auto it : *$4)
-        {
-            $$->addArgument(IrVariableDeclPtr(it));
-        }
-    }
-    | type ident LPAREN RPAREN 
+    : type ident LPAREN opt_argument_decl_list RPAREN 
     { 
         $$ = new Decaf::IrMethodDecl(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2), (Decaf::IrType)$1);
-    }
-    | ident ident LPAREN argument_decl_list RPAREN
-    { 
-        $$ = new Decaf::IrMethodDecl(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2), Decaf::IrType::Class); 
-        for (auto it : *$4)
+        if ($4 != nullptr)
         {
-            $$->addArgument(IrVariableDeclPtr(it));
+            for (auto it : *$4)
+            {
+                $$->addArgument(IrVariableDeclPtr(it));
+            }
         }
     }
-    | ident ident LPAREN RPAREN 
+    | ident ident LPAREN opt_argument_decl_list RPAREN
     { 
-        $$ = new Decaf::IrMethodDecl(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2), Decaf::IrType::Class);
+        $$ = new Decaf::IrMethodDecl(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($2), Decaf::IrType::Class); 
+        if ($4 != nullptr)
+        {
+            for (auto it : *$4)
+            {
+                $$->addArgument(IrVariableDeclPtr(it));
+            }
+        }
     }
     ;
 
@@ -294,6 +346,11 @@ method_decl
     {
         $1->addBlock(IrBlockPtr($2));
     }
+    ;
+
+opt_method_prototype_list
+    : // empty
+    | method_prototype_list
     ;
 
 method_prototype_list
@@ -306,25 +363,22 @@ method_prototype
     ;
 
 block 
-    : LBRACE var_decl_list statement_list RBRACE 
+    : LBRACE var_decl_list opt_statement_list RBRACE 
     { 
         $$ = new Decaf::IrBlock(@1.first_line, @1.first_column, d_scanner.filename()); 
         $$->addVariableDecl(*$2); 
-        $$->addStatements(*$3); 
+        if ($3 != nullptr)
+        {
+            $$->addStatements(*$3); 
+        }
     }
-    | LBRACE statement_list RBRACE 
+    | LBRACE opt_statement_list RBRACE 
     {
         $$ = new Decaf::IrBlock(@1.first_line, @1.first_column, d_scanner.filename()); 
-        $$->addStatements(*$2); 
-    }
-    | LBRACE var_decl_list RBRACE 
-    { 
-        $$ = new Decaf::IrBlock(@1.first_line, @1.first_column, d_scanner.filename()); 
-        $$->addVariableDecl(*$2); 
-    }
-    | LBRACE RBRACE 
-    { 
-        $$ = new Decaf::IrBlock(@1.first_line, @1.first_column, d_scanner.filename()); 
+        if ($2 != nullptr)
+        {
+            $$->addStatements(*$2); 
+        }
     }
     ;
 
@@ -368,16 +422,33 @@ case_list
     ;
 
 case_statement
-    : CASE int_literal COLON statement_list
+    : CASE int_literal COLON opt_statement_list
     {
         $$ = new Decaf::IrCaseStatement(@1.first_line, @1.first_column, d_scanner.filename(), IrIntegerLiteralPtr($2));
-        $$->addStatements(*$4); 
+        if ($4 != nullptr)
+        {
+            $$->addStatements(*$4); 
+        }
     }
-    | DEFAULT COLON statement_list
+    | DEFAULT COLON opt_statement_list
     {
         $$ = new Decaf::IrCaseStatement(@1.first_line, @1.first_column, d_scanner.filename());
-        $$->addStatements(*$3); 
+        if ($3 != nullptr)
+        {
+            $$->addStatements(*$3); 
+        }
     }
+    ;
+
+opt_statement_list
+    : // empty
+    {
+        $$ = nullptr;
+    }
+    | statement_list
+    {
+        $$ = $1;
+    }   
     ;
 
 statement_list 
@@ -519,30 +590,28 @@ assign_op
     ;
     
 method_call 
-    : ident LPAREN expr_list RPAREN 
+    : ident LPAREN opt_expr_list RPAREN 
     { 
         $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($1), Decaf::IrType::Unknown);
-        for (auto it : *$3) 
+        if ($3 != nullptr)
         {
-            $$->addArgument(IrExpressionPtr(it));
+            for (auto it : *$3) 
+            {
+                $$->addArgument(IrExpressionPtr(it));
+            }
         }
     }
-    | ident LPAREN RPAREN 
-    { 
-        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($1), Decaf::IrType::Unknown); 
-    }
-    | ident DOT ident LPAREN expr_list RPAREN
+    | ident DOT ident LPAREN opt_expr_list RPAREN
     {
         $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($1), Decaf::IrType::Unknown);
-        for (auto it : *$5) 
+        if ($5 != nullptr)
         {
-            $$->addArgument(IrExpressionPtr(it));
+            for (auto it : *$5) 
+            {
+                $$->addArgument(IrExpressionPtr(it));
+            }
         }
     }
-    | ident DOT ident LPAREN RPAREN
-    {
-        $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($1), Decaf::IrType::Unknown); 
-    }    
     | ident LBRACKET expr RBRACKET DOT ident LPAREN RPAREN
     {
         $$ = new Decaf::IrMethodCall(@1.first_line, @1.first_column, d_scanner.filename(), IrIdentifierPtr($1), Decaf::IrType::Unknown); 
@@ -739,6 +808,17 @@ expr
     }
     ;
 
+opt_expr_list
+    : // empty
+    {
+        $$ = nullptr;
+    }
+    | expr_list
+    {
+        $$ = $1;
+    }
+    ;
+
 expr_list 
     : expr 
     { 
@@ -796,10 +876,10 @@ int_literal
     ;
     
 literal 
-	: int_literal
-	{
-		$$ = $1;
-	}
+    : int_literal
+    {
+        $$ = $1;
+    }
     | BOOLEAN 
     { 
         $$ = new Decaf::IrBooleanLiteral(@1.first_line, @1.first_column, d_scanner.filename(), d_scanner.matched()); 
