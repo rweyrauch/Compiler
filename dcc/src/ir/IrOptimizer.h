@@ -61,16 +61,19 @@ protected:
     std::vector<IrBasicBlockPtr> m_blocks;
     std::vector<IrTacStmt> m_statements;
    
+    struct ControlFlowNode;
+    typedef std::shared_ptr<ControlFlowNode> ControlFlowNodePtr;
+    
     // A node in the control flow graph, a block and a list of all of its following blocks.
     struct ControlFlowNode
     {
         IrBasicBlockPtr m_block;
-        std::vector<ControlFlowNode*> m_next_nodes, m_previous_nodes;
+        std::vector<ControlFlowNodePtr> m_next_nodes, m_previous_nodes;
     };
     
-    std::list<ControlFlowNode*> m_control_graphs; // each function gets its own graph
+    std::list<ControlFlowNodePtr> m_control_graphs; // each function gets its own graph
  
-    void insertBlock(IrBasicBlockPtr block, ControlFlowNode* graph);
+    void insertBlock(IrBasicBlockPtr block, ControlFlowNodePtr graph);
      
 private:
     IrOptimizer(const IrOptimizer& rhs) = delete;

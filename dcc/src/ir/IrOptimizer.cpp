@@ -64,17 +64,17 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
         // Create a root control graph for each function/procedure in the block list.
         if (stmts.front().m_opcode == IrOpcode::FBEGIN)
         {
-            ControlFlowNode* node = new ControlFlowNode;
+            ControlFlowNodePtr node(new ControlFlowNode);
             node->m_block = *it;           
             m_control_graphs.push_back(node);
         }
         else 
         {
-			if (!m_control_graphs.empty()) 
-			{
-				insertBlock(*it, m_control_graphs.back());
-			}
-		}  
+            if (!m_control_graphs.empty()) 
+            {
+                insertBlock(*it, m_control_graphs.back());
+            }
+        }  
     }
 }
 
@@ -153,8 +153,12 @@ void IrOptimizer::print(std::ostream& stream)
     }
 }
 
-void IrOptimizer::insertBlock(IrBasicBlockPtr block, ControlFlowNode* graph)
+void IrOptimizer::insertBlock(IrBasicBlockPtr block, ControlFlowNodePtr graph)
 {
+    ControlFlowNodePtr node(new ControlFlowNode);
+    node->m_block = block;           
+
+    graph->
 }
 
 } // namespace Decaf
