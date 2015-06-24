@@ -21,12 +21,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+#include <cstring>
 #include "IrOptimizer.h"
 #include "IrBasicBlock.h"
 
 namespace Decaf
 {
-	
+
 void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
 {
     m_statements = statements;
@@ -55,43 +56,28 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
         }
     }
     
-    // Generate control flow graph from list of blocks
-    for (auto it = m_blocks.cbegin(); it != m_blocks.cend(); ++it)
+    // Generate adjacency matrix from list of blocks
+    const size_t N = m_blocks.size();
+    m_blockAdjacencyMat = std::unique_ptr<unsigned short>(new unsigned short[N*N]);
+    memset(m_blockAdjacencyMat.get(), 0, sizeof(unsigned short) * N * N);
+    int n = 0;
+    for (auto it : m_blocks)
     {
-        const std::vector<IrTacStmt>& stmts = (*it)->getStatements();
+        const std::vector<IrTacStmt>& stmts = it->getStatements();
         if (stmts.empty()) continue;
         
-        // Create a root control graph for each function/procedure in the block list.
-        if (stmts.front().m_opcode == IrOpcode::FBEGIN)
-        {
-            ControlFlowNodePtr node(new ControlFlowNode);
-            node->m_block = *it;           
-            m_control_graphs.push_back(node);
-        }
-        else 
-        {
-            if (!m_control_graphs.empty()) 
-            {
-                insertBlock(*it, m_control_graphs.back());
-            }
-        }  
+        
+        n++;
     }
 }
 
 void IrOptimizer::basicBlocksOptimizations(IrBasicBlockOpts which)
-{
-    for (auto it : m_control_graphs)
-    {
-        it->m_block->optimize(which);
-        for (auto bit : it->m_next_nodes)
-        {
-            bit->m_block->optimize(which);
-        }
-    }
-    
+{    
     m_statements.clear();
     for (auto it : m_blocks)
     {
+        it->optimize(which);
+        
         const std::vector<IrTacStmt>& stmts = it->getStatements();
         if (stmts.empty()) continue;
         
@@ -136,29 +122,10 @@ bool IrOptimizer::isLeader(const IrTacStmt& stmt)
 
 void IrOptimizer::print(std::ostream& stream)
 {
-    //for (auto it : m_blocks)
-    //{
-    //    it->print(stream);
-    //}
-    
-    stream << "Control graph nodes." << std::endl;
-    for (auto it : m_control_graphs)
+    for (auto it : m_blocks)
     {
-        stream << "Procedure Start" << std::endl;
-        it->m_block->print(stream);
-        for (auto nit : it->m_next_nodes)
-        {
-            nit->m_block->print(stream);
-        }
+        it->print(stream);
     }
-}
-
-void IrOptimizer::insertBlock(IrBasicBlockPtr block, ControlFlowNodePtr graph)
-{
-    ControlFlowNodePtr node(new ControlFlowNode);
-    node->m_block = block;           
-
-    graph->
 }
 
 } // namespace Decaf

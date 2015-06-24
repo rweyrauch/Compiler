@@ -37,7 +37,10 @@ class IrTraversalContext;
 class IrOptimizer
 {
 public:
-    IrOptimizer()
+    IrOptimizer() :
+        m_blocks(),
+        m_statements(),
+        m_blockAdjacencyMat(nullptr)
     {}
     
     virtual ~IrOptimizer() 
@@ -61,19 +64,8 @@ protected:
     std::vector<IrBasicBlockPtr> m_blocks;
     std::vector<IrTacStmt> m_statements;
    
-    struct ControlFlowNode;
-    typedef std::shared_ptr<ControlFlowNode> ControlFlowNodePtr;
-    
-    // A node in the control flow graph, a block and a list of all of its following blocks.
-    struct ControlFlowNode
-    {
-        IrBasicBlockPtr m_block;
-        std::vector<ControlFlowNodePtr> m_next_nodes, m_previous_nodes;
-    };
-    
-    std::list<ControlFlowNodePtr> m_control_graphs; // each function gets its own graph
- 
-    void insertBlock(IrBasicBlockPtr block, ControlFlowNodePtr graph);
+    // NxN block adjacency matrix
+    std::unique_ptr<unsigned short> m_blockAdjacencyMat;
      
 private:
     IrOptimizer(const IrOptimizer& rhs) = delete;
