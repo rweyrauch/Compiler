@@ -67,7 +67,7 @@ protected:
     std::vector<IrTacStmt> m_statements;
    
     // NxN block adjacency matrix
-    unsigned short* m_blockAdjacencyMat;
+    unsigned char* m_blockAdjacencyMat;
      
 private:
     IrOptimizer(const IrOptimizer& rhs) = delete;

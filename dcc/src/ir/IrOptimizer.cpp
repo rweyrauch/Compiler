@@ -58,15 +58,14 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
     
     // Generate adjacency matrix from list of blocks
     const size_t N = m_blocks.size();
-    m_blockAdjacencyMat = new unsigned short[N*N];
-    memset(m_blockAdjacencyMat, 0, sizeof(unsigned short) * N * N);
+    m_blockAdjacencyMat = new unsigned char[N*N];
+    memset(m_blockAdjacencyMat, 0, sizeof(unsigned char) * N * N);
     size_t n = 0;
     for (auto it : m_blocks)
     {
         const std::vector<IrTacStmt>& stmts = it->getStatements();
         if (stmts.empty()) continue;
-        
-/*        
+                
         if (stmts.front().m_opcode == IrOpcode::LABEL)
         {
             // find predecessor(s)
@@ -75,12 +74,17 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
             {
                 if (ib->isLabelTargetInBlock(stmts.front().m_src0.m_asString))
                 {
-                    m_blockAdjacencyMat[n * N + nb] = 1;
+                    m_blockAdjacencyMat[n * N + nb] = 2;
                 }
                 nb++;
             }
         }
-*/        
+        else if (stmts.front().m_opcode != IrOpcode::FBEGIN)
+        {
+            if (n-1 >= 0)
+                m_blockAdjacencyMat[n * N + (n-1)] = 2;           
+        }
+       
         if (stmts.back().m_opcode == IrOpcode::JUMP)
         {
             // find next
@@ -179,13 +183,32 @@ void IrOptimizer::print(std::ostream& stream)
     }
     
     const size_t N = m_blocks.size();
+    
+    for (n = 0; n < N; n++)
+    {
+        std::cout << " ";
+        if (n >= 10) std::cout << n/10;
+        else std::cout << " ";
+    }
+    std::cout << std::endl;
+    for (n = 0; n < N; n++)
+    {
+        std::cout << " " << n%10;
+    }
+    std::cout << std::endl;
+    for (n = 0; n < N; n++)
+    {
+        std::cout << "--";
+    }
+    std::cout << std::endl;
+    
     for (n = 0; n < N; n++)
     {
         for (size_t nn = 0; nn < N; nn++)
         {
-            std::cout << " " << m_blockAdjacencyMat[n * N + nn];
+            std::cout << " " << (unsigned int)m_blockAdjacencyMat[n * N + nn];
         }
-        std::cout << std::endl;
+        std::cout << " | " << n << std::endl;
     }
 }
 
