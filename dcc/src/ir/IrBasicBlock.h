@@ -55,6 +55,8 @@ public:
     
     const std::vector<IrTacStmt>& getStatements() const { return m_statements; }
     
+    bool isLabelTargetInBlock(const std::string& label) const;
+    
     void optimize(IrBasicBlockOpts which);
         
     void print(std::ostream& stream);

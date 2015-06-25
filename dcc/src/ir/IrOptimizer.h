@@ -44,7 +44,9 @@ public:
     {}
     
     virtual ~IrOptimizer() 
-    {}
+    {
+        delete[] m_blockAdjacencyMat;
+    }
    
     void generateBasicBlocks(const std::vector<IrTacStmt>& statements);
     void basicBlocksOptimizations(IrBasicBlockOpts which);
@@ -65,7 +67,7 @@ protected:
     std::vector<IrTacStmt> m_statements;
    
     // NxN block adjacency matrix
-    std::unique_ptr<unsigned short> m_blockAdjacencyMat;
+    unsigned short* m_blockAdjacencyMat;
      
 private:
     IrOptimizer(const IrOptimizer& rhs) = delete;
