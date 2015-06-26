@@ -40,7 +40,8 @@ public:
     IrOptimizer() :
         m_blocks(),
         m_statements(),
-        m_blockAdjacencyMat(nullptr)
+        m_blockAdjacencyMat(nullptr),
+        m_controlFlowGraphRoots()
     {}
     
     virtual ~IrOptimizer() 
@@ -68,7 +69,8 @@ protected:
    
     // NxN block adjacency matrix
     unsigned char* m_blockAdjacencyMat;
-     
+    std::vector<unsigned char> m_controlFlowGraphRoots;
+    
 private:
     IrOptimizer(const IrOptimizer& rhs) = delete;
 };

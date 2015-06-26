@@ -52,6 +52,7 @@ public:
     {
         m_statements.push_back(tac);
     }
+    bool isEmpty() const { return m_statements.empty(); }
     
     const std::vector<IrTacStmt>& getStatements() const { return m_statements; }
     

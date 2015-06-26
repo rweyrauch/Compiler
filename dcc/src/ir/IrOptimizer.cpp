@@ -42,8 +42,12 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
         // start a new block when a leader statement is found
         if (isLeader(it))
         {
-            curBlock = IrBasicBlockPtr(new IrBasicBlock());
-            m_blocks.push_back(curBlock);
+            // create a new block if needed
+            if (!curBlock->isEmpty())
+            {
+                curBlock = IrBasicBlockPtr(new IrBasicBlock());
+                m_blocks.push_back(curBlock);
+            }
         }
         
         curBlock->append(it);
@@ -57,6 +61,8 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
     }
     
     // Generate adjacency matrix from list of blocks
+    m_controlFlowGraphRoots.clear();
+    
     const size_t N = m_blocks.size();
     m_blockAdjacencyMat = new unsigned char[N*N];
     memset(m_blockAdjacencyMat, 0, sizeof(unsigned char) * N * N);
@@ -79,7 +85,12 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
                 nb++;
             }
         }
-        else if (stmts.front().m_opcode != IrOpcode::FBEGIN)
+        else if (stmts.front().m_opcode == IrOpcode::FBEGIN)
+        {
+            // root of a control flow graph
+            m_controlFlowGraphRoots.push_back(n);
+        }
+        else
         {
             if (n-1 >= 0)
                 m_blockAdjacencyMat[n * N + (n-1)] = 2;           
@@ -176,11 +187,18 @@ void IrOptimizer::print(std::ostream& stream)
     std::cout << "---------------------------" << std::endl;
     for (auto it : m_blocks)
     {
-        std::cout << "Block[" << n << "]:" << std::endl;
+        std::cout << "Block[" << n << "]:  NumStatements: " << it->getStatements().size() << std::endl;
         it->print(stream);
         std::cout << "---------------------------" << std::endl;
         n++;
     }
+    
+    std::cout << "Control Flow Graph Roots: ";
+    for (auto it : m_controlFlowGraphRoots)
+    {
+        std::cout << (unsigned int)it << " ";
+    }
+    std::cout << std::endl;
     
     const size_t N = m_blocks.size();
     
