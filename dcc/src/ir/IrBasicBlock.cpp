@@ -575,19 +575,34 @@ void IrBasicBlock::print(std::ostream& stream)
     }
 }
 
-bool IrBasicBlock::isLabelTargetInBlock(const std::string& label) const
+bool IrBasicBlock::isLabelUsedInBlock(const std::string& label) const
+{
+    bool found = false;
+    
+    for (auto it = m_statements.rbegin(); it != m_statements.rend(); ++it)
+    {
+        if (it->m_opcode == IrOpcode::JUMP)
+        {
+            found = (it->m_src0.m_asString == label);
+        }
+        else if (it->m_opcode == IrOpcode::IFZ || it->m_opcode == IrOpcode::IFNZ)
+        {
+            found = (it->m_src1.m_asString == label);
+        }
+        if (found) break;
+    }
+    return found;
+}
+
+bool IrBasicBlock::isLabelDefinedInBlock(const std::string& label) const
 {
     bool found = false;
     
     for (auto it : m_statements)
     {
-        if (it.m_opcode == IrOpcode::JUMP)
+        if (it.m_opcode == IrOpcode::LABEL)
         {
             found = (it.m_src0.m_asString == label);
-        }
-        else if (it.m_opcode == IrOpcode::IFZ || it.m_opcode == IrOpcode::IFNZ)
-        {
-            found = (it.m_src1.m_asString == label);
         }
         if (found) break;
     }

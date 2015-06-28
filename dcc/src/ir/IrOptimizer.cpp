@@ -75,14 +75,24 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
         if (stmts.front().m_opcode == IrOpcode::LABEL)
         {
             // find predecessor(s)
+            bool found = false;
             int nb = 0;
             for (auto ib : m_blocks)
             {
-                if (ib->isLabelTargetInBlock(stmts.front().m_src0.m_asString))
+                if (ib->isLabelUsedInBlock(stmts.front().m_src0.m_asString))
                 {
                     m_blockAdjacencyMat[n * N + nb] = 2;
+                    found = true;
                 }
                 nb++;
+            }
+            if (!found)
+            {
+                // then n-1 is the previous block
+                if (n-1>=0)
+                {
+                    m_blockAdjacencyMat[n * N + (n-1)] = 2;
+                }
             }
         }
         else if (stmts.front().m_opcode == IrOpcode::FBEGIN)
@@ -102,7 +112,7 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
             size_t nb = 0;
             for (auto ib : m_blocks)
             {
-                if (ib->isLabelTargetInBlock(stmts.back().m_src0.m_asString))
+                if (ib->isLabelDefinedInBlock(stmts.back().m_src0.m_asString))
                 {
                     m_blockAdjacencyMat[n * N + nb] = 1;
                 }
@@ -111,12 +121,14 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
         }
         else if (stmts.back().m_opcode == IrOpcode::IFZ || stmts.back().m_opcode == IrOpcode::IFNZ)
         {
-            if (n+1 < N)
+            if (n+1 < N) 
+            {
                 m_blockAdjacencyMat[n * N + (n+1)] = 1;
+            }
             size_t nb = 0;
             for (auto ib : m_blocks)
             {
-                if (ib->isLabelTargetInBlock(stmts.back().m_src1.m_asString))
+                if (ib->isLabelDefinedInBlock(stmts.back().m_src1.m_asString))
                 {
                     m_blockAdjacencyMat[n * N + nb] = 1;
                 }
@@ -126,7 +138,9 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
         else if (stmts.back().m_opcode != IrOpcode::RETURN)
         {
             if (n+1 < N)
+            {
                 m_blockAdjacencyMat[n * N + (n+1)] = 1;                
+            }
         }
         n++;
     }
