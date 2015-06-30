@@ -183,6 +183,7 @@ class Parser: public ParserBase
                     d_optimizer->globalCommonSubexpressionElimination();
                 }
             }
+            d_optimizer->generateStatements();
             
             if (m_enableBasicBlocksOutput) d_optimizer->print();
                         

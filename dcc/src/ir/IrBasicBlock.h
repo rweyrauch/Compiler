@@ -42,7 +42,9 @@ public:
     IrBasicBlock() :
         m_statements(),
         m_next_value_number(42),
-        m_verbose(false)
+        m_verbose(false),
+        m_gen(),
+        m_kill()
     {}
     
     virtual ~IrBasicBlock() 
@@ -60,7 +62,8 @@ public:
     bool isLabelDefinedInBlock(const std::string& label) const;
     
     void optimize(IrBasicBlockOpts which);
-        
+    void generateDefinitions();  
+    
     void print(std::ostream& stream);
     
 protected:
@@ -114,9 +117,13 @@ protected:
         
     int m_next_value_number;
     
-    int getValueNumber(const std::string& ident, std::unordered_map<std::string, int>& variable_value_map);
-    
     bool m_verbose;
+
+    std::map<std::string, IrTacStmt> m_gen, m_kill;
+    
+protected:
+    
+    int getValueNumber(const std::string& ident, std::unordered_map<std::string, int>& variable_value_map);
     
     void constantFolding();
     void algebraicSimplification();

@@ -52,7 +52,8 @@ public:
     void generateBasicBlocks(const std::vector<IrTacStmt>& statements);
     void basicBlocksOptimizations(IrBasicBlockOpts which);
     void globalCommonSubexpressionElimination();
-
+    void generateStatements();
+    
     const std::vector<IrTacStmt>& getOptimizedStatements() const { return m_statements; }
     
     void print(std::ostream& stream = std::cout);
@@ -62,6 +63,8 @@ protected:
     bool isLeader(const IrTacStmt& stmt);
     bool isLeaderPost(const IrTacStmt& stmt);
 
+    void printControlFlowGraphs(std::ostream& stream);
+    
 protected:
     
     std::vector<IrBasicBlockPtr> m_blocks;
@@ -69,7 +72,7 @@ protected:
    
     // NxN block adjacency matrix
     unsigned char* m_blockAdjacencyMat;
-    std::vector<unsigned char> m_controlFlowGraphRoots;
+    std::vector<unsigned int> m_controlFlowGraphRoots;
     
 private:
     IrOptimizer(const IrOptimizer& rhs) = delete;

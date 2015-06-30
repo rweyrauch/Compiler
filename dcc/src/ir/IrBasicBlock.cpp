@@ -222,6 +222,21 @@ void IrBasicBlock::optimize(IrBasicBlockOpts which)
         deadCodeElimination(); 
 }
 
+void IrBasicBlock::generateDefinitions()
+{
+    m_gen.clear();
+    m_kill.clear();
+    
+    for (auto it = m_statements.begin(); it != m_statements.end(); ++it)
+    {
+        if (!isBinaryOp(it->m_opcode) && !isMoveOp(it->m_opcode) && !isLogicOp(it->m_opcode))
+        {
+            continue;
+        }
+        
+    }
+}
+
 void IrBasicBlock::constantFolding()
 {
     for (auto it = m_statements.begin(); it != m_statements.end(); ++it)

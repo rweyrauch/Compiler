@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 #include <cstring>
+#include <cassert>
 #include "IrOptimizer.h"
 #include "IrBasicBlock.h"
 
@@ -88,7 +89,7 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
             }
             if (!found)
             {
-                // then n-1 is the previous block
+                // then n-1 is the previous block, label not used
                 if (n-1>=0)
                 {
                     m_blockAdjacencyMat[n * N + (n-1)] = 2;
@@ -115,7 +116,7 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
                 if (ib->isLabelDefinedInBlock(stmts.back().m_src0.m_asString))
                 {
                     m_blockAdjacencyMat[n * N + nb] = 1;
-                }
+                 }
                 nb++;
             }            
         }
@@ -140,7 +141,7 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
             if (n+1 < N)
             {
                 m_blockAdjacencyMat[n * N + (n+1)] = 1;                
-            }
+             }
         }
         n++;
     }
@@ -148,11 +149,31 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
 
 void IrOptimizer::basicBlocksOptimizations(IrBasicBlockOpts which)
 {    
-    m_statements.clear();
     for (auto it : m_blocks)
     {
         it->optimize(which);
-        
+    }        
+}
+
+void IrOptimizer::globalCommonSubexpressionElimination()
+{
+    for (auto ig : m_controlFlowGraphRoots)
+    {
+        std::cout << "Root: " << ig << std::endl;  
+    }
+    
+    for (auto it : m_blocks)
+    {
+        it->generateDefinitions();
+    }
+    
+}
+
+void IrOptimizer::generateStatements()
+{
+    m_statements.clear();
+    for (auto it : m_blocks)
+    {
         const std::vector<IrTacStmt>& stmts = it->getStatements();
         if (stmts.empty()) continue;
         
@@ -161,10 +182,6 @@ void IrOptimizer::basicBlocksOptimizations(IrBasicBlockOpts which)
             m_statements.push_back(sit);
         }
     }        
-}
-
-void IrOptimizer::globalCommonSubexpressionElimination()
-{
 }
 
 bool IrOptimizer::isLeaderPost(const IrTacStmt& stmt)
@@ -198,50 +215,56 @@ bool IrOptimizer::isLeader(const IrTacStmt& stmt)
 void IrOptimizer::print(std::ostream& stream)
 {
     size_t n = 0;
-    std::cout << "---------------------------" << std::endl;
+    stream << "---------------------------" << std::endl;
     for (auto it : m_blocks)
     {
-        std::cout << "Block[" << n << "]:  NumStatements: " << it->getStatements().size() << std::endl;
+        stream << "Block[" << n << "]:  NumStatements: " << it->getStatements().size() << std::endl;
         it->print(stream);
-        std::cout << "---------------------------" << std::endl;
+        stream << "---------------------------" << std::endl;
         n++;
     }
     
-    std::cout << "Control Flow Graph Roots: ";
+    printControlFlowGraphs(stream);
+}
+
+void IrOptimizer::printControlFlowGraphs(std::ostream& stream)
+{
+    size_t n = 0;
+    stream << "Control Flow Graph Roots: ";
     for (auto it : m_controlFlowGraphRoots)
     {
-        std::cout << (unsigned int)it << " ";
+        stream << (unsigned int)it << " ";
     }
-    std::cout << std::endl;
+    stream << std::endl;
     
     const size_t N = m_blocks.size();
     
     for (n = 0; n < N; n++)
     {
-        std::cout << " ";
-        if (n >= 10) std::cout << n/10;
-        else std::cout << " ";
+        stream << " ";
+        if (n >= 10) stream << n/10;
+        else stream << " ";
     }
-    std::cout << std::endl;
+    stream << std::endl;
     for (n = 0; n < N; n++)
     {
-        std::cout << " " << n%10;
+        stream << " " << n%10;
     }
-    std::cout << std::endl;
+    stream << std::endl;
     for (n = 0; n < N; n++)
     {
-        std::cout << "--";
+        stream << "--";
     }
-    std::cout << std::endl;
+    stream << std::endl;
     
     for (n = 0; n < N; n++)
     {
         for (size_t nn = 0; nn < N; nn++)
         {
-            std::cout << " " << (unsigned int)m_blockAdjacencyMat[n * N + nn];
+            stream << " " << (unsigned int)m_blockAdjacencyMat[n * N + nn];
         }
-        std::cout << " | " << n << std::endl;
-    }
+        stream << " | " << n << std::endl;
+    }    
 }
 
 } // namespace Decaf
