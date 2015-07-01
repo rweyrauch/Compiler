@@ -136,12 +136,17 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
                 nb++;
             }
         }
-        else if (stmts.back().m_opcode != IrOpcode::RETURN)
+        else if (stmts.back().m_opcode == IrOpcode::RETURN)
+        {
+            // exit of a control flow graph
+            m_controlFlowGraphExits.push_back(n);            
+        }
+        else
         {
             if (n+1 < N)
             {
                 m_blockAdjacencyMat[n * N + (n+1)] = 1;                
-             }
+            }
         }
         n++;
     }
@@ -232,6 +237,13 @@ void IrOptimizer::printControlFlowGraphs(std::ostream& stream)
     size_t n = 0;
     stream << "Control Flow Graph Roots: ";
     for (auto it : m_controlFlowGraphRoots)
+    {
+        stream << (unsigned int)it << " ";
+    }
+    stream << std::endl;
+    
+    stream << "Control Flow Graph Exits: ";
+    for (auto it : m_controlFlowGraphExits)
     {
         stream << (unsigned int)it << " ";
     }
