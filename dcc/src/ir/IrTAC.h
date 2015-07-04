@@ -169,4 +169,63 @@ void IrPrintTac(const IrTacStmt& stmt, std::ostream& stream = std::cout);
 
 void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream = std::cout);
 
+struct Key
+{
+    Key(int left, IrOpcode opcode, int right) :
+        m_left(left),
+        m_op(opcode),
+        m_right(right) {}
+    Key() :
+        m_left(0),
+        m_op(IrOpcode::NOOP),
+        m_right(0) {}
+        
+    int m_left;
+    IrOpcode m_op;
+    int m_right;
+    
+    bool operator<(const Key& lhs) const
+    {
+        if (m_left < lhs.m_left)
+            return true;
+        else if ((int)m_op < (int)lhs.m_op)
+            return true;
+        else if (m_right < lhs.m_right)
+            return true;
+        return false;
+    }
+    bool operator==(const Key& lhs) const
+    {
+        if ((m_left == lhs.m_left) &&
+            (m_op == lhs.m_op) &&
+            (m_right == lhs.m_right))
+            return true;
+        return false;
+    }
+};
+
+struct KeyHasher
+{
+    size_t operator()(const Key& key) const
+    {
+        return ((std::hash<int>()(key.m_left) ^
+                (std::hash<int>()((int)key.m_op) << 1)) >> 1) ^
+                (std::hash<int>()(key.m_right) << 1);
+    }
+};
+
+bool isBinaryOp(IrOpcode opcode);
+bool isLogicOp(IrOpcode opcode);
+bool isMoveOp(IrOpcode opcode);
+bool isTempIdentifier(const IrTacArg& arg);
+bool isIntLiteral(const IrTacArg& arg);
+bool isDoubleLiteral(const IrTacArg& arg);
+bool isBoolLiteral(const IrTacArg& arg);
+bool isIntegerZero(const IrTacArg& arg);
+bool isIntegerOne(const IrTacArg& arg);
+bool isDoubleZero(const IrTacArg& arg);
+bool isDoubleOne(const IrTacArg& arg);
+bool isTrue(const IrTacArg& arg);
+bool isFalse(const IrTacArg& arg);
+
 } // namespace Decaf

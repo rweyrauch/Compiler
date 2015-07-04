@@ -66,6 +66,8 @@ protected:
 
     void printControlFlowGraphs(std::ostream& stream);
     
+    void generateDefinitions(unsigned int root);
+
 protected:
     
     std::vector<IrBasicBlockPtr> m_blocks;

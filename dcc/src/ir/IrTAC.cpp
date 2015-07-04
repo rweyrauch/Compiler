@@ -933,4 +933,81 @@ void IrTacGenCode(const IrTacStmt& stmt, std::ostream& stream)
     
 }
 
+bool isBinaryOp(IrOpcode opcode)
+{
+    switch (opcode)
+    {
+        case IrOpcode::ADD:
+        case IrOpcode::SUB:
+        case IrOpcode::MUL:
+        case IrOpcode::DIV:
+        case IrOpcode::MOD:
+            return true;
+        default:
+            break;
+    }
+    return false;
+}
+
+bool isLogicOp(IrOpcode opcode)
+{
+    switch (opcode)
+    {
+        case IrOpcode::OR:
+        case IrOpcode::AND:
+            return true;
+        default:
+            break;
+    }
+    return false;
+}
+bool isMoveOp(IrOpcode opcode)
+{
+    return (opcode == IrOpcode::MOV);
+}
+
+bool isTempIdentifier(const IrTacArg& arg)
+{
+    if ((arg.m_usage == IrUsage::Identifier) && (arg.m_asString.find_first_of(".LC") != std::string::npos))
+        return true;
+    return false;
+}
+
+bool isIntLiteral(const IrTacArg& arg)
+{
+    return (arg.m_usage == IrUsage::Literal && arg.m_type == IrArgType::Integer);
+}
+bool isDoubleLiteral(const IrTacArg& arg)
+{
+    return (arg.m_usage == IrUsage::Literal && arg.m_type == IrArgType::Double);
+}
+bool isBoolLiteral(const IrTacArg& arg)
+{
+    return (arg.m_usage == IrUsage::Literal && arg.m_type == IrArgType::Boolean);
+}
+bool isIntegerZero(const IrTacArg& arg)
+{
+    return (arg.m_usage == IrUsage::Literal && arg.m_type == IrArgType::Integer && arg.m_value.m_int == 0);  
+}
+bool isIntegerOne(const IrTacArg& arg)
+{
+    return (arg.m_usage == IrUsage::Literal && arg.m_type == IrArgType::Integer && arg.m_value.m_int == 1);  
+}
+bool isDoubleZero(const IrTacArg& arg)
+{
+    return (arg.m_usage == IrUsage::Literal && arg.m_type == IrArgType::Double && arg.m_value.m_double == 0.0);  
+}
+bool isDoubleOne(const IrTacArg& arg)
+{
+    return (arg.m_usage == IrUsage::Literal && arg.m_type == IrArgType::Double && arg.m_value.m_double == 1.0);  
+}
+bool isTrue(const IrTacArg& arg)
+{
+    return (arg.m_usage == IrUsage::Literal && arg.m_type == IrArgType::Boolean && arg.m_value.m_int == 1);  
+}
+bool isFalse(const IrTacArg& arg)
+{
+    return (arg.m_usage == IrUsage::Literal && arg.m_type == IrArgType::Boolean && arg.m_value.m_int == 0);  
+}
+
 } // namespace Decaf

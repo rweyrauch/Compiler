@@ -69,57 +69,12 @@ public:
 protected:
     
     std::vector<IrTacStmt> m_statements;
-    
-    struct Key
-    {
-        Key(int left, IrOpcode opcode, int right) :
-            m_left(left),
-            m_op(opcode),
-            m_right(right) {}
-        Key() :
-            m_left(0),
-            m_op(IrOpcode::NOOP),
-            m_right(0) {}
             
-        int m_left;
-        IrOpcode m_op;
-        int m_right;
-        
-        bool operator<(const Key& lhs) const
-        {
-            if (m_left < lhs.m_left)
-                return true;
-            else if ((int)m_op < (int)lhs.m_op)
-                return true;
-            else if (m_right < lhs.m_right)
-                return true;
-            return false;
-        }
-        bool operator==(const Key& lhs) const
-        {
-            if ((m_left == lhs.m_left) &&
-                (m_op == lhs.m_op) &&
-                (m_right == lhs.m_right))
-                return true;
-            return false;
-        }
-    };
-    
-    struct KeyHasher
-    {
-        size_t operator()(const Key& key) const
-        {
-            return ((std::hash<int>()(key.m_left) ^
-                    (std::hash<int>()((int)key.m_op) << 1)) >> 1) ^
-                    (std::hash<int>()(key.m_right) << 1);
-        }
-    };
-        
     int m_next_value_number;
     
     bool m_verbose;
 
-    std::map<std::string, IrTacStmt> m_gen, m_kill;
+    std::vector<bool> m_gen, m_kill;
     
 protected:
     

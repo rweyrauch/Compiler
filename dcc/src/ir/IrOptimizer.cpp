@@ -63,6 +63,7 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
     
     // Generate adjacency matrix from list of blocks
     m_controlFlowGraphRoots.clear();
+    m_controlFlowGraphExits.clear();
     
     const size_t N = m_blocks.size();
     m_blockAdjacencyMat = new unsigned char[N*N];
@@ -164,14 +165,26 @@ void IrOptimizer::globalCommonSubexpressionElimination()
 {
     for (auto ig : m_controlFlowGraphRoots)
     {
-        std::cout << "Root: " << ig << std::endl;  
+        generateDefinitions(ig);  
     }
+}
+
+void IrOptimizer::generateDefinitions(unsigned int root)
+{
+    std::vector<std::string> definitions;
     
-    for (auto it : m_blocks)
+    // traverse the control flow graph rooted by 'root' building list of blocks in graph
+
+    for (auto it = m_statements.begin(); it != m_statements.end(); ++it)
     {
-        it->generateDefinitions();
+        if (!isBinaryOp(it->m_opcode) && !isMoveOp(it->m_opcode) && !isLogicOp(it->m_opcode))
+        {
+            continue;
+        }
+        
+        definitions.push_back(it->m_dst.m_asString);
     }
-    
+    std::cout << "Total definitions: " << std::endl;
 }
 
 void IrOptimizer::generateStatements()
