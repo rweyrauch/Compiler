@@ -165,26 +165,77 @@ void IrOptimizer::globalCommonSubexpressionElimination()
 {
     for (auto ig : m_controlFlowGraphRoots)
     {
-        generateDefinitions(ig);  
+        generateExpressions(ig);  
     }
 }
 
-void IrOptimizer::generateDefinitions(unsigned int root)
+int IrOptimizer::getValueNumber(const std::string& ident, std::unordered_map<std::string, int>& variable_value_map)
+{  
+    int valueNumber = -1;
+    auto ip = variable_value_map.find(ident);
+    if (ip == variable_value_map.end())
+    {
+        valueNumber = m_next_value_number++;
+        variable_value_map[ident] = valueNumber;
+    }
+    else
+    {
+        valueNumber = ip->second;
+    }
+    return valueNumber;
+}
+
+void IrOptimizer::generateExpressions(unsigned int root)
 {
-    std::vector<std::string> definitions;
+    // Value number for each variable/literal in graph.
+    std::unordered_map<std::string, int> variable_value_map;
+ 
+     // Value number for each expression in grapy.
+    std::unordered_multimap<Key, int, KeyHasher> expression_value_map;
     
     // traverse the control flow graph rooted by 'root' building list of blocks in graph
 
     for (auto it = m_statements.begin(); it != m_statements.end(); ++it)
     {
-        if (!isBinaryOp(it->m_opcode) && !isMoveOp(it->m_opcode) && !isLogicOp(it->m_opcode))
+        if (!isBinaryOp(it->m_opcode) && !isComparisonOp(it->m_opcode) && !isLogicOp(it->m_opcode))
         {
             continue;
         }
         
-        definitions.push_back(it->m_dst.m_asString);
+        // Get/create the value numbers of D, L and R    
+        it->m_src0.m_valueNumber = getValueNumber(it->m_src0.m_asString, variable_value_map);
+        it->m_src0.m_isConstant = (it->m_src0.m_usage == IrUsage::Literal);
+        
+        if (it->hasSrc1())
+        {
+            it->m_src1.m_valueNumber = getValueNumber(it->m_src1.m_asString, variable_value_map);
+            it->m_src1.m_isConstant = (it->m_src1.m_usage == IrUsage::Literal);
+        }
+        else
+        {
+            it->m_src1.m_valueNumber = -1;
+        }
+        
+        it->m_dst.m_valueNumber = getValueNumber(it->m_dst.m_asString, variable_value_map);
+        assert(it->m_dst.m_usage != IrUsage::Literal);
+        it->m_dst.m_isConstant = false;
+        
+        // Create key from opcode, L and R.
+        Key keyExpr(it->m_src0.m_valueNumber, it->m_opcode, it->m_src1.m_valueNumber);
+        
+        auto mip = expression_value_map.find(keyExpr);
+        if (mip == expression_value_map.end())
+        {
+            int value = m_next_value_number++;
+            expression_value_map.emplace(keyExpr, value);
+            
+            // Record new value for D.
+            variable_value_map[it->m_dst.m_asString] = value;
+            it->m_dst.m_valueNumber = value;
+        }
+         
     }
-    std::cout << "Total definitions: " << std::endl;
+    std::cout << "Total expressions: " << expression_value_map.size() << std::endl;
 }
 
 void IrOptimizer::generateStatements()

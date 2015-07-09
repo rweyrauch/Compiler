@@ -965,6 +965,22 @@ bool isMoveOp(IrOpcode opcode)
 {
     return (opcode == IrOpcode::MOV);
 }
+bool isComparisonOp(IrOpcode opcode)
+{
+    switch (opcode)
+    {
+        case IrOpcode::LESSEQUAL:
+        case IrOpcode::LESS:
+        case IrOpcode::GREATER:
+        case IrOpcode::GREATEREQUAL:
+        case IrOpcode::EQUAL:
+        case IrOpcode::NOTEQUAL:
+            return true;
+        default:
+            break;
+    }
+    return false;
+}
 
 bool isTempIdentifier(const IrTacArg& arg)
 {

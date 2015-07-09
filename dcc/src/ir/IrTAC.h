@@ -217,6 +217,7 @@ struct KeyHasher
 bool isBinaryOp(IrOpcode opcode);
 bool isLogicOp(IrOpcode opcode);
 bool isMoveOp(IrOpcode opcode);
+bool isComparisonOp(IrOpcode opcode);
 bool isTempIdentifier(const IrTacArg& arg);
 bool isIntLiteral(const IrTacArg& arg);
 bool isDoubleLiteral(const IrTacArg& arg);

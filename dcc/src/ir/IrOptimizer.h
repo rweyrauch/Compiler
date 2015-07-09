@@ -66,8 +66,10 @@ protected:
 
     void printControlFlowGraphs(std::ostream& stream);
     
-    void generateDefinitions(unsigned int root);
+    void generateExpressions(unsigned int root);
 
+    int getValueNumber(const std::string& ident, std::unordered_map<std::string, int>& variable_value_map);
+    
 protected:
     
     std::vector<IrBasicBlockPtr> m_blocks;
@@ -77,6 +79,8 @@ protected:
     unsigned char* m_blockAdjacencyMat;
     std::vector<unsigned int> m_controlFlowGraphRoots;
     std::vector<unsigned int> m_controlFlowGraphExits;
+        
+    int m_next_value_number;
     
 private:
     IrOptimizer(const IrOptimizer& rhs) = delete;
