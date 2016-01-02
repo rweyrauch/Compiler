@@ -27,7 +27,6 @@
 #include "IrWhileStmt.h"
 #include "IrIdentifier.h"
 #include "IrExpression.h"
-#include "IrBooleanExpr.h"
 #include "IrBlock.h"
 #include "IrGotoStmt.h"
 #include "IrTravCtx.h"

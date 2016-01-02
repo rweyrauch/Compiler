@@ -1,7 +1,4 @@
 
-%scanner Scanner.h
-%lsp-needed 
-
 %union {
     Decaf::IrProgram *programDef;
     Decaf::IrClass *classDef;

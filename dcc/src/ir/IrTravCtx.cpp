@@ -25,7 +25,6 @@
 #include <iostream>
 #include "IrTravCtx.h"
 #include "IrSymbolTable.h"
-#include "IrIdentifier.h"
 #include "IrMethodCall.h"
 #include "IrStringLiteral.h"
 #include "IrDoubleLiteral.h"

@@ -23,16 +23,13 @@
 //
 #include <iostream>
 #include <sstream>
-#include <cassert>
 #include <vector>
 #include "IrTAC.h"
-#include "IrBase.h"
 #include "IrIdentifier.h"
 #include "IrIntLiteral.h"
 #include "IrDoubleLiteral.h"
 #include "IrBoolLiteral.h"
 #include "IrStringLiteral.h"
-#include "IrExpression.h"
 
 namespace Decaf
 {

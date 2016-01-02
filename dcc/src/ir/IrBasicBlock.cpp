@@ -27,9 +27,6 @@
 #include <algorithm>
 #include <cassert>
 #include "IrBasicBlock.h"
-#include "IrTAC.h"
-#include "IrIdentifier.h"
-#include "IrLiteral.h"
 
 namespace Decaf
 {
@@ -65,7 +62,7 @@ int evaluateConstIntExpression(IrOpcode opcode, int src0, int src1)
     return value;
 }
 
-int evaluateConstDoubleExpression(IrOpcode opcode, double src0, double src1)
+double evaluateConstDoubleExpression(IrOpcode opcode, double src0, double src1)
 {
     double value = 0;
     

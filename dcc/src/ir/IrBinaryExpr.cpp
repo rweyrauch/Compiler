@@ -27,7 +27,6 @@
 #include "IrBinaryExpr.h"
 #include "IrLiteral.h"
 #include "IrLocation.h"
-#include "IrIdentifier.h"
 #include "IrTravCtx.h"
 
 namespace Decaf

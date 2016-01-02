@@ -26,7 +26,6 @@
 #include <cassert>
 #include "IrCommon.h"
 #include "IrMethodCall.h"
-#include "IrIdentifier.h"
 #include "IrStringLiteral.h"
 #include "IrLocation.h"
 #include "IrTravCtx.h"

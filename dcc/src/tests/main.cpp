@@ -26,9 +26,7 @@
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/ui/text/TextTestRunner.h>
 #include <popt.h>
-#include <string>
 #include <stdexcept>
-#include <cstdio>
 
 #include "SymbolTableTests.h"
 

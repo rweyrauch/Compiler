@@ -25,8 +25,6 @@
 #include <sstream>
 #include "IrCommon.h"
 #include "IrMethodDecl.h"
-#include "IrVarDecl.h"
-#include "IrBlock.h"
 #include "IrIntLiteral.h"
 #include "IrTravCtx.h"
 #include "IrReturnStmt.h"
@@ -153,7 +151,6 @@ bool IrMethodDecl::allocate(IrTraversalContext* ctx)
     if (m_stackSize % 16 != 0)
         m_stackSize += 8;
      
-    int argNum = 0;
     for (auto it : m_argument_list)
     {
         it->allocate(ctx);

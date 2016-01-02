@@ -24,7 +24,6 @@
 #include <iostream>
 #include "IrCommon.h"
 #include "IrProgram.h"
-#include "IrSymbolTable.h"
 #include "IrTravCtx.h"
 
 namespace Decaf

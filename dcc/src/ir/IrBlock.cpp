@@ -24,9 +24,6 @@
 #include <iostream>
 #include "IrCommon.h"
 #include "IrBlock.h"
-#include "IrVarDecl.h"
-#include "IrStatement.h"
-#include "IrSymbolTable.h"
 #include "IrTravCtx.h"
 #include "IrIntLiteral.h"
 #include "IrBoolLiteral.h"

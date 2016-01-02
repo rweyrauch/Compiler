@@ -24,7 +24,6 @@
 #include <cstring>
 #include <cassert>
 #include "IrOptimizer.h"
-#include "IrBasicBlock.h"
 
 namespace Decaf
 {

@@ -26,17 +26,12 @@
 #include <cassert>
 #include "IrCommon.h"
 #include "IrLocation.h"
-#include "IrIdentifier.h"
-#include "IrExpression.h"
 #include "IrSymbolTable.h"
 #include "IrTravCtx.h"
 #include "IrIntLiteral.h"
-#include "IrBlock.h"
-#include "IrBooleanExpr.h"
 #include "IrIfStmt.h"
 #include "IrMethodCall.h"
 #include "IrStringLiteral.h"
-#include "IrExprStmt.h"
 
 namespace Decaf
 {

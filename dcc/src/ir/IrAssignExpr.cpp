@@ -28,7 +28,6 @@
 #include "IrTravCtx.h"
 #include "IrLocation.h"
 #include "IrLiteral.h"
-#include "IrIdentifier.h"
 
 namespace Decaf
 {

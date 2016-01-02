@@ -24,7 +24,6 @@
 #include <iostream>
 #include "IrCommon.h"
 #include "IrFieldDecl.h"
-#include "IrLocation.h"
 #include "IrTravCtx.h"
 
 namespace Decaf
