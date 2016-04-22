@@ -2,7 +2,7 @@ project(Decaf)
 
 cmake_minimum_required(VERSION 2.8)
 
-set(CMAKE_MODULE_PATH "/usr/share/cmake-2.8/Modules")
+LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR})
 
 set(CMAKE_CXX_FLAGS "-g -Wall -std=c++11")
 

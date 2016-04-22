@@ -12,12 +12,9 @@ set(IR_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/ir)
 
 include_directories(
     ${IR_INCLUDE_DIR}
+    ${CPPUNIT_INCLUDE_DIRS}
     )
- 
-# Specify library paths
-link_directories(
-    )
- 
+  
 # For compilation ...
 # Specify target & source files to compile it from
 add_executable(
@@ -31,6 +28,10 @@ add_executable(
 target_link_libraries(
     testDccIr
     IrAst
-    cppunit
+    libcppunit.a
     popt
+    )
+
+# Specify library paths
+link_directories(
     )
