@@ -1,4 +1,6 @@
 
+%lsp-needed
+
 %union {
     Decaf::IrProgram *programDef;
     Decaf::IrClass *classDef;
@@ -39,7 +41,7 @@
 %token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET COMMA SEMI BANG COLON DOT
 %token MOD LOR LAND
 
-%token INCREMENT DECREMENT PLUS MINUS CEQ CNE CLT CLE CGT CGE 
+%token PLUS MINUS CEQ CNE CLT CLE CGT CGE
 %token MUL DIV
 
 %nonassoc IFX
@@ -198,9 +200,10 @@ location_list
         $$ = new std::vector<Decaf::IrLocation*>(); 
         $$->push_back($1); 
     }
-    | location_list COMMA location 
-    { 
-        $1->push_back($3); 
+    | location_list COMMA location
+    {
+        $1->push_back($3);
+        $$ = $1;
     }
     ;
         
@@ -208,11 +211,12 @@ field_decl_list
     : field_decl 
     { 
         $$ = new std::vector<std::vector<Decaf::IrFieldDecl*>>(); 
-        $$->push_back(*$<fieldDeclList>1); 
+        $$->push_back(*$1); 
     }
-    | field_decl_list field_decl 
-    { 
-        $1->push_back(*$<fieldDeclList>2); 
+    | field_decl_list field_decl
+    {
+        $1->push_back(*$2);
+        $$ = $1;
     }
     ;
     
@@ -267,11 +271,12 @@ method_decl_list
     : method_decl 
     { 
         $$ = new std::vector<Decaf::IrMethodDecl*>(); 
-        $$->push_back($<methodDecl>1); 
+        $$->push_back($1); 
     }
-    | method_decl_list method_decl 
-    { 
-        $1->push_back($<methodDecl>2); 
+    | method_decl_list method_decl
+    {
+        $1->push_back($2);
+        $$ = $1;
     }
     ;
     
@@ -290,11 +295,12 @@ argument_decl_list
     : argument_decl 
     { 
         $$ = new std::vector<Decaf::IrVariableDecl*>(); 
-        $$->push_back($<varDecl>1); 
+        $$->push_back($1); 
     }
-    | argument_decl_list COMMA argument_decl 
-    { 
-        $1->push_back($<varDecl>3); 
+    | argument_decl_list COMMA argument_decl
+    {
+        $1->push_back($3);
+        $$ = $1;
     }
     ;
 
@@ -338,10 +344,11 @@ method_signature
     }
     ;
 
-method_decl 
+method_decl
     : method_signature block
     {
         $1->addBlock(IrBlockPtr($2));
+        $$ = $1;
     }
     ;
 
@@ -383,11 +390,12 @@ var_decl_list
     : var_decl 
     { 
         $$ = new std::vector<Decaf::IrVariableDecl*>(); 
-        $$->push_back($<varDecl>1); 
+        $$->push_back($1); 
     }
-    | var_decl_list var_decl 
-    { 
-        $1->push_back($<varDecl>2); 
+    | var_decl_list var_decl
+    {
+        $1->push_back($2);
+        $$ = $1;
     }
     ;
     
@@ -415,6 +423,7 @@ case_list
     | case_list case_statement
     {
         $1->push_back($2);
+        $$ = $1;
     }
     ;
 
@@ -454,9 +463,10 @@ statement_list
         $$ = new std::vector<Decaf::IrStatement*>(); 
         $$->push_back($1); 
     }
-    | statement_list statement 
-    { 
-        $1->push_back($2); 
+    | statement_list statement
+    {
+        $1->push_back($2);
+        $$ = $1;
     }
     ;
     
@@ -493,9 +503,10 @@ ident_list
         $$ = new std::vector<IrIdentifier*>(); 
         $$->push_back($1); 
     }
-    | ident_list COMMA ident 
+    | ident_list COMMA ident
     {
-        $1->push_back($3); 
+        $1->push_back($3);
+        $$ = $1;
     }
     ;
    
@@ -846,9 +857,10 @@ expr_list
     { 
         $$ = new std::vector<Decaf::IrExpression*>(); $$->push_back($1); 
     }
-    | expr_list COMMA expr 
-    { 
-        $$->push_back($3); 
+    | expr_list COMMA expr
+    {
+        $1->push_back($3);
+        $$ = $1;
     }
     ;
     

@@ -9,10 +9,10 @@ xdigit [a-fA-F0-9]
 %%
 
 "//"[^\n]*                      ;   // comment
-"/*"                            { track_column(); begin(StartCondition__::comment); }
+"/*"                            { track_column(); begin(StartCondition_::comment); }
 
 <comment>{
-    "*/"                        { track_column(); begin(StartCondition__::INITIAL); }
+    "*/"                        { track_column(); begin(StartCondition_::INITIAL); }
     .|\n                        { track_column(); }; // c-style comment - skip
 }
 
@@ -55,17 +55,17 @@ false|true                      { track_column(); return (Parser::BOOLEAN); }
 [0][xX]                         { track_column(); error(); }
 '(\\[tn\\\"]|[^\\'\n\t\"])'     { track_column(); return (Parser::CHARACTER); }
 
-\"                              { track_column(); more(); begin(StartCondition__::string); }
+\"                              { track_column(); more(); begin(StartCondition_::string); }
 <string>{
     \"                          {
                                     track_column();
-                                    begin(StartCondition__::INITIAL);
+                                    begin(StartCondition_::INITIAL);
                                     return (Parser::STRING);
                                 }
     '{1}                        { 
                                     track_column();
                                     error();
-                                    begin(StartCondition__::INITIAL);
+                                    begin(StartCondition_::INITIAL);
                                 }                            
     \\.|[^\\\n\t\"]             { 
                                     track_column(); 
@@ -99,8 +99,6 @@ false|true                      { track_column(); return (Parser::BOOLEAN); }
 "!"                             { track_column(); return (Parser::BANG); }
 "."                             { track_column(); return (Parser::DOT); }
 
-"++"                            { track_column(); return (Parser::INCREMENT); }
-"--"                            { track_column(); return (Parser::DECREMENT); }
 
 "+"                             { track_column(); return (Parser::PLUS); }
 "-"                             { track_column(); return (Parser::MINUS); }

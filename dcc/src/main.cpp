@@ -60,7 +60,7 @@ int main(int argc, char **argv)
             scanner = new Scanner();
         }
         
-        ParserBase::LTYPE__ location;
+        ParserBase::LTYPE_ location;
         scanner->setSLoc(&location);
         
         int token = 0;

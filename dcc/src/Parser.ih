@@ -6,15 +6,15 @@
 #include "Parser.h"
 
 
-inline void Parser::error(char const *msg)
+inline void Parser::error()
 {
-    std::cerr << d_scanner.filename() << ":" << d_loc__.first_line << ":" << d_loc__.first_column << ": error: unexpected token, \'" << d_scanner.matched() << "\'" << std::endl;
+    std::cerr << d_scanner.filename() << ":" << d_loc_.first_line << ":" << d_loc_.first_column << ": error: unexpected token, \'" << d_scanner.matched() << "\'" << std::endl;
 
-    const std::string& bad_line = line((size_t)d_loc__.first_line);
+    const std::string& bad_line = line((size_t)d_loc_.first_line);
     if (bad_line.size() > 0)
     {
         std::cerr << bad_line << std::endl;
-        for (int i = 0; i < d_loc__.first_column; i++) std::cerr << " ";
+        for (int i = 0; i < d_loc_.first_column; i++) std::cerr << " ";
         std::cerr << "^";
         std::cerr << std::endl;
     }
@@ -51,10 +51,10 @@ inline int Parser::lex()
 
 inline void Parser::print()         
 {
-    print__();           // displays tokens if --print was specified
+    print_();           // displays tokens if --print was specified
 }
 
-inline void Parser::exceptionHandler__(std::exception const &exc)         
+inline void Parser::exceptionHandler(std::exception const &exc)         
 {
     throw;              // re-implement to handle exceptions thrown by actions
 }

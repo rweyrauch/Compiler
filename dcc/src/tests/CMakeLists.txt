@@ -2,10 +2,6 @@ cmake_minimum_required(VERSION 2.8)
 
 find_package(CppUnit QUIET REQUIRED)
 find_package(Popt QUIET REQUIRED)
-
-set(CMAKE_CXX_FLAGS "-Wall -std=c++11")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O2") 
   
 # Specify include directories
 set(IR_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/ir)

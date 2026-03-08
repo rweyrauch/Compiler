@@ -1,10 +1,11 @@
 project(Decaf)
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.20)
 
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR})
 
-set(CMAKE_CXX_FLAGS "-g -Wall -std=c++11")
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(ir . ${CMAKE_BUILD_DIR})
 
