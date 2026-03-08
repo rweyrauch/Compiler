@@ -412,6 +412,19 @@ const IrTacArg g_paramDoubleRegisters[NUM_DOUBLE_ARG_REGS] =
 
 void IrGenMov(const IrTacArg& src, const IrTacArg& dst, std::ostream& stream)
 {
+    // Labels are symbol addresses — must use RIP-relative leaq for PIE compatibility
+    if (src.m_usage == IrUsage::Label)
+    {
+        if (dst.isRegister())
+            stream << "leaq " << src.m_asString << "(%rip), " << dst << std::endl;
+        else
+        {
+            stream << "leaq " << src.m_asString << "(%rip), " << g_tempReg << std::endl;
+            stream << "movq " << g_tempReg << ", " << dst << std::endl;
+        }
+        return;
+    }
+
     if (src.isMemory() && dst.isMemory())
     {
         if (src.isDouble() || dst.isDouble())
@@ -470,13 +483,14 @@ void IrGenBoundsCheck(const IrTacArg& offset, int limit, int lineNo, std::ostrea
     stream << labelFail.str() << ":" << std::endl;    
     
     // puts(.BOUNDSMSG)
-    stream << "mov $.BOUNDSMSG, %rdi" << std::endl;
-    stream << "mov $.DCFFILE, %rsi" << std::endl;
+    stream << "leaq .BOUNDSMSG(%rip), %rdi" << std::endl;
+    stream << "leaq .DCFFILE(%rip), %rsi" << std::endl;
     stream << "mov $" << lineNo << ", %rdx" << std::endl;
     stream << "call printf" << std::endl;
-    
-    // abort() 
-    stream << "call abort" << std::endl;
+
+    // exit(1) — flush buffers then terminate
+    stream << "mov $1, %rdi" << std::endl;
+    stream << "call exit" << std::endl;
 
     stream << labelPass.str() << ":" << std::endl;    
 }
@@ -489,28 +503,28 @@ void IrGenLoad(const IrTacArg& baseAddr, const IrTacArg& offset, const IrTacArg&
     // load offset value into rsi/esi register
     IrGenMov(offset, g_indexRegister, stream);
         
-    stream << "movq ";
-    
-    if (baseAddr.m_usage == IrUsage::Label)
+    if (baseAddr.m_usage == IrUsage::Global)
     {
-        stream << "$" << baseAddr.m_asString;
+        // RIP-relative load for PIE compatibility
+        stream << "leaq " << baseAddr.m_asString << "(%rip), %rbx" << std::endl;
+        if (offset.m_usage == IrUsage::Literal)
+            stream << "movq " << (offset.m_value.m_address * 8) << "(%rbx), " << g_tempReg << std::endl;
+        else
+            stream << "movq (%rbx,%rsi,8), " << g_tempReg << std::endl;
     }
-    else if (baseAddr.m_usage == IrUsage::Global)
+    else
     {
-        stream << baseAddr.m_asString;
+        stream << "movq ";
+        if (baseAddr.m_usage == IrUsage::Label)
+            stream << "$" << baseAddr.m_asString;
+        if (offset.m_usage == IrUsage::Literal)
+            stream << "+(" << offset.m_value.m_address << "*8), ";
+        else if (offset.m_usage == IrUsage::Identifier)
+            stream << "(,%rsi,8), ";
+        stream << g_tempReg << std::endl;
     }
-    
-    if (offset.m_usage == IrUsage::Literal)
-    {
-        stream << "+(" << offset.m_value.m_address << "*8), "; 
-    }
-    else if (offset.m_usage == IrUsage::Identifier)
-    {
-        stream << "(,%rsi,8), ";
-    }
-    stream << g_tempReg << std::endl;
-    
-    stream << "movq " << g_tempReg << ", " << dst << std::endl;      
+
+    stream << "movq " << g_tempReg << ", " << dst << std::endl;
 }
 
 void IrGenStore(const IrTacArg& src, const IrTacArg& baseAddr, const IrTacArg& offset, int limit, int lineNo, std::ostream& stream)
@@ -524,26 +538,26 @@ void IrGenStore(const IrTacArg& src, const IrTacArg& baseAddr, const IrTacArg& o
     // load offset value into rsi/esi register
     IrGenMov(offset, g_indexRegister, stream);
 
-    stream << "movq " << g_tempReg << ",";
-    
-    if (baseAddr.m_usage == IrUsage::Label)
+    if (baseAddr.m_usage == IrUsage::Global)
     {
-        stream << "$" << baseAddr.m_asString;
+        // RIP-relative store for PIE compatibility
+        stream << "leaq " << baseAddr.m_asString << "(%rip), %rbx" << std::endl;
+        if (offset.m_usage == IrUsage::Literal)
+            stream << "movq " << g_tempReg << ", " << (offset.m_value.m_address * 8) << "(%rbx)" << std::endl;
+        else
+            stream << "movq " << g_tempReg << ", (%rbx,%rsi,8)" << std::endl;
     }
-    else if (baseAddr.m_usage == IrUsage::Global)
+    else
     {
-        stream << baseAddr.m_asString;
+        stream << "movq " << g_tempReg << ",";
+        if (baseAddr.m_usage == IrUsage::Label)
+            stream << "$" << baseAddr.m_asString;
+        if (offset.m_usage == IrUsage::Literal)
+            stream << "+(" << offset.m_value.m_address << "*8)";
+        else if (offset.m_usage == IrUsage::Identifier)
+            stream << "(,%rsi,8)";
+        stream << std::endl;
     }
-    
-    if (offset.m_usage == IrUsage::Literal)
-    {
-        stream << "+(" << offset.m_value.m_address << "*8)"; 
-    }
-    else if (offset.m_usage == IrUsage::Identifier)
-    {
-        stream << "(,%rsi,8)";
-    }
-    stream << std::endl;
 }
 
 void IrGenComparison(const IrTacStmt& stmt, std::ostream& stream)

@@ -90,7 +90,7 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
             if (!found)
             {
                 // then n-1 is the previous block, label not used
-                if (n-1>=0)
+                if (n > 0)
                 {
                     m_blockAdjacencyMat[n * N + (n-1)] = 2;
                 }
@@ -103,8 +103,8 @@ void IrOptimizer::generateBasicBlocks(const std::vector<IrTacStmt>& statements)
         }
         else
         {
-            if (n-1 >= 0)
-                m_blockAdjacencyMat[n * N + (n-1)] = 2;           
+            if (n > 0)
+                m_blockAdjacencyMat[n * N + (n-1)] = 2;
         }
        
         if (stmts.back().m_opcode == IrOpcode::JUMP)
